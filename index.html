@@ -2,7 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#05090b">
 <title>Planilandia — Un romance de muchas dimensiones</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap">
@@ -24,6 +26,18 @@
   <div id="prompt" hidden></div>
   <div id="bearing" hidden>◆</div>
   <div id="eyeHint" hidden>VISTA DEL PLANO — <b>A/D</b> girar · <b>W/S</b> avanzar · <b>V</b> volver a la lámina</div>
+</div>
+
+<div id="touch" hidden>
+  <div id="stick"><i></i></div>
+  <div id="tbtns">
+    <button data-k="KeyR" class="alt">▲</button>
+    <button data-k="KeyF" class="alt">▼</button>
+    <button data-k="KeyJ" class="sm">J</button>
+    <button data-k="KeyV" class="sm">V</button>
+    <button data-k="KeyE" class="big">E</button>
+  </div>
+  <button id="tmenu" data-k="Escape">☰</button>
 </div>
 
 <div id="caption" hidden></div>
@@ -57,7 +71,7 @@
     <h1>PLANILANDIA</h1>
     <div class="m-sub">Un romance de muchas dimensiones</div>
     <div class="m-btns" id="menuBtns"></div>
-    <div class="m-foot">Una aventura narrativa. Se recomienda sonido.<br>WASD / flechas · E interactuar · Espacio continuar · V cambiar de vista</div>
+    <div class="m-foot">Una aventura narrativa. Se recomienda sonido.<br><span class="kb">WASD / flechas · E interactuar · Espacio continuar · V cambiar de vista</span><span class="tc">Palanca para moverte · E interactuar · V cambiar de vista · toca para continuar<br>Mejor con el móvil en horizontal</span></div>
   </div>
 </div>
 <script type="module" src="src/main.js"></script>

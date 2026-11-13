@@ -56,7 +56,7 @@ export const UI = {
     const c = $('caption'); c.hidden = false; c.classList.toggle('wide', !!wide || $('dlg').hidden);
     c.innerHTML = '<span></span>';
     await this.type(c.firstChild, fmt(text), 'narr', 70);
-    c.insertAdjacentHTML('beforeend', '<small>espacio ▸</small>');
+    c.insertAdjacentHTML('beforeend', `<small>${document.body.classList.contains('touch') ? 'toca' : 'espacio'} ▸</small>`);
     await this.waitAdvance(); Audio.sfx('ui'); c.hidden = true;
   },
   // Apunte no bloqueante
@@ -111,7 +111,7 @@ export const UI = {
   // ---------- panel de minijuego ----------
   async panel(title, text, options) {
     if (this.auto) return options[0].id ?? 0;
-    const p = $('panel'), inn = $('panelIn'); p.hidden = false;
+    const p = $('panel'), inn = $('panelIn'); p.hidden = false; p.classList.add('pick'); document.body.classList.add('picking');
     inn.innerHTML = `<h3>${title}</h3><p>${fmt(text)}</p><div class="opts"></div>`;
     const pick = await new Promise(res => {
       options.forEach((o, i) => {
@@ -121,7 +121,7 @@ export const UI = {
       });
       this._pickKey = n => { if (options[n]) res(n); };
     });
-    this._pickKey = null; p.hidden = true; Audio.sfx('pick');
+    this._pickKey = null; p.hidden = true; p.classList.remove('pick'); document.body.classList.remove('picking'); Audio.sfx('pick');
     return options[pick].id ?? pick;
   },
   panelInfo(title, text) { const p = $('panel'); if (!title) { p.hidden = true; return; } if (this.auto) return; p.hidden = false; $('panelIn').innerHTML = `<h3>${title}</h3><p style="margin-bottom:0">${fmt(text)}</p>`; },
@@ -130,7 +130,7 @@ export const UI = {
   // ---------- manuscrito ----------
   journalOpen: false,
   toggleJournal(game, tab) {
-    this.journalOpen = !this.journalOpen; $('journal').hidden = !this.journalOpen;
+    this.journalOpen = !this.journalOpen; $('journal').hidden = !this.journalOpen; document.body.classList.toggle('journal', this.journalOpen);
     if (this.journalOpen) { this._game = game; this.jTab(tab || this._tab || 'ms'); Audio.sfx('ui'); }
   },
   jTab(tab) {
@@ -173,3 +173,5 @@ export const UI = {
 };
 document.querySelectorAll('.j-head [data-tab]').forEach(b => b.onclick = () => UI.jTab(b.dataset.tab));
 $('dlgMore').onclick = () => UI.advance();
+$('dlgLog').onclick = () => UI.advance();
+$('jClose').onclick = () => { if (UI.journalOpen) { UI.toggleJournal(UI._game); UI._game.paused = false; } };

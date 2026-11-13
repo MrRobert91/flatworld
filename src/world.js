@@ -328,7 +328,7 @@ export class World {
   updateCam(dt, p) {
     const cam = this.cam, f = this.focus || p || { x: 0, y: 0 };
     const k = Math.min(1, dt * 4);
-    this.shiftCur = lerp(this.shiftCur || 0, this.shift || 0, k); this.camX = lerp(this.camX, f.x + this.shiftCur, k); this.camY = lerp(this.camY, f.y, k); this.zoomCur = lerp(this.zoomCur, this.zoom, Math.min(1, dt * 2));
+    this.shiftCur = lerp(this.shiftCur || 0, this.shift || 0, k); this.camX = lerp(this.camX, f.x + this.shiftCur, k); this.shiftYCur = lerp(this.shiftYCur || 0, this.shiftY || 0, k); this.camY = lerp(this.camY, f.y + this.shiftYCur, k); this.zoomCur = lerp(this.zoomCur, this.zoom, Math.min(1, dt * 2));
     if (this.camMode === 'free' && p) {
       const F = this.free, cp = Math.cos(F.pitch), tx = p.x, ty = p.alt, tz = -p.y;
       cam.position.set(tx + Math.sin(F.yaw) * cp * F.dist, ty + Math.sin(F.pitch) * F.dist, tz + Math.cos(F.yaw) * cp * F.dist);

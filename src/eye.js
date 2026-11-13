@@ -68,7 +68,7 @@ export class Eye {
   // t: 0 = tira en el HUD, 1 = pantalla completa
   layout(t, aspect, time, stripVisible) {
     const u = this.mat.uniforms, e = t * t * (3 - 2 * t);
-    const w = 0.44 + (1 - 0.44) * e, h = (44 / innerHeight) + (1 - 44 / innerHeight) * e;
+    const sw = innerWidth < innerHeight && innerWidth < 820 ? 0.7 : 0.44, w = sw + (1 - sw) * e, h = (44 / innerHeight) + (1 - 44 / innerHeight) * e;
     const cy = (1 - (14 + 22) / innerHeight) + (0.5 - (1 - 36 / innerHeight)) * e;
     this.quad.scale.set(w, h, 1); this.quad.position.set(0.5, cy, 0);
     u.uStrip.value = 1 - e; u.uHalf.value = 0.26 + (0.022 - 0.26) * e; u.uBg.value = 0.85 + 0.15 * e;

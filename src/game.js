@@ -26,6 +26,8 @@ export class Game {
     addEventListener('pointerup', () => { this.drag = null; });
     addEventListener('pointermove', e => { if (this.drag && this.world.camMode === 'free') { const F = this.world.free; F.yaw -= (e.clientX - this.drag.x) * 0.006; F.pitch = clamp(F.pitch + (e.clientY - this.drag.y) * 0.005, 0.12, 1.5); this.drag = { x: e.clientX, y: e.clientY }; } });
     addEventListener('wheel', e => { if (this.world.camMode === 'free') this.world.free.dist = clamp(this.world.free.dist * (1 + Math.sign(e.deltaY) * 0.08), 8, 90); });
+    if (matchMedia('(pointer: coarse)').matches || new URLSearchParams(location.search).has('touch')) this.initTouch();
+    addEventListener('touchstart', () => this.initTouch(), { once: true, passive: true });
     requestAnimationFrame(t => this.frame(t));
   }
   resize() { const w = innerWidth, h = innerHeight; this.renderer.setSize(w, h, false); this.world.cam.aspect = w / h; this.world.cam.updateProjectionMatrix(); }
@@ -60,6 +62,30 @@ export class Game {
     this.keys.add(e.code);
   }
   setView(v) { this.view = v; }
+  press(code) { this.key({ code, preventDefault() { } }); }
+  release(code) { this.keys.delete(code); }
+  // controles táctiles: palanca virtual (emite WASD) y botones
+  initTouch() {
+    if (this._touch) return; this._touch = true;
+    document.body.classList.add('touch'); document.getElementById('touch').hidden = false;
+    const st = document.getElementById('stick'), knob = st.firstElementChild, codes = ['KeyW', 'KeyS', 'KeyA', 'KeyD'];
+    const set = (dx, dy) => { knob.style.transform = `translate(${dx * 40}px,${dy * 40}px)`;
+      const on = [dy < -0.38, dy > 0.38, dx < -0.38, dx > 0.38]; codes.forEach((c, i) => on[i] && this.running ? this.keys.add(c) : this.keys.delete(c)); };
+    const mv = e => { const r = st.getBoundingClientRect(); let dx = (e.clientX - r.left - r.width / 2) / (r.width / 2), dy = (e.clientY - r.top - r.height / 2) / (r.height / 2); const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } set(dx, dy); };
+    let act = false;
+    st.addEventListener('pointerdown', e => { e.preventDefault(); act = true; try { st.setPointerCapture(e.pointerId); } catch (_) { } Audio.init(); mv(e); });
+    st.addEventListener('pointermove', e => { if (act) mv(e); });
+    const end = () => { act = false; set(0, 0); }; st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end);
+    document.querySelectorAll('#touch button').forEach(b => {
+      const k = b.dataset.k;
+      b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); b.classList.add('on'); this.press(k); });
+      const up = () => { b.classList.remove('on'); this.release(k); }; b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('pointerleave', up);
+    });
+    // pellizco para acercar la cámara en el Espacio
+    let pd = 0; const cv = this.renderer.domElement;
+    cv.addEventListener('touchmove', e => { if (e.touches.length === 2 && this.world.camMode === 'free') { const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); if (pd) this.world.free.dist = clamp(this.world.free.dist * pd / d, 8, 90); pd = d; this.drag = null; } }, { passive: true });
+    cv.addEventListener('touchend', () => { pd = 0; });
+  }
   down(...codes) { return codes.some(c => this.keys.has(c)); }
 
   // ---------- utilidades de guion ----------
@@ -133,7 +159,7 @@ export class Game {
       if (p && this.running) this.movePlayer(dt, p);
       for (const f of [...this.tickers]) f(dt);
       W.eyeT = clamp(W.eyeT + (this.view === 'eye' ? 1 : -1) * dt * 1.1, 0, 1);
-      W.shift = UI.dlgOpen && innerWidth > 900 ? W.zoomCur * 0.13 : 0;
+      const land = innerWidth > innerHeight; W.shift = UI.dlgOpen && land ? W.zoomCur * 0.13 : 0; W.shiftY = UI.dlgOpen && !land ? -W.zoomCur * 0.12 : 0;
       W.update(dt, p);
       for (let i = this.timers.length - 1; i >= 0; i--) { const t = this.timers[i]; if ((t.t -= dt) <= 0) { this.timers.splice(i, 1); t.res(); } }
       for (let i = this.waiters.length - 1; i >= 0; i--) { const w = this.waiters[i]; if (w.fn()) { this.waiters.splice(i, 1); w.res(); } }

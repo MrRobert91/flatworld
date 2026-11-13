@@ -15,6 +15,14 @@ python3 -m http.server 8000     # o: npx serve
 
 three.js va incluido en `vendor/`; no hace falta instalar nada.
 
+Con Docker (nginx):
+
+```bash
+docker compose up --build       # http://localhost:8080
+# o bien
+docker build -t planilandia . && docker run --rm -p 8080:80 planilandia
+```
+
 ## Controles
 
 | Tecla | Acción |
@@ -26,6 +34,10 @@ three.js va incluido en `vendor/`; no hace falta instalar nada.
 | J | el manuscrito, los saberes y tu posición social |
 | M · Esc | sonido · menú |
 | Ratón, R / F | en Espaciolandia: mirar alrededor, subir y bajar |
+
+En móvil o tableta aparecen controles táctiles: una palanca para moverte, botones **E**, **V** y
+**J**, **▲ / ▼** en Espaciolandia (arrastra para mirar, pellizca para acercar) y un toque en
+pantalla para continuar el texto. Se juega mejor en horizontal. `?touch` los fuerza en escritorio.
 
 ## Qué hay dentro
 
