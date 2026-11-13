@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#05090b">
+<title>Planilandia — Un romance de muchas dimensiones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<div id="hud" hidden>
+  <div id="chapterTag"></div>
+  <div id="objective"></div>
+  <div id="eyeFrame"><span>EL OJO · lo que ve un planilandés</span></div>
+  <div id="keys">
+    <span><b>V</b> vista</span><span><b>J</b> manuscrito</span><span><b>M</b> sonido</span><span><b>Esc</b> menú</span>
+  </div>
+  <div id="keysFree"><span><b>ratón</b> mirar</span><span><b>WASD</b> volar</span><span><b>R</b>/<b>F</b> subir · bajar</span><span><b>J</b> manuscrito</span></div>
+  <div id="compass" title="La lluvia viene siempre del Norte">N<i></i></div>
+  <div id="prompt" hidden></div>
+  <div id="bearing" hidden>◆</div>
+  <div id="eyeHint" hidden>VISTA DEL PLANO — <b>A/D</b> girar · <b>W/S</b> avanzar · <b>V</b> volver a la lámina</div>
+</div>
+
+<div id="touch" hidden>
+  <div id="stick"><i></i></div>
+  <div id="tbtns">
+    <button data-k="KeyR" class="alt">▲</button>
+    <button data-k="KeyF" class="alt">▼</button>
+    <button data-k="KeyJ" class="sm">J</button>
+    <button data-k="KeyV" class="sm">V</button>
+    <button data-k="KeyE" class="big">E</button>
+  </div>
+  <button id="tmenu" data-k="Escape">☰</button>
+</div>
+
+<div id="caption" hidden></div>
+<div id="toasts"></div>
+
+<aside id="dlg" hidden>
+  <div id="dlgLog"></div>
+  <div id="dlgChoices"></div>
+  <div id="dlgMore" hidden>▾ continuar <small>(Espacio)</small></div>
+</aside>
+
+<div id="panel" hidden><div id="panelIn"></div></div>
+<div id="slate" hidden><canvas id="slateCv" width="640" height="420"></canvas><div id="slateCap"></div></div>
+
+<div id="titleCard" hidden><div class="tc-num"></div><div class="tc-title"></div><div class="tc-sub"></div></div>
+<div id="fade"></div>
+
+<div id="journal" hidden>
+  <div class="j-head">
+    <button data-tab="ms" class="on">El Manuscrito</button>
+    <button data-tab="know">Saberes</button>
+    <button data-tab="pos">Posición social</button>
+    <button id="jClose">cerrar ✕</button>
+  </div>
+  <div class="j-body"><div id="jList"></div><div id="jText"></div></div>
+</div>
+
+<div id="menu">
+  <div class="m-in">
+    <div class="m-over">Edwin A. Abbott · 1884</div>
+    <h1>PLANILANDIA</h1>
+    <div class="m-sub">Un romance de muchas dimensiones</div>
+    <div class="m-btns" id="menuBtns"></div>
+    <div class="m-foot">Una aventura narrativa. Se recomienda sonido.<br><span class="kb">WASD / flechas · E interactuar · Espacio continuar · V cambiar de vista</span><span class="tc">Palanca para moverte · E interactuar · V cambiar de vista · toca para continuar<br>Mejor con el móvil en horizontal</span></div>
+  </div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
