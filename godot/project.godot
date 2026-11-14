@@ -1,0 +1,42 @@
+; Planilandia — versión Godot
+config_version=5
+
+[application]
+
+config/name="Planilandia"
+config/description="Aventura narrativa basada en Flatland (E. A. Abbott, 1884)."
+config/version="2.0.0"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+boot_splash/bg_color=Color(0.02, 0.035, 0.043, 1)
+boot_splash/show_image=false
+config/icon="res://icon.png"
+
+[autoload]
+
+Snd="*res://scripts/audio.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=6
+
+[gui]
+
+theme/default_font_multichannel_signed_distance_field=false
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=false
+pointing/emulate_mouse_from_touch=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=false
+environment/defaults/default_clear_color=Color(0.02, 0.035, 0.043, 1)
+anti_aliasing/quality/msaa_3d=1
