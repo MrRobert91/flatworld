@@ -23,7 +23,35 @@ godot/tools/export.sh
 
 La exportación web es de un solo hilo: no necesita cabeceras COOP/COEP y se puede alojar en cualquier
 servidor estático. En la web los parámetros van en la URL: `?ch=6`, `?touch`.
-`godot/build/` no se versiona.
+
+`godot/build/web/` **se versiona** (es lo que despliega el Dockerfile); `godot/build/linux/` no.
+Tras cambiar el juego, vuelve a ejecutar `godot/tools/export.sh` y sube `build/web/` en el mismo commit.
+
+## Docker y despliegue
+
+La imagen sirve `build/web/` con nginx y precomprime el `.wasm` (39 MB → 10 MB en la red):
+
+```bash
+cd godot
+docker compose up --build       # http://localhost:8080
+# o bien
+docker build -t planilandia-godot . && docker run --rm -p 8080:80 planilandia-godot
+```
+
+La imagen no compila nada: sólo copia la exportación ya versionada, así que el servicio de despliegue
+no necesita Godot.
+
+**Sliplane** (u otro servicio que construya desde el repositorio):
+
+| Ajuste | Valor |
+|---|---|
+| Repositorio / rama | este repo, `main` |
+| Dockerfile | `godot/Dockerfile` |
+| Contexto de Docker | `godot` |
+| Puerto | `80` (HTTP) |
+| Comprobación de salud | `/` |
+
+No hacen falta variables de entorno ni volúmenes: la partida se guarda en el navegador de cada jugador.
 
 ## Qué cambia respecto a la versión three.js
 
@@ -44,6 +72,8 @@ Mismas mecánicas, capítulos y texto. Además:
 
 ```
 project.godot · main.tscn · export_presets.cfg
+Dockerfile · docker-compose.yml · docker/nginx.conf   imagen de la exportación web
+build/web/             exportación web (versionada)
 scripts/main.gd        arranque, menú, cadena de capítulos
 scripts/game.gd        bucle, entrada, guardado, utilidades de guion
 scripts/world.gd       mundo plano: mapa, muros, colisiones, cámara
