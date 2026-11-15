@@ -35,6 +35,14 @@ var world
 var body: MeshInstance3D
 var guts: MeshInstance3D
 var _tok := 0
+var cur_sp := 0.0        # velocidad actual (arranca y frena con suavidad)
+var pause := 0.0         # se detiene un momento (saludo, susto)
+var greet_cd := 0.0
+var look = null          # Vector2 hacia el que se vuelve cuando está quieto (quien habla)
+var talk := 0.0          # 1 mientras habla: late
+var shake := 0.0         # sacudida de dolor
+var dying := -1.0        # >= 0: animación de muerte en curso
+var phase := 0.0
 
 func setup(w, d: Dictionary) -> Ent:
 	world = w; def = d
@@ -44,7 +52,7 @@ func setup(w, d: Dictionary) -> Ent:
 	ai = d.get("ai", null); lum = d.get("lum", 1.0); solidity = 1 if d.get("solid", false) else 0
 	sway = d.get("sway", 1.0) if woman else 0.0
 	no_collide = d.get("noCollide", false); fixed_rot = d.get("fixedRot", false)
-	t = randf() * 10.0
+	t = randf() * 10.0; phase = randf() * TAU
 	body = MeshInstance3D.new(); add_child(body)
 	if d.get("spot", false):
 		is_spot = true; rad = 0.2; no_collide = true
@@ -147,20 +155,41 @@ func update(dt: float) -> void:
 		position = Vector3(x, 0, -y); rotation.y = world.time * 1.3
 		scale = Vector3.ONE * (1.0 + 0.15 * sin(world.time * 3.0))
 		return
+	greet_cd = maxf(0.0, greet_cd - dt); talk = maxf(0.0, talk - dt * 2.5); shake = maxf(0.0, shake - dt * 2.6)
+	if dying >= 0.0:
+		# herida mortal: gira sobre sí, se encoge y desaparece
+		dying += dt / 0.55
+		rot += dt * 9.0; sc = maxf(0.001, sc * (1.0 - minf(1.0, dt * 4.5)))
+		if dying >= 1.0: hid = true; no_collide = true; dying = -1.0
+		visible = not hid
+		position = Vector3(x, alt, -y); rotation.y = rot; scale = Vector3.ONE * maxf(sc, 0.0001)
+		return
 	var has_t := false; var tx := 0.0; var ty := 0.0; var sp := speed
 	if mv != null:
 		tx = mv.x; ty = mv.y; sp = mv.speed; has_t = true
+	elif pause > 0.0:
+		pause -= dt
 	elif ai != null and not frozen:
 		var a: Dictionary = ai
 		if a.type == "wander":
 			if not a.has("wait"): a.wait = randf() * 3.0
 			a.wait -= dt
 			if a.wait <= 0.0 and a.get("tgt") == null:
-				var an := randf() * TAU; var r: float = randf() * a.r
-				a.tgt = Vector2(a.home.x + cos(an) * r * a.get("sx", 1.0), a.home.y + sin(an) * r); a.life = 7.0
+				var an := randf() * TAU; var r: float = (0.35 + 0.65 * randf()) * a.r
+				a.tgt = Vector2(a.home.x + cos(an) * r * a.get("sx", 1.0), a.home.y + sin(an) * r); a.life = 9.0
 			if a.get("tgt") != null:
 				tx = a.tgt.x; ty = a.tgt.y; has_t = true; a.life -= dt
 				if a.life < 0.0: a.tgt = null; a.wait = 1.0; has_t = false
+		elif a.type == "stroll":
+			# va de un sitio a otro (puertas, esquinas, puestos) y se detiene un rato en cada uno
+			if not a.has("wait"): a.wait = randf() * 2.0
+			a.wait -= dt
+			if a.wait <= 0.0 and a.get("tgt") == null:
+				var q: Vector2 = a.pts[randi() % a.pts.size()]
+				a.tgt = q + Vector2(randf() - 0.5, randf() - 0.5) * a.get("jit", 1.6); a.life = 5.0 + a.tgt.distance_to(Vector2(x, y)) / maxf(speed, 0.5) * 1.6
+			if a.get("tgt") != null:
+				tx = a.tgt.x; ty = a.tgt.y; has_t = true; a.life -= dt
+				if a.life < 0.0: a.tgt = null; a.wait = 0.5; has_t = false
 		elif a.type == "path":
 			var p: Vector2 = a.pts[a.get("i", 0)]
 			tx = p.x; ty = p.y; has_t = true
@@ -169,17 +198,58 @@ func update(dt: float) -> void:
 			if o and Vector2(o.x - x, o.y - y).length() > a.get("dist", 2.0):
 				tx = o.x; ty = o.y; sp = a.get("speed", 5.5); has_t = true
 	if has_t:
-		var dx := tx - x; var dy := ty - y; var d := sqrt(dx * dx + dy * dy); var step := sp * dt
+		var dx := tx - x; var dy := ty - y; var d := sqrt(dx * dx + dy * dy)
+		var scripted: bool = mv != null
+		# arranca y frena; las figuras libres reducen el paso al girar y al llegar
+		var want := sp
+		if not scripted:
+			var off := absf(App.ang_diff(rot, atan2(dy, dx))) if not fixed_rot else 0.0
+			want *= clampf(1.15 - off / 1.6, 0.25, 1.0) * clampf(d / 0.8, 0.35, 1.0)
+		cur_sp = lerpf(cur_sp, want, 1.0 - exp(-dt * (14.0 if scripted else 5.0)))
+		var step := maxf(cur_sp, sp * 0.3 if scripted else 0.0) * dt
 		if d <= maxf(step, 0.05):
+			cur_sp = 0.0
 			if mv != null:
 				x = tx; y = ty
 				var tok = mv.tok; mv = null
 				arrived.emit(tok)
 			elif ai.type == "wander": ai.tgt = null; ai.wait = 1.5 + randf() * 4.0
+			elif ai.type == "stroll": ai.tgt = null; ai.wait = 2.0 + randf() * 5.0
 			elif ai.type == "path": ai.i = (ai.get("i", 0) + 1) % ai.pts.size()
 		else:
 			x += dx / d * step; y += dy / d * step
-			if not fixed_rot: rot += App.ang_diff(rot, atan2(dy, dx)) * minf(1.0, dt * 7.0)
-			if mv == null and ai != null and ai.type == "wander": world.collide(self)
+			if not fixed_rot: rot += App.ang_diff(rot, atan2(dy, dx)) * minf(1.0, dt * (9.0 if scripted else 5.5))
+			if mv == null and ai != null and ai.type in ["wander", "stroll"]: world.collide(self)
+	else:
+		cur_sp = lerpf(cur_sp, 0.0, minf(1.0, dt * 8.0))
+		# quieto: se vuelve hacia quien habla
+		if look != null and not fixed_rot and id != "yo":
+			var lv: Vector2 = look
+			if lv.distance_to(Vector2(x, y)) > 0.3: rot += App.ang_diff(rot, atan2(lv.y - y, lv.x - x)) * minf(1.0, dt * 3.5)
 	visible = not hid
-	position = Vector3(x, alt, -y); rotation.y = eff_rot(); scale = Vector3.ONE * maxf(sc, 0.0001)
+	var jx := 0.0; var jy := 0.0; var jr := 0.0
+	if shake > 0.0:
+		jx = sin(t * 71.0) * 0.07 * shake; jy = cos(t * 83.0) * 0.07 * shake; jr = sin(t * 60.0) * 0.22 * shake
+	# respiración: una figura quieta nunca está del todo quieta
+	var idle := 0.0
+	if not has_t and not woman and not fixed_rot and not frozen and id != "yo": idle = sin(t * 1.3 + phase) * 0.035
+	position = Vector3(x + jx, alt, -y - jy); rotation.y = eff_rot() + jr + idle
+	var pulse := 1.0 + 0.07 * talk * (0.5 + 0.5 * sin(t * 15.0)) + (0.02 * sin(t * 9.0) * clampf(cur_sp / 2.5, 0.0, 1.0) if not woman else 0.0)
+	scale = Vector3.ONE * maxf(sc * pulse, 0.0001)
+
+# vértices que pinchan: [posición en el mundo, gravedad]. Punta de mujer o de Isósceles: 1;
+# Equilátero: 0,45; Cuadrado: 0,3. Con más lados el ángulo ya no hiere.
+func sharp_points() -> Array:
+	var out := []
+	if is_spot or hid: return out
+	var w := world_pts()
+	if woman:
+		for q in w: out.append([q, 1.0])
+	elif def.has("iso"):
+		var sev := clampf(1.25 - float(def.iso) / 60.0, 0.45, 1.0)
+		out.append([w[0], sev])
+	elif local.size() == 3:
+		for q in w: out.append([q, 0.45])
+	elif local.size() == 4:
+		for q in w: out.append([q, 0.3])
+	return out

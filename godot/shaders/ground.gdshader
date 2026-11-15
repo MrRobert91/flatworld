@@ -1,5 +1,5 @@
 // El suelo de Planilandia: una lámina de papel milimetrado. Fibra y manchas del papel, cuadrícula fina
-// y maestra, lluvia del Norte en trazos de tinta y el marco de la lámina en los confines.
+// y maestra y el marco de la lámina en los confines.
 shader_type spatial;
 render_mode unshaded, cull_disabled, depth_draw_never, blend_mix;
 uniform vec3 u_a; uniform vec3 u_b; uniform vec3 u_line; uniform vec3 u_fog; uniform vec3 u_bg; uniform vec3 u_ink;
@@ -27,12 +27,6 @@ void fragment() {
 	float fine = max(rule(g1.x, 1.0), rule(g1.y, 1.0)) * (1.0 - smoothstep(0.035, 0.11, fwidth(vw.x)));
 	float major = max(rule(g5.x, 1.4), rule(g5.y, 1.4));
 	c = mix(c, u_line, (fine * 0.20 + major * 0.42) * inside);
-	// lluvia del Norte: trazos cortos de plumilla
-	float rx = floor(vw.x * 2.6);
-	float ry = fract(vw.y * 0.09 + TIME * 0.55 + h(vec2(rx, 1.0)));
-	float fx = fract(vw.x * 2.6);
-	float rain = smoothstep(0.86, 1.0, ry) * step(0.6, h(vec2(rx, 7.0))) * smoothstep(0.0, 0.08, fx) * smoothstep(0.22, 0.12, fx);
-	c = mix(c, u_ink, rain * u_rain * 0.42 * inside);
 	// el margen de la lámina: papel sin cuadrícula, un filete grueso y otro fino
 	c = mix(mix(u_fog, c, 0.35), c, inside);
 	float w = fwidth(d);

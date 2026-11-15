@@ -6,7 +6,7 @@ func _anger(sph: MeshInstance3D, v: float) -> void:
 
 # ============ CAP. VIII — ESPACIOLANDIA ============
 func ch8() -> void:
-	var map := town({palace = true}); map.palette = 'space'; g.set_map(map)
+	var map := town({palace = true}); g.set_map(map)   # la misma lámina de Planilandia, vista desde Arriba
 	var W := g.world
 	for b in map.buildings: W.known[b.id] = true
 	W.rebuild()
@@ -30,7 +30,8 @@ func ch8() -> void:
 	var street := [F_mujer('dama', -10, 1), F_iso('obrero', 4, 1), F_penta('medico', 18, 1)]
 	for i in 3:
 		street[i].ai = {type = 'wander', home = Vector2(-10 + i * 14, 0), r = 4.0}; street[i].speed = 1.5; g.add(street[i])
-	var sph := Space.make_sphere(); var bd := Space.backdrop(); W.add_child(sph); W.add_child(bd)
+	var sph := Space.make_sphere(); var bd := Space.backdrop(false); W.add_child(sph); W.add_child(bd)
+	g.actors['esfera'] = sph
 	var st := {free = true, time = 0.0}
 	var stop_space := g.tick(func(dt):
 		st.time += dt
@@ -39,7 +40,7 @@ func ch8() -> void:
 		if st.free:
 			var y: float = W.free.yaw
 			sph.position = sph.position.lerp(Vector3(p.x + cos(y) * 4.5, p.alt + 1.2 + sin(st.time) * 0.3, -p.y - sin(y) * 4.5 - 1), minf(1.0, dt * 3.0)))
-	g.show_strip = false; g.view_lock = true; W.cam_mode = 'free'; W.free = {yaw = 0.5, pitch = 0.42, dist = 26.0}; p.alt = 0.4; p.no_collide = true; g.alt_min = 0.4; g.alt_max = 0.4
+	g.show_strip = false; g.view_lock = true; W.cam_mode = 'free'; W.free = {yaw = 0.0, pitch = 0.5, dist = 26.0}; p.alt = 0.4; p.no_collide = true; g.alt_min = 0.4; g.alt_max = 0.4
 	ui.chapter_tag('Capítulo VIII · Espaciolandia'); Snd.drone('space')
 	await narr('Un horror indecible. Oscuridad. Luego una sensación mareante de una vista que no era ver: vi una Línea que no era Línea; un Espacio que no era Espacio. Yo era yo y no lo era.', true)
 	await narr('Grité: «¡Esto es la locura, o es el Infierno!»', true)
@@ -49,7 +50,7 @@ func ch8() -> void:
 	ui.fade(false, 2.0)
 	await g.tween(5, func(t):
 		var k := App.ease(t)
-		p.alt = 0.4 + k * 13; W.free.pitch = 0.42 + k * 0.5; W.free.dist = 26 + k * 12; W.free.yaw = 0.5 + k * 0.9)
+		p.alt = 0.4 + k * 13; W.free.pitch = 0.5 + k * 0.55; W.free.dist = 26 + k * 12; W.free.yaw = 0.0)
 	g.alt_min = 4; g.alt_max = 20
 	g.begin_scene()
 	await say('esfera', 'Mira. No con el borde de tu ojo: con todo él. Lo que hay debajo de ti es tu mundo. Entero.')
@@ -115,9 +116,10 @@ func ch8() -> void:
 	# --- los Sólidos ---
 	var cube := Space.make_cube(); W.add_child(cube)
 	var cm: ShaderMaterial = cube.material_override
+	cm.set_shader_parameter('col', Vector3(0.98, 0.96, 0.89)); cm.set_shader_parameter('edge_col', World._v3(W.pal.edge))
 	var L := 4.0; cube.scale = Vector3(0.08, 0.08, 0.08)
 	g.begin_scene()
-	cube.position = Vector3(p.x, p.alt + 0.5, -p.y - 9); W.free.yaw = 0.35; W.free.pitch = 0.35; W.free.dist = 24.0
+	cube.position = Vector3(p.x, p.alt + 0.5, -p.y - 9); W.free.yaw = 0.0; W.free.pitch = 0.35; W.free.dist = 24.0
 	await say('esfera', 'Aquí tienes un Punto.')
 	await g.tween(2, func(t): cube.scale = Vector3(lerpf(0.08, L, App.ease(t)), 0.08, 0.08))
 	Snd.sfx('know')
@@ -142,7 +144,7 @@ func ch8() -> void:
 	await say('esfera', 'No existe tal tierra. La sola idea es inconcebible.')
 	_anger(sph, 0.2)
 	# teseracto imaginado
-	var tess := Space.make_lines(Color('b79cf0')); W.add_child(tess)
+	var tess := Space.make_lines(W.ink(Color('b79cf0'))); W.add_child(tess)
 	var V := []; var E := []
 	for i in 16: V.append([1.0 if i & 1 else -1.0, 1.0 if i & 2 else -1.0, 1.0 if i & 4 else -1.0, 1.0 if i & 8 else -1.0])
 	for i in 16:
@@ -194,10 +196,11 @@ func ch8() -> void:
 # ============ CAP. IX — PUNTOLANDIA Y EL NIETO ============
 func ch9() -> void:
 	# --- visión: Puntolandia ---
-	g.set_map({bounds = {x0 = -40, y0 = -40, x1 = 40, y1 = 40}, palette = 'cell', fog = 10.0})
+	g.set_map({bounds = {x0 = -40, y0 = -40, x1 = 40, y1 = 40}, palette = 'space', fog = 10.0})
 	var W := g.world; g.spawn_player(8, -8, 2.3); var p := g.player; W.ground.visible = false
 	var pt := Space.make_point(); pt.scale = Vector3.ONE * 1.6; W.add_child(pt)
 	var sph := Space.make_sphere(); W.add_child(sph)
+	g.actors['esfera'] = sph; g.actors['punto'] = pt
 	var st := {time = 0.0, hum = 0.0}
 	var stop := g.tick(func(dt):
 		st.time += dt
@@ -208,7 +211,7 @@ func ch9() -> void:
 			st.hum = 1.4
 			var d := Vector3(p.x, p.y, p.alt).length()
 			if d < 22: Snd.tone(880, 0.5, 'sine', snappedf(0.05 * (1 - d / 22), 0.01) + 0.005))
-	g.show_strip = false; g.view_lock = true; W.cam_mode = 'free'; W.free = {yaw = 0.8, pitch = 0.3, dist = 16.0}; p.alt = 5; p.no_collide = true; g.alt_min = 1; g.alt_max = 14
+	g.show_strip = false; g.view_lock = true; W.cam_mode = 'free'; W.free = {yaw = 0.0, pitch = 0.3, dist = 16.0}; p.alt = 5; p.no_collide = true; g.alt_min = 1; g.alt_max = 14
 	ui.chapter_tag('Capítulo IX · Hacia Arriba, no hacia el Norte'); Snd.drone('dream')
 	ui.fade(false, 0.5)
 	await ui.title('Capítulo IX', 'Hacia Arriba, no hacia el Norte', 'Donde se visita el reino más pequeño y más feliz, y se pierde a un discípulo.')

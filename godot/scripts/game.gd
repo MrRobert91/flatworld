@@ -37,6 +37,10 @@ var need_act := ""       # un minijuego pide el botón de acción (con esta etiq
 var need_stick := false  # ídem para la palanca
 var on_menu := Callable()
 var epoch := 0
+var actors := {}         # quién habla → Ent o Node3D, cuando no coincide con el id de una figura
+var talk_ent = null      # la figura con la que se conversa ahora
+var hurt_cd := 0.0
+var stun := 0.0
 var _fwd := 0.0
 
 static func fresh() -> Dictionary:
@@ -159,7 +163,67 @@ func other_held() -> bool:
 var player: Ent:
 	get: return world.ents.get("yo")
 
+# ---------- quién habla ----------
+# La interfaz avisa de cada parlamento: la figura que habla late y emite ondas, las demás se vuelven
+# hacia ella y la cámara se le acerca. who = "" cuando calla todo el mundo.
+func speaking(who: String) -> void:
+	var W := world
+	var e = null
+	if who == "yo": e = player
+	elif who == "voces":
+		# la multitud: todos los que rodean al jugador laten a la vez
+		var p := player
+		if p != null:
+			for o in W.ents.values():
+				if o != p and not o.hid and Vector2(o.x - p.x, o.y - p.y).length() < 18.0: o.talk = 1.6 + randf() * 0.8
+	elif who != "" and who != "narr" and not (ui.SPEAKERS.get(who, {}).get("cls", "") == "inner"):
+		if actors.has(who) and is_instance_valid(actors[who]): e = actors[who]
+		elif W.ents.has(who): e = W.ents[who]
+		elif talk_ent != null and is_instance_valid(talk_ent): e = talk_ent
+	W.talker = e
+	# el jugador mira a quien le habla
+	var p := player
+	if p != null and e != null and e != p and busy and W.cam_mode == "follow" and view == "top" and not p.fixed_rot and p.mv == null:
+		var tp = W.talker_pos()
+		if tp != null and (tp as Vector2).distance_to(Vector2(p.x, p.y)) > 0.5:
+			var want := atan2(tp.y - p.y, tp.x - p.x); var from := p.rot; var ep := epoch
+			tween(0.35, func(t):
+				var q := player   # se consulta cada vez: el jugador puede cambiar con el mapa
+				if ep == epoch and q != null: q.rot = from + App.ang_diff(from, want) * App.ease(t))
+
+# un pinchazo: retroceso, sacudida y chispas. sev 1 = punta de mujer o de Isósceles
+func hurt(sev: float, at: Vector2) -> void:
+	var p := player
+	if p == null or hurt_cd > 0.0: return
+	hurt_cd = 0.9
+	var away := Vector2(p.x - at.x, p.y - at.y)
+	away = away.normalized() if away.length() > 0.01 else Vector2(0, -1)
+	vel = away * (3.5 + 6.5 * sev); stun = 0.12 + 0.3 * sev
+	p.shake = maxf(p.shake, 0.35 + 0.65 * sev)
+	world.fx_add("spark", at.x, at.y, 0.3 + 0.25 * sev, 0.55 + 0.65 * sev)
+	world.shake = maxf(world.shake, 0.5 * sev)
+	if sev >= 0.8:
+		Snd.sfx("stab"); Input.vibrate_handheld(90); ui.flash(0.24)
+		world.fx_add("puff", p.x, p.y, 0.5, 0.6)
+	else:
+		Snd.tone(520.0 - 180.0 * sev, 0.09, "square", 0.05 + 0.06 * sev); Input.vibrate_handheld(25)
+		if sev >= 0.4: ui.flash(0.12)
+
+func _check_pricks(p: Ent, hits: Array) -> void:
+	if hurt_cd > 0.0 or vel.length() < 1.2 or p.no_collide: return
+	var pr := p.rad * p.sc
+	var pc := Vector2(p.x, p.y)
+	for o in hits:
+		if o == p or o.hid or o.dying >= 0.0: continue
+		for sp in o.sharp_points():
+			var q: Vector2 = sp[0]
+			var d := q.distance_to(pc)
+			# hay que ir hacia la punta, no rozarla de lado
+			if d < pr + 0.14 and vel.normalized().dot((q - pc).normalized() if d > 0.01 else vel.normalized()) > 0.35:
+				hurt(sp[1], q); return
+
 func set_map(map: Dictionary) -> void:
+	actors.clear(); talk_ent = null
 	handlers.clear(); world.load_map(map); near = null; ui.prompt(null); vel = Vector2.ZERO
 
 func spawn_player(x: float, y: float, rot := PI / 2, extra := {}) -> Ent:
@@ -190,6 +254,7 @@ func run_handler(o: Ent) -> void:
 	if h == null: return
 	busy = true; ui.prompt(null); vel = Vector2.ZERO
 	Input.vibrate_handheld(10)
+	talk_ent = null if o.is_spot else o
 	if not o.is_spot and player != null and o.mv == null:
 		o.frozen = true
 		if not o.fixed_rot: o.rot = atan2(player.y - o.y, player.x - o.x)
@@ -198,7 +263,7 @@ func run_handler(o: Ent) -> void:
 		talk_started.emit(o.id)
 		return
 	await _call(h.fn, o)
-	ui.close_dlg()
+	ui.close_dlg(); talk_ent = null
 	if is_instance_valid(o): o.frozen = false
 	busy = false
 
@@ -273,7 +338,7 @@ func talk_begin(id: String, text: String, label := "Hablar") -> Ent:
 	return o
 
 func talk_end(o) -> void:
-	ui.close_dlg()
+	ui.close_dlg(); talk_ent = null
 	if o != null and is_instance_valid(o): o.frozen = false; off(o.id)
 	busy = false; objective("", null)
 
@@ -357,7 +422,11 @@ func _process(delta: float) -> void:
 
 func move_player(dt: float, p: Ent) -> void:
 	var W := world
+	hurt_cd = maxf(0.0, hurt_cd - dt); stun = maxf(0.0, stun - dt)
 	var can := not busy and not locked and not ui.journal_open
+	if stun > 0.0 and can and W.cam_mode != "free":
+		# aturdido por el pinchazo: sólo el retroceso
+		vel = vel.lerp(Vector2.ZERO, 1.0 - exp(-dt * 7.0)); p.x += vel.x * dt; p.y += vel.y * dt; W.collide(p); can = false
 	if need_stick: can = false
 	var ax := axis(); var m := ax.length()
 	var sp := (2.2 + 7.6 * m) * speed_mul if m > 0.01 else 0.0   # inclinar más = correr
@@ -378,7 +447,7 @@ func move_player(dt: float, p: Ent) -> void:
 			_fwd = lerpf(_fwd, ax.y * (2.0 + 5.6 * absf(ax.y)) * speed_mul, 1.0 - exp(-dt * 10.0))
 			vel = Vector2(cos(p.rot), sin(p.rot)) * _fwd
 			p.x += vel.x * dt; p.y += vel.y * dt
-			W.collide(p)
+			_check_pricks(p, W.collide(p))
 		else:
 			var want := dir * sp
 			vel = vel.lerp(want, 1.0 - exp(-dt * (13.0 if m > 0.01 else 9.0)))
@@ -386,8 +455,8 @@ func move_player(dt: float, p: Ent) -> void:
 			p.x += vel.x * dt; p.y += vel.y * dt
 			if m > 0.01: p.rot += App.ang_diff(p.rot, atan2(dir.y, dir.x)) * minf(1.0, dt * 12.0)
 			moved += vel.length() * dt
-			W.collide(p)
-	else:
+			_check_pricks(p, W.collide(p))
+	elif stun <= 0.0:
 		vel = vel.lerp(Vector2.ZERO, minf(1.0, dt * 10.0)); _fwd = 0.0
 	# objeto interactuable cercano
 	near = null

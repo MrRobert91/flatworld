@@ -160,12 +160,21 @@ func ch1() -> void:
 
 # ============ CAP. II — LA CALLE MAYOR ============
 func town_folk() -> void:
+	# sitios a los que va la gente: puertas, esquinas y tramos de la Calle Mayor
+	var places := [Vector2(-56, 6), Vector2(-42, 2.5), Vector2(-28, -3), Vector2(-14, -9), Vector2(-4, 6.5), Vector2(7, -8.5), Vector2(18, 7), Vector2(30, -7), Vector2(40, 8), Vector2(54, 7.5), Vector2(-20, 1), Vector2(26, 1)]
+	var near := func(x: float, span: float) -> Array:
+		return places.filter(func(q): return absf(q.x - x) < span)
 	g.add(F_mujer('dama', -18, -2, {name = 'una dama', ai = {type = 'path', pts = [Vector2(-18, -2.5), Vector2(10, -2.5), Vector2(10, 2.5), Vector2(-18, 2.5)]}, speed = 1.9}))
-	g.add(F_iso('obrero', -12, 3, 8, {name = 'un obrero', ai = {type = 'wander', home = Vector2(-8, 2), r = 5.0, sx = 2.0}, speed = 1.8}))
-	g.add(F_penta('medico', 34, 3, {name = 'un médico', ai = {type = 'wander', home = Vector2(36, 2), r = 4.0, sx = 2.0}, speed = 1.5}))
+	g.add(F_iso('obrero', -12, 3, 8, {name = 'un obrero', ai = {type = 'stroll', pts = near.call(-10, 22)}, speed = 1.9}))
+	g.add(F_penta('medico', 34, 3, {name = 'un médico', ai = {type = 'stroll', pts = near.call(36, 22)}, speed = 1.6}))
 	g.add(F_iso('sold1', 50, -2, 12, {name = 'un soldado', ai = {type = 'path', pts = [Vector2(52, -3), Vector2(-55, -3), Vector2(-55, 3), Vector2(52, 3)]}, speed = 3.0}))
 	g.add(F_iso('sold2', 48, -2, 12, {name = 'un soldado', ai = {type = 'follow', target = 'sold1', dist = 2.4, speed = 3.2}}))
-	g.add(F_tri('trans', 20, -3, {name = 'un tendero', ai = {type = 'wander', home = Vector2(22, -2), r = 6.0, sx = 2.0}, speed = 1.6}))
+	g.add(F_tri('trans', 20, -3, {name = 'un tendero', ai = {type = 'stroll', pts = near.call(18, 24)}, speed = 1.7}))
+	# vecinos de paso: cada uno con su recado
+	g.add(F_cuad('amb0', 44, 2, {name = 'un vecino', ai = {type = 'stroll', pts = places}, speed = 1.7}))
+	g.add(F_tri('amb1', -50, 1, {name = 'un artesano', ai = {type = 'stroll', pts = near.call(-40, 30)}, speed = 2.0}))
+	g.add(F_hexa('amb2', 8, 2, {name = 'un caballero', ai = {type = 'stroll', pts = near.call(10, 34)}, speed = 1.3}))
+	g.add(F_hexa('amb3', 9, 3, {name = 'su hijo', r = 0.5, ai = {type = 'follow', target = 'amb2', dist = 1.7, speed = 2.6}}))
 	var st := {t = 0.0}
 	g.tick(func(dt):
 		st.t += dt

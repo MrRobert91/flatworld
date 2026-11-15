@@ -98,6 +98,20 @@ Sigue siendo la línea que describe el libro, y la niebla sigue siendo lo que pe
 - bajo la línea hay una regla graduada cada 5°, y el perfil de claridad cuando se aprende el
   Reconocimiento por la Vista.
 
+## Vida de las escenas
+
+- **Quién habla:** la figura que habla late y emite ondas de color; las que están cerca se vuelven hacia
+  ella y la cámara se desliza a medio camino (también desde el Espacio). Cuando habla «la multitud», late toda.
+- **Paseantes con recado:** la gente de la calle va de puerta en puerta (`ai = {type = "stroll", pts = [...]}`),
+  arranca y frena con suavidad, y se detiene a saludarse al cruzarse.
+- **La matanza del Color:** las mujeres retroceden de punta, los presos rematan, los artesanos se apartan;
+  cada caído gira, se encoge y deja una marca en el papel (`World.slay`).
+- **Lluvia:** gotas que caen del Norte y rompen contra tejados, muros y figuras; dentro de las casas no llueve.
+- **Pinchazos:** chocar de frente con la punta de una Mujer o de un Isósceles hiere (retroceso, sacudida,
+  destello); con un vértice de Equilátero o de Cuadrado la reacción es menor; con más lados no pincha.
+  Para probarlo: `godot -- --ch=2 --prick=iso` (o `mujer`, `tri`, `cuad`, `penta`).
+- **Espaciolandia:** la misma lámina de Planilandia vista desde Arriba, con el Norte arriba.
+
 ## Estructura
 
 ```

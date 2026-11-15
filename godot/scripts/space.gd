@@ -22,7 +22,8 @@ static func make_cube() -> MeshInstance3D:
 	return m
 
 # firmamento: estrellas y Sólidos a lo lejos, girando despacio
-static func backdrop() -> Node3D:
+# dark = cianotipo (luces sobre azul); si no, tinta sobre papel
+static func backdrop(dark := true) -> Node3D:
 	var G := Node3D.new()
 	var pts := PackedVector3Array()
 	for i in 1400:
@@ -33,6 +34,7 @@ static func backdrop() -> Node3D:
 	var am := ArrayMesh.new(); am.add_surface_from_arrays(Mesh.PRIMITIVE_POINTS, arr)
 	var stars := MeshInstance3D.new(); stars.mesh = am
 	var sm := ShaderMaterial.new(); sm.shader = preload("res://shaders/stars.gdshader"); stars.material_override = sm
+	if not dark: sm.set_shader_parameter("col", Color(0.09, 0.13, 0.17, 0.45))
 	G.add_child(stars)
 	var names := ["Icosaedro", "Hexaedro", "Tetraedro", "Octaedro", "Dodecaedro", "Cono", "Cilindro"]
 	var cols := [Color("9fe8e0"), Color("e6bd6e"), Color("b79cf0"), Color("f0a090")]
@@ -41,7 +43,7 @@ static func backdrop() -> Node3D:
 		var a := float(i) / names.size() * TAU + 0.4
 		var s := MeshInstance3D.new(); s.mesh = mesh(names[i])
 		var m := StandardMaterial3D.new(); m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		m.albedo_color = Color(cols[i % 4], 0.6); m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.albedo_color = Color(cols[i % 4], 0.6) if dark else Color(App.inked(cols[i % 4], 0.45), 0.8); m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		s.material_override = m
 		s.position = Vector3(cos(a) * 170.0, 50.0 + (i % 3) * 30.0, sin(a) * 170.0)
 		G.add_child(s); spin.append(s)

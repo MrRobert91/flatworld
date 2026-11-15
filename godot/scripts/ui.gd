@@ -51,6 +51,7 @@ var note_l: RichTextLabel
 var note_box: PanelContainer
 var toasts: VBoxContainer
 var fade_r: ColorRect
+var hurt_r: ColorRect
 var dock: VBoxContainer
 var dock_margin: MarginContainer
 var dlg: PanelContainer
@@ -133,6 +134,7 @@ func _ready() -> void:
 	toasts = VBoxContainer.new(); toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toasts.add_theme_constant_override("separation", 6); add_child(toasts)
 	fade_r = ColorRect.new(); fade_r.color = Color("e6dec8"); fade_r.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(fade_r); add_child(fade_r)
+	hurt_r = ColorRect.new(); hurt_r.color = Color(App.ACC, 0.0); hurt_r.mouse_filter = Control.MOUSE_FILTER_IGNORE; hurt_r.visible = false; _full(hurt_r); add_child(hurt_r)
 	_build_dock()
 	_build_info()
 	_build_slate()
@@ -466,6 +468,12 @@ func fade(on: bool, sec := 0.3) -> void:
 	_fade_sp = 1.0 / maxf(sec, 0.01)
 	await sleep(sec + 0.03)
 
+# destello de dolor: un velo rojo que se apaga
+func flash(a: float) -> void:
+	if auto: return
+	hurt_r.color = Color(App.ACC, a); hurt_r.visible = true
+	var tw := create_tween(); tw.tween_property(hurt_r, "color:a", 0.0, 0.45); tw.tween_callback(func(): hurt_r.visible = false)
+
 # rótulo de capítulo: breve, sobre un velo, y se puede saltar con un toque
 func title(num: String, title_text: String, sub := "", dur := 2.6) -> void:
 	if auto: return
@@ -525,6 +533,7 @@ func _show_block(who: String, text: String) -> void:
 	dlg_text.add_theme_color_override("default_color", tc)
 	dlg_text.text = body; dlg_text.visible = true
 	dlg_choices.visible = false; dlg.visible = true
+	if App.g != null: App.g.speaking(who)
 	if _block_tw: _block_tw.kill()
 	dlg.modulate.a = 0.0
 	_block_tw = create_tween(); _block_tw.tween_property(dlg, "modulate:a", 1.0, 0.16)
@@ -534,6 +543,7 @@ func open_dlg() -> void:
 	if not dlg_open: dlg_open = true; _layout()
 
 func close_dlg() -> void:
+	if App.g != null: App.g.speaking("")
 	dlg_open = false; dlg.visible = false; dlg_more.visible = false; _layout()
 
 func _more(on: bool) -> void:
@@ -555,7 +565,9 @@ func narrate(text: String, _wide := false) -> void:
 	_more(true)
 	await wait_advance()
 	dlg_more.visible = false; Snd.sfx("ui")
-	if not dlg_open: dlg.visible = false
+	if not dlg_open:
+		dlg.visible = false
+		if App.g != null: App.g.speaking("")
 
 # Apunte no bloqueante
 func note(text: String, sec := 6.0) -> void:
