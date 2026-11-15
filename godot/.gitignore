@@ -1,0 +1,4 @@
+.godot/
+*.import.bak
+# la exportación web se versiona (la usa el Dockerfile para desplegar); el binario de Linux no
+build/linux/

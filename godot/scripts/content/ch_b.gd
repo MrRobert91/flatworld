@@ -1,0 +1,296 @@
+# Capítulos IV–V: la Sedición Cromática (teatro de la memoria) y el Templo.
+class_name ChB extends Ch
+
+const HUES := ['#ff5a4f', '#ffa53b', '#ffe14d', '#59d98e', '#3fc4ff', '#7b74ff', '#e56bff', '#ff8fb0']
+const RED := '#ff4a43'
+const GREEN := '#3fd97a'
+
+func paint(e: Ent) -> bool:
+	if e.woman or e.n >= 20 or e.side_colors != null: return false
+	var k := randi() % 8; var cols := []
+	for i in e.local.size(): cols.append(HUES[(k + i * 3) % 8])
+	e.set_colors(cols)
+	return true
+
+func agora() -> Dictionary:
+	return {bounds = {x0 = -44, y0 = -28, x1 = 44, y1 = 28}, fog = 16.0, palette = 'color', zoom = 56.0,
+		walls = [[-6, 16, 6, 16], [-6, 16, -8, 19], [6, 16, 8, 19]],
+		labels = [{t = 'Mercado', x = -16, y = -8, s = 1.6, a = 0.25}, {t = 'Tribuna', x = 0, y = 18.4, s = 0.9, a = 0.5}, {t = 'teatro de la memoria · hace muchos siglos', x = 0, y = -24, s = 0.7, a = 0.4, it = true}]}
+
+func crowd(n: int, mix: Array) -> Array:
+	var out := []
+	for i in n:
+		var k: String = mix[i % mix.size()]; var x := -30.0 + randf() * 60.0; var y := -16.0 + randf() * 26.0; var id := 'c%d' % i
+		var d: Dictionary
+		match k:
+			'iso': d = F_iso(id, x, y, 6.0 + randf() * 14.0)
+			'mujer': d = F_mujer(id, x, y)
+			'tri': d = F_tri(id, x, y)
+			'cuad': d = F_cuad(id, x, y)
+			'penta': d = F_penta(id, x, y)
+			'circ': d = F_circ(id, x, y)
+			_: d = F_hexa(id, x, y)
+		d.ai = {type = 'wander', home = Vector2(x, y), r = 6.0}; d.speed = 1.3 + randf()
+		out.append(g.add(d))
+	return out
+
+func ch4() -> void:
+	# --- el Colegio ---
+	g.set_map(town({school = true})); g.spawn_player(-41, 13.3, -PI / 2); a.town_folk()
+	var W := g.world
+	g.add(F_hexa('archivero', 18, 23, {name = 'el viejo archivero', r = 0.95, rot = -1.57}))
+	for i in 3:
+		var d := F_poli('e%d' % (i + 1), 13 + i * 4, 17 + (i % 2) * 2, 6 + i, {r = 0.55, name = 'un estudiante'})
+		d.ai = {type = 'wander', home = Vector2(14 + i * 4, 17), r = 2.5}; d.speed = 1.6
+		g.add(d)
+	g.on('e1', 'Hablar', func(): await say('estudiante', 'Si suspendo el examen final de Vista, señor, no seré ni noble ni plebeyo. A los suspendidos no los quiere nadie. Dicen que de ahí salen todos los revoltosos.'))
+	g.on('e2', 'Hablar', func(): await say('estudiante', 'Tres años para distinguir un Decágono de un Dodecágono en movimiento. Mi padre dice que es lo único que nos separa de los que palpan.'))
+	await a.intro('Capítulo IV', 'El tiempo de los colores', 'Donde un viejo recuerda que el mundo no siempre fue una línea gris.', 'flat')
+	var ic = g.flag('irregularChoice')
+	if ic == null or ic == 's': await narr('No dormí bien. A la mañana siguiente fui al Colegio de Vista, con el pretexto de consultar un tratado. En realidad quería que alguien me dijera que mirar y callar era lo correcto.')
+	elif ic == 'o': await narr('Dormí bien, lo confieso. A la mañana siguiente fui al Colegio de Vista a consultar un tratado. Me sentía un buen ciudadano.')
+	else: await narr('No dormí. A la mañana siguiente fui al Colegio de Vista; quería saber si siempre habíamos sido así.')
+	await g.go_to(18, 12.5, 2.2, 'Ve al Colegio de Vista, al este por la Calle Mayor')
+	W.reveal('school')
+	var o := await g.talk_begin('archivero', 'Habla con el viejo archivero')
+	await say('archivero', 'El perito de la Puerta. Ya se sabe por aquí lo del calderero. ¿Viene a por absolución? No la doy: soy archivero.')
+	await say('archivero', 'Doy otra cosa. ¿Sabe usted que hubo un tiempo en que no hacía falta mirar con tanto esfuerzo, ni palpar a nadie? Un tiempo en que cada cual llevaba escrito por fuera lo que era… o lo que quería ser.')
+	var c = await choose([{t = 'El Color. Sé que está prohibido nombrarlo.', id = 'a'}, {t = 'Cuentos de viejos.', id = 'b'}])
+	await say('archivero', 'Aquí dentro, entre tablillas, se puede nombrar. Flojito.' if c == 'a' else 'Cuentos, sí. Con ciento cuarenta mil muertos al final. Siéntese.')
+	await say('archivero', 'Cierre el ojo. Los del Colegio lo llamamos el Teatro de la Memoria. Durante un rato será usted otro: un Pentágono al que la historia llama Cromatistes.')
+	g.talk_end(o)
+	await a.outro()
+
+	# --- teatro de la memoria: Cromatistes ---
+	g.set_map(agora()); g.spawn_player(-20, -12, 0.4, {n = 5, r = 0.85, name = 'Cromatistes'})
+	var folk := crowd(34, ['iso', 'tri', 'cuad', 'hexa', 'iso', 'penta', 'mujer', 'tri', 'iso', 'circ'])
+	ui.chapter_tag('Teatro de la memoria · Cromatistes'); Snd.drone('color'); g.set_view('top'); await ui.fade(false)
+	await narr('Mira: el mismo mundo, siglos atrás. Todo líneas pálidas, como hoy. Y tú, un Pentágono cualquiera que una tarde, revolviendo tierras y óxidos en su taller, da con algo que no tiene nombre.')
+	if not g.auto:
+		var cols := []
+		var sw := []
+		for h in HUES: sw.append({swatch = h, id = h})
+		for i in 5:
+			var pick = await ui.panel('Los pigmentos', 'Elige un color para tu lado %s.' % ['primero', 'segundo', 'tercero', 'cuarto', 'quinto'][i], sw)
+			cols.append(pick)
+			var all_c := cols.duplicate()
+			while all_c.size() < 5: all_c.append('#3a2f24')
+			g.player.set_colors(all_c); Snd.tone(300 + i * 80, 0.5, 'sine', 0.1)
+	else: g.player.set_colors(HUES.slice(0, 5))
+	await narr('Primero pintaste tu casa. Luego a tus esclavos, a tu padre, a tus hijos, a tus nietos. Por último, a ti. Y saliste al mercado.')
+	var st := {painted = 0}
+	g.objective('Pasea por el mercado. Que te vean.')
+	var stop := g.tick(func(_dt):
+		var p := g.player
+		for e in folk:
+			if Vector2(e.x - p.x, e.y - p.y).length() < 3.6 and paint(e):
+				st.painted += 1; Snd.tone(400 + st.painted * 35, 0.4, 'sine', 0.07))
+	var paint_all := func():
+		for e in folk: paint(e)
+	await g.until(func(): return st.painted >= 12, paint_all)
+	stop.call(); paint_all.call(); g.objective('')
+	await narr('Nadie tropezaba contigo. Nadie tenía que palparte ni calcular tus ángulos: te *veían*. En dos generaciones no quedaba figura sin pintar, salvo las Mujeres y los Sacerdotes, que no tienen lados.')
+	g.begin_scene()
+	g.set_view('eye'); await g.wait(1.5)
+	await narr('Míralo con el ojo de un planilandés. Ya no es una raya gris: cada cual lleva su clase a la vista. Fue la infancia del Arte. Inmoral, anárquica… y bellísima.')
+	await g.wait(1.2); g.set_view('top')
+	g.end_scene()
+	g.frag(8)
+	await narr('Pero si un soldado se pinta como un noble, ¿en qué se distinguen? El Reconocimiento por la Vista dejó de estudiarse. Y los de abajo empezaron a decir, cada vez con más razón, que eran iguales a los de arriba.')
+
+	# --- el Proyecto de Ley ---
+	var ag_pts := []
+	for i in 26:
+		var an := i / 26.0 * TAU
+		ag_pts.append([cos(an) * (1 + 0.13 * cos(an * 2 + 0.5)), sin(an) * 0.9])
+	g.add({id = 'agitador', pts = ag_pts, noEye = true, voice = 'iso', x = 0, y = 14, rot = -1.57, name = 'el tribuno'}).set_colors(HUES)
+	var pri := g.add(F_circ('cura', 9, 12, {name = 'un Sacerdote', rot = -2.0})); var dam := g.add(F_mujer('damaC', -8, 12, {name = 'una mujer', rot = -1.0}))
+	o = await g.talk_begin('agitador', 'Años después. Escucha al tribuno, junto a la Tribuna', 'Escuchar')
+	await say('agitador', '¡Ciudadanos de todos los ángulos! ¿Quién sigue sin color en Planilandia? ¡Ellos! Los Círculos, que nos gobiernan. Y ellas, que no tienen voto ni lados.')
+	await say('agitador', 'Proyecto de Ley del Color Universal: ¡que todos se pinten! Y como ni mujeres ni sacerdotes tienen lados, sea roja la mitad de cada cual que lleva el ojo y la boca, y verde la otra mitad.')
+	var pc := []
+	for i in 30: pc.append(RED if (i < 8 or i > 22) else GREEN)
+	pri.set_colors(pc); dam.set_colors([RED, GREEN, GREEN, RED]); Snd.sfx('her')
+	await say('logica', 'Piensa lo que eso significa visto *de canto*. Una mujer: línea mitad roja, mitad verde. Un sacerdote: línea mitad roja, mitad verde.')
+	await say('agitador', '¡Cualquier mujer podrá ser tomada por un Círculo, y tratada como tal! ¡Y cualquier Círculo, por una mujer! ¿Quién se opondrá? ¿Vuestras esposas?')
+	await say('narr', 'Era diabólico, y era brillante. Lo ideó un Círculo Irregular, a quien una indulgencia insensata perdonó la vida de niño. Las mujeres apoyaron la Ley en masa. Tres años estuvo el Estado al borde del abismo.')
+	c = await choose([{t = '(Gritar con la multitud.) ¡Color para todos!', id = 'h', tag = 'Herejía'}, {t = '(Callar.) Esto acabará en sangre.', id = 's'}, {t = '(Abuchear.) ¡Demagogo irregular!', id = 'o'}])
+	if c == 'h': await say('voces', '¡Color! ¡Color! ¡Color!'); g.her(1)
+	elif c == 'o': await say('voces', '(Te empujan. Aquí eres minoría.)'); g.her(-1)
+	g.frag(9)
+	g.talk_end(o)
+
+	# --- el fraude ---
+	await narr('Un ejército de Isósceles había vencido ya a los Polígonos. Entonces ocurrió, aquí mismo, en el mercado, un incidente pequeño. Míralo tú. Con el ojo.')
+	g.begin_scene()
+	g.player.x = -14; g.player.y = -6; g.player.rot = 0; W.cam_x = -14; W.cam_y = -6
+	for e in folk:
+		if absf(e.y + 6) < 4 and e.x > -16: e.y += 9; e.ai.home.y += 9
+	g.view_lock = true; g.set_view('eye'); var f0 := W.fog; W.fog = 4.0; await g.wait(1.3)
+	var twelve := []
+	for i in 12: twelve.append(HUES[(i * 3) % 8])
+	await sight_round('iso', {deg = 9.0, colors = twelve, near = 3.0, title = 'En el mercado', text = 'Se te acerca alguien con doce colores y la voz redonda de un gran señor. ¿Qué es?',
+		options = [{id = 'dode', label = 'Dodecágono', sub = 'doce colores'}, {id = 'iso', label = 'Isósceles', sub = 'una cuña'}, {id = 'hexa', label = 'Hexágono', sub = 'un noble menor'}],
+		verdict = func(r): return 'Lo has calado: un Isósceles de cuatro grados, pintado con los doce colores de un Dodecágono.' if r == 'iso' else 'Era un Isósceles de cuatro grados, pintado con los doce colores de un Dodecágono. *El color miente mejor que la voz.*'})
+	W.fog = f0; g.set_view('top'); g.view_lock = false
+	await narr('Así engañó a una doncella, huérfana de un noble Polígono. Hubo boda. Cuando ella descubrió el fraude, se quitó la vida. La noticia corrió de casa en casa, y las mujeres empezaron a mirar la Ley con otros ojos.')
+	g.end_scene()
+
+	# --- Pantociclo ---
+	var pan := g.add(F_circ('pantociclo', 0, 22, {name = 'Pantociclo', r = 1.5, rot = -1.57})); await pan.move_to(0, 13.2, 3)
+	g.npc('agitador').move_to(-5, 11, 2)
+	var guards := []
+	for i in 4: guards.append(g.add(F_iso('pg%d' % i, -9 + i * 6, 20, 14, {name = 'un preso armado', rot = -1.57})))
+	o = await g.talk_begin('pantociclo', 'Asamblea extraordinaria. Acude ante el Círculo Supremo', 'Escuchar')
+	await say('pantociclo', 'Ciudadanos. Los Círculos hemos decidido ceder. Aceptamos la Ley del Color. Sólo os pido, antes de votar, que me escuchéis una última vez.')
+	await say('narr', 'Habló casi un día entero. Nadie supo después repetir sus frases, sólo lo que hicieron.')
+	await say('pantociclo', 'Artesanos: hoy vuestros hijos pueden nacer Equiláteros y subir. Cuando nada distinga a un noble de un obrero, ¿a qué subirán? Lo que ganáis en pintura lo perdéis en hijos.')
+	await say('pantociclo', 'Mujeres: recordad a la doncella del mercado. Con el Color, ningún honor de esposa está a salvo de un impostor de cuatro grados.')
+	c = await choose([{t = '(Mirar a las mujeres. Están girando.)', id = 'a'}, {t = '(Mirar a los presos armados junto a la Tribuna.)', id = 'b'}, {t = '(Gritar.) ¡Es una trampa!', id = 'c', tag = 'Cuestionar'}])
+	if c == 'c': await say('logica', 'Nadie te oye. Un día entero de discurso lo ha preparado todo; tu grito llega con un día de retraso.')
+	await say('pantociclo', '¡Antes la muerte que el Color!')
+	Snd.sfx('gavel')
+	ui.close_dlg()
+	# la matanza
+	for gd in guards: gd.move_to(-5 + randf() * 2, 11 + randf(), 9)
+	await g.wait(0.8); W.remove('agitador'); Snd.sfx('stab')
+	var isos := folk.filter(func(e): return e.def.has('iso'))
+	var k := 0
+	for e in isos:
+		g.after(0.5 + k * 0.33, func(): e.hid = true; e.no_collide = true; Snd.sfx('stab'))
+		k += 1
+		e.speed = 7.0; e.ai = {type = 'wander', home = Vector2(0, 0), r = 8.0}
+	await g.wait(1 + isos.size() * 0.33)
+	await narr('A una señal, las mujeres retrocedieron de punta sobre los soldados. Los artesanos las imitaron. Los presos tomaron las salidas. Los Isósceles, creyéndose traicionados, se revolvieron unos contra otros.')
+	await narr('En media hora no quedaba ninguno. Ciento cuarenta mil, muertos por los ángulos de sus compañeros.')
+	for e in W.ents.values():
+		if e.side_colors != null: e.set_colors(null)
+	W.set_palette('flat'); Snd.drone('flat'); Snd.sfx('fall')
+	await g.wait(1.5)
+	await narr('Después vinieron las purgas: todo Triángulo sospechoso, destruido sin medición. Y el Color quedó abolido. Hoy sólo un viviente conoce el secreto de fabricarlo: el Círculo Supremo.')
+	g.frag(10); g.learn('color')
+	g.talk_end(o)
+	await a.outro()
+
+	# --- de vuelta ---
+	g.set_map(town({school = true})); W.reveal('school'); g.spawn_player(18, 20.5, PI / 2)
+	g.add(F_hexa('archivero', 18, 23, {name = 'el viejo archivero', r = 0.95, rot = -1.57}))
+	ui.chapter_tag('Capítulo IV · El tiempo de los colores'); await ui.fade(false)
+	o = await g.talk_begin('archivero', 'Abre el ojo. Habla con el archivero')
+	await say('archivero', 'Ya está. Vuelve usted a ser una raya gris entre rayas grises. ¿Qué le ha parecido?')
+	c = await choose([{t = 'Que era hermoso. Y que nos lo quitaron.', id = 'h', tag = 'Herejía'}, {t = 'Que el Color era una mentira peligrosa. Hicieron bien.', id = 'o', tag = 'Ortodoxia'}, {t = 'Que Pantociclo no convenció a nadie: los enfrentó.', id = 'l', lock = null if g.knows('clases') else 'requiere conocer las clases'}])
+	if c == 'h': await say('archivero', 'Baje la voz. …Sí. Yo también lo pienso, los días de lluvia.'); g.her(1)
+	if c == 'o': await say('archivero', 'Eso dice el manual. Tiene usted buena memoria para los manuales.'); g.her(-1); g.rep('sac', 1)
+	if c == 'l': await say('archivero', 'Ah. Un Cuadrado que mira la mano y no la boca. Tenga cuidado con ese ojo, perito: aquí se premia ver ángulos, no ver *eso*.'); g.her(1)
+	await say('archivero', 'Mañana hay ceremonia en el Templo. Vaya. Conviene que lo vean a usted allí, después de lo de la Puerta.')
+	g.talk_end(o)
+	await a.outro()
+
+# ============ CAP. V — EL TEMPLO ============
+func ch5() -> void:
+	var map := town({temple = true})
+	for q in [['Círculos', -33], ['Nobleza', -29.6], ['Profesionales', -26], ['Equiláteros', -22.4], ['Isósceles', -18.8]]:
+		map.labels.append({t = q[0], x = 19.4, y = q[1], s = 0.55, a = 0.5, it = true})
+	map.labels.append({t = 'mujeres', x = 41.2, y = -19.5, s = 0.55, a = 0.5, it = true})
+	g.set_map(map); var W := g.world; W.reveal('temple'); g.spawn_player(30, -4, -PI / 2)
+	var up := {rot = -PI / 2}
+	g.add(F_circ('circulo', 30, -37, {name = 'el Círculo oficiante', r = 1.5, rot = PI / 2}))
+	var i := 0
+	for x in [24, 27, 33, 36]: g.add(F_circ('tc%d' % i, x, -33, up)); i += 1
+	i = 0
+	for x in [23, 26, 29, 32, 35]: g.add(F_poli('tn%d' % i, x, -29.6, 6 + (x % 5), up)); i += 1
+	i = 0
+	for x in [23, 25.5, 28, 32.5, 35, 37]:
+		g.add(F_penta('tp%d' % i, x, -26, up) if fmod(x, 2.0) != 0.0 else F_cuad('tp%d' % i, x, -26, up)); i += 1
+	i = 0
+	for x in [22, 24.5, 27, 29.5, 32, 34.5, 37]: g.add(F_tri('tt%d' % i, x, -22.4, up)); i += 1
+	i = 0
+	for x in [23, 25, 27, 29, 31, 33, 35, 37]: g.add(F_iso('ti%d' % i, x, -18.8, 8 + (x % 9), up)); i += 1
+	i = 0
+	for y in [-28, -25, -22, -19]: g.add(F_mujer('tm%d' % i, 41.2, y, {rot = PI})); i += 1
+	await a.intro('Capítulo V', 'Atiende a tu Configuración', 'Donde los Círculos explican por qué nadie tiene la culpa, y a quién se castiga de todos modos.', 'temple')
+	await narr('El Templo de los Círculos. Tantos lados que desde dentro la pared parece no tener ninguno.')
+	await g.go_to(30, -12, 2, 'Entra en el Templo')
+	await narr('Cada clase tiene su fila; más cerca del altar cuantos más lados. Busca la tuya.')
+	var st := {scold = false}
+	var stop := g.tick(func(_dt):
+		if not st.scold and g.player.y < -27.9 and absf(g.player.x - 30) < 11:
+			st.scold = true; ui.note('*Un ujier te cierra el paso con un ángulo muy educado.* «La fila de los Profesionales está detrás, caballero.»', 5); g.rep('sac', -1); g.player.y = -27.0)
+	await g.go_to(30, -26, 1.1, 'Ocupa tu sitio en la fila de los Profesionales')
+	stop.call(); g.player.rot = -PI / 2
+	g.begin_scene()
+	W.focus = Vector2(30, -29); W.zoom = 44
+	await say('circulo', 'Hijos del Plano. Hay una sola ley, y cabe en cuatro palabras. Decidlas conmigo.')
+	var c = await choose([{t = '«Atiende a tu Configuración.»', id = 'o'}, {t = '(Mover la boca sin voz.)', id = 's'}, {t = '(Susurrar.) ¿Y quién atiende a la del calderero?', id = 'h', tag = 'Herejía', lock = null if g.flag('irregularChoice') else true}])
+	await say('voces', '«ATIENDE A TU CONFIGURACIÓN.»')
+	if c == 'o': g.rep('sac', 1)
+	if c == 'h': await say('decoro', 'El Pentágono de tu izquierda se ha apartado medio paso. Te ha oído.'); g.her(1); g.rep('sac', -1)
+	await say('circulo', 'Lo que sois, lo sois por vuestros ángulos. El ladrón Isósceles no elige robar: su vértice roba por él. No lo culpamos. No culpamos a nadie.')
+	await say('circulo', 'Y como él no puede evitar ser un daño para sus vecinos, el Magistrado no puede evitar hacerlo consumir. Así, sin culpa y sin rencor, todo queda en orden.')
+	await say('logica', 'Sigue el razonamiento: si nadie es culpable, nadie merece castigo. Y sin embargo castigan. El silogismo cojea de un lado. Irregular, diríase.')
+	await say('narr', 'Los llamamos Círculos, pero ninguno lo es. Son Polígonos de lados tan numerosos y pequeños que no se distinguen. Del Círculo Supremo se dice, por cortesía, que tiene diez mil. Palparlo para comprobarlo sería impensable.')
+	g.frag(11); g.learn('config')
+	# presentación del recién nacido
+	var pa := g.add(F_iso('padre', 27, -14, 58, {name = 'el padre'})); var ma := g.add(F_mujer('madre', 29, -13.5, {name = 'la madre'})); var be := g.add(F_tri('bebe', 28, -14.6, {r = 0.38, name = 'el niño'}))
+	Snd.sfx('bell')
+	await say('circulo', 'Hoy hay júbilo. A un obrero de cincuenta y nueve grados y medio le ha nacido un hijo. Que lo traigan.')
+	await g.moves([[pa, 28.6, -34.6, 3.5], [ma, 31.6, -34.4, 3.5], [be, 30, -34.8, 3.5]])
+	W.focus = Vector2(30, -31); W.zoom = 38
+	await say('circulo', 'La Junta Sanitaria y Social ha medido. Sesenta grados. Sesenta. Sesenta. Lo declaramos Regular: un Equilátero.')
+	await say('voces', '(Un murmullo de fila en fila. En la de los Isósceles, algo parecido a un sollozo de orgullo.)')
+	await say('padre', 'Gracias, Reverencia. Gracias. Cien generaciones, y me ha tocado a mí verlo.')
+	var ad := g.npc('tt3'); await ad.move_to(30, -31.5, 3)
+	await say('circulo', 'Un Regular no puede criarse entre puntas. Será adoptado por este Equilátero sin hijos. Padre: jura no volver a verlo.')
+	await say('padre', '…Lo juro.')
+	await say('madre', '¿Adónde lo llevan? Esposo, ¿adónde llevan al niño?')
+	var c2 = await choose([{t = '(Aplaudir con la asamblea.)', id = 'o'}, {t = '(Bajar el ojo.)', id = 's'}, {t = '(En voz alta.) ¡Dejad al menos que la madre lo visite!', id = 'h', tag = 'Cuestionar'}])
+	be.ai = {type = 'follow', target = 'tt3', dist = 1.0, speed = 4.0}
+	var leave := func():
+		await ad.move_to(30, -11, 3)
+		ad.hid = true; be.hid = true
+	leave.call()
+	if c2 == 'o': await say('narr', 'Aplaudí. Era un día de fiesta, y yo un ciudadano que sabía cuándo se aplaude.'); g.rep('sac', 1); g.her(-1)
+	if c2 == 's': await say('narr', 'Miré al suelo, que en mi mundo es mirar a ninguna parte.')
+	if c2 == 'h':
+		await say('circulo', 'El caballero de cuatro lados confunde la piedad con la Geometría. La madre lo habrá olvidado antes de la cena: su Configuración no retiene. ¿No es una misericordia?')
+		await say('madre', '¿Qué niño?')
+		await say('recelo', 'No. Ha dicho «¿qué niño?» porque tres ujieres la están mirando.'); g.her(1); g.rep('sac', -2); g.rep('ciu', 1)
+	await say('narr', 'Esa es la esperanza que sostiene a los de abajo: que un día les nazca un hijo que les quiten. Los Círculos la llaman válvula de seguridad.')
+	await g.moves([[pa, 27, -18.8, 3], [ma, 41.2, -16.5, 3]])
+	await say('circulo', 'Id en orden. Atended a vuestra Configuración.')
+	W.focus = null; W.zoom = W.base_zoom
+	g.end_scene()
+	g.add(F_circ('novicio', 38, -13.5, {name = 'un Círculo joven', r = 0.85, rot = 2.5}))
+	var o := await g.talk_begin('novicio', 'Un Círculo joven te hace una seña junto a la salida')
+	await say('novicio', 'Lo he observado durante el oficio, Cuadrado. Tiene usted el perímetro inquieto. Pregunte: prefiero una duda dicha que una pensada.')
+	var asked := 0; var done := {}
+	while asked < 2:
+		var opts := []
+		if not done.has('a'): opts.append({t = 'Si la falta es de la Configuración, ¿por qué reprendo a mi nieto?', id = 'a'})
+		if not done.has('b'): opts.append({t = '¿Por qué no se enseña a leer a las mujeres?', id = 'b'})
+		if not done.has('c'): opts.append({t = '¿Cuántos lados tiene usted, en verdad?', id = 'c', tag = 'Osadía'})
+		opts.append({t = 'Nada más, Reverencia.', id = 'x'})
+		c = await choose(opts)
+		if c == 'x': break
+		done[c] = 1; asked += 1
+		if c == 'a':
+			await say('yo', 'El pequeño Hexágono alegó que un cambio de temperatura fue demasiado para su perímetro. Que la culpa no era suya sino de su Configuración.')
+			await say('novicio', '¿Y qué le respondió usted?')
+			await say('yo', 'Que, en ese caso, una buena reprimenda le fortalecería la Configuración.')
+			await say('novicio', 'Je. Heterodoxo, pero práctico. Así gobernamos también nosotros, sólo que sin reírnos.')
+		if c == 'b':
+			await say('novicio', 'Hace trescientos años, el Círculo Supremo decretó que, siendo ellas pobres en Razón y ricas en Emoción, educarlas era malgastar la tablilla. Desde entonces no leen ni cuentan.')
+			await say('logica', 'Y desde entonces tú hablas dos lenguas. Con ella: «amor», «deber», «piedad». Con ellos: «anticipación de beneficios», «necesidad». Dos idiomas, casi dos mentes.')
+			var d = await choose([{t = 'Temo que esa doble carga sea excesiva para los jóvenes. Humildemente, pido que se reconsidere.', id = 'h', tag = 'Apelar'}, {t = 'Una disposición sabia.', id = 'o'}])
+			if d == 'h': await say('novicio', 'Humildemente anotado. No lo repita ante el oficiante: él no distingue una apelación de una sedición, y a veces tiene razón.'); g.her(1); g.flag('apelo', 1)
+			else: await say('novicio', 'Eso decimos.'); g.her(-1)
+			g.learn('bilingue')
+		if c == 'c':
+			await say('novicio', 'Qué pregunta tan de palpador. Unos cuatrocientos. Mi padre tenía trescientos cincuenta; entre nosotros no rige eso de un lado por generación.')
+			await say('novicio', 'A mi hermano mayor lo llevaron de niño al Gimnasio Neoterapéutico, a que le fracturasen el marco para ganar lados. Sobrevive uno de cada diez. Él no fue ése.')
+			await say('asombro', 'Lo dice con la misma voz con que antes dijo «misericordia».'); g.rep('sac', -1)
+	await say('novicio', 'Vaya a casa. Faltan dos noches para el milenio; dicen que en esas fechas la gente ve cosas. Usted no vea nada.')
+	g.frag(12)
+	g.talk_end(o)
+	await narr('Volví a casa bajo una niebla espesa. Era el penúltimo día del año 1999. Me entretuve hasta tarde con mi vicio de siempre, la Geometría, y me dormí sobre las tablillas.')
+	await a.outro()
