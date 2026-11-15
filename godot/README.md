@@ -24,8 +24,9 @@ godot/tools/export.sh
 La exportación web es de un solo hilo: no necesita cabeceras COOP/COEP y se puede alojar en cualquier
 servidor estático. En la web los parámetros van en la URL: `?ch=6`, `?touch`.
 
-`godot/build/web/` **se versiona** (es lo que despliega el Dockerfile); `godot/build/linux/` no.
-Tras cambiar el juego, vuelve a ejecutar `godot/tools/export.sh` y sube `build/web/` en el mismo commit.
+`godot/build/web/` y `godot/build/linux/` **se versionan**: la web es lo que despliega el Dockerfile y
+`build/linux/planilandia.x86_64` es un ejecutable listo para descargar y lanzar (`chmod +x` si hace falta).
+Tras cambiar el juego, vuelve a ejecutar `godot/tools/export.sh` y sube `build/web/` y `build/linux/` en el mismo commit.
 
 ## Docker y despliegue
 
