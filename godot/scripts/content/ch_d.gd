@@ -166,9 +166,10 @@ func ch8() -> void:
 	await say('yo', 'Vuestra propia Analogía, Maestro. Punto, Línea, Cuadrado, Cubo: uno, dos, cuatro, ocho puntos terminales. ¿Qué sigue?')
 	c = await choose([{t = 'Dieciséis.', id = 16}, {t = 'Diez.', id = 10}, {t = 'Doce.', id = 12}])
 	Snd.sfx('her')
+	var held := {cube = cube}   # el Cubo puede borrarse antes de que acabe esta animación suelta
 	g.tween(4, func(t):
 		ts.sc = App.ease(t)
-		if is_instance_valid(cube): cm.set_shader_parameter('dim', 1.0 - t * 0.6); cube.scale = Vector3.ONE * L * (1.0 - 0.45 * App.ease(t)))
+		if is_instance_valid(held.cube): cm.set_shader_parameter('dim', 1.0 - t * 0.6); held.cube.scale = Vector3.ONE * L * (1.0 - 0.45 * App.ease(t)))
 	await say('yo', 'Dieciséis. Y sus límites: dos Puntos, cuatro Líneas, seis Cuadrados… *ocho Cubos*. Un Cubo movido en una dirección nueva. ¡Casi lo veo!' if c == 16 else 'No… el doble cada vez: *dieciséis*. Y sus límites: dos Puntos, cuatro Líneas, seis Cuadrados… ocho Cubos. ¡Casi lo veo!')
 	g.learn('cuarta')
 	await say('asombro', 'Eso que gira ahí no está en el Espacio. Está en ti. Es la sombra de una sombra, y es lo más grande que has pensado nunca.')

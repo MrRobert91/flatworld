@@ -49,7 +49,7 @@ func setup(w, d: Dictionary) -> Ent:
 	if d.get("spot", false):
 		is_spot = true; rad = 0.2; no_collide = true
 		var mb := Geo.MB.new()
-		mb.ring(Geo.make_points({n = 4, r = 0.34}), 0.07, 0.02, null, World.GAS, 0.85)
+		mb.ring(Geo.make_points({n = 4, r = 0.36}), 0.08, 0.02, null, world.pal.acc, 0.95)
 		body.mesh = mb.commit(); body.material_override = world.mat(3)
 		return self
 	local = Geo.make_points(d)
@@ -69,14 +69,30 @@ func build() -> void:
 	if woman:
 		var L: float = local[0].x
 		pts = [Vector2(L, 0), Vector2(0, 0.055), Vector2(-L, 0), Vector2(0, -0.055)]
-	var edge_col: Color = App.col(def.tint) if def.has("tint") else P.edge
+	var edge_col: Color = world.ink(App.col(def.tint)) if def.has("tint") else P.edge
+	var sides = null
+	if side_colors:
+		sides = []
+		for c in side_colors: sides.append(world.ink(App.col(c), 0.74))
 	var mb := Geo.MB.new()
-	var ink := App.lin(edge_col); ink.a = 0.96
-	mb.fan(pts, 0.01, ink, Vector2(3.2, 0.5 if solidity else 0.16))
-	var hp := []
-	for p in pts: hp.append(p * 1.09)
-	mb.ring(hp, 0.3, 0.012, null, edge_col, 0.11)
-	mb.ring(pts, 0.06 if woman else 0.075, 0.02, side_colors, edge_col, 1.0)
+	# interior de papel con rayado de sección (más denso si la figura es «sólida»)
+	mb.fan(pts, 0.01, Color(edge_col, 1.0), Vector2(4.0, 0.62 if solidity else 0.24))
+	if not woman:
+		var hp := []
+		for p in pts: hp.append(p * 1.0)
+		mb.ring(hp, 0.2, 0.012, null, edge_col, 0.07)
+		# trazos de construcción: prolongación de los lados y, en los regulares, su circunferencia
+		var np := pts.size()
+		if np <= 8:
+			for i in np:
+				var a: Vector2 = pts[i]; var b: Vector2 = pts[(i + 1) % np]
+				var dn := (b - a).normalized() * 0.16
+				mb.quad(a - dn, a, 0.022, 0.016, Color(edge_col, 0.5)); mb.quad(b, b + dn, 0.022, 0.016, Color(edge_col, 0.5))
+			if not def.has("iso") and not def.has("pts"):
+				mb.ring(Geo.make_points({n = 40, r = local[0].length() + 0.012}), 0.02, 0.014, null, P.line, 0.7)
+		mb.quad(Vector2(-0.07, 0), Vector2(0.07, 0), 0.02, 0.016, Color(edge_col, 0.55))
+		mb.quad(Vector2(0, -0.07), Vector2(0, 0.07), 0.02, 0.016, Color(edge_col, 0.55))
+	mb.ring(pts, 0.06 if woman else 0.07, 0.02, sides, edge_col, 1.0)
 	if woman:
 		mb.disc(Vector2(pts[0].x, 0), 0.085, 0.03, edge_col)
 		mb.disc(Vector2(-pts[0].x, 0), 0.05, 0.03, edge_col)
@@ -91,8 +107,8 @@ func build() -> void:
 			var a := TAU * i / 9.0
 			gp.append(Vector2(s * (0.75 + 0.3 * sin(i * 2.3)) * cos(a) - s * 0.3, s * (0.7 + 0.3 * cos(i * 1.7)) * sin(a)))
 		var gb := Geo.MB.new()
-		gb.ring(gp, 0.045, 0.025, null, Color("e2857a"))
-		gb.disc(Vector2(s * 0.1, 0), s * 0.2, 0.028, Color("f0b25c"), 10)
+		gb.ring(gp, 0.045, 0.025, null, world.ink(Color("e2857a"), 0.7))
+		gb.disc(Vector2(s * 0.1, 0), s * 0.2, 0.028, world.ink(Color("f0b25c"), 0.8), 10)
 		guts.mesh = gb.commit(); guts.material_override = world.mat(2)
 	guts.visible = world.show_guts
 

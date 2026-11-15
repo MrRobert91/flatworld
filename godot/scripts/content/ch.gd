@@ -172,7 +172,7 @@ func feel(e: Ent, text := '') -> bool:
 				var t0 := a0 + da * i / steps; var t1 := a0 + da * (i + 1) / steps
 				var q := [Vector2(cos(t0), sin(t0)) * 0.34, Vector2(cos(t1), sin(t1)) * 0.34, Vector2(cos(t1), sin(t1)) * 0.42, Vector2(cos(t0), sin(t0)) * 0.34, Vector2(cos(t1), sin(t1)) * 0.42, Vector2(cos(t0), sin(t0)) * 0.42]
 				for k in q:
-					im.surface_set_color(World.GAS); im.surface_set_uv(Vector2.ZERO); im.surface_add_vertex(Geo.v3(v + k, 0.05))
+					im.surface_set_color(W.pal.acc); im.surface_set_uv(Vector2.ZERO); im.surface_add_vertex(Geo.v3(v + k, 0.05))
 			im.surface_end()
 		return st.prog >= 1.0)
 	g.need_act = ''

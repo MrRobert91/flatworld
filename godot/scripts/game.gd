@@ -103,7 +103,7 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 	if not ev.pressed or ev.echo: return
 	var k: int = ev.physical_keycode
 	if not running: return
-	if k == KEY_J and not ui.choosing and not ui.picking and not ui.dlg_open and not busy:
+	if k == KEY_J and not ui.pause_open and not ui.choosing and not ui.picking and not ui.dlg_open and not busy:
 		ui.toggle_journal(); return
 	if k == KEY_ESCAPE:
 		if ui.journal_open: ui.toggle_journal()
@@ -111,7 +111,7 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 		return
 	if k == KEY_M:
 		ui.toast("", "Sonido", "silenciado" if Snd.toggle_mute() else "activado"); return
-	if ui.journal_open: return
+	if ui.modal(): return
 	if k >= KEY_1 and k <= KEY_9:
 		if ui.pick_key(k - KEY_1): return
 	if k >= KEY_KP_1 and k <= KEY_KP_9:
@@ -344,7 +344,6 @@ func _process(delta: float) -> void:
 		frame.emit(dt)
 	var e := W.eye_t; var free := W.cam_mode == "free"
 	var bg: Color = W.pal.bg
-	if not free: bg = bg.lerp(Color("03070a"), e)
 	RenderingServer.set_default_clear_color(bg)
 	W.visible = e < 0.995 or free
 	var strip := show_strip and p != null and not free and running
@@ -353,7 +352,7 @@ func _process(delta: float) -> void:
 	if eye_on:
 		var fx: float = p.local[0].x * 0.9
 		eye.cast(W, p, p.x + cos(p.rot) * fx, p.y + sin(p.rot) * fx, p.rot, W.fog)
-		eye.layout(e, ui.size, W.time, strip)
+		eye.layout(e, ui.size, W.time, strip, ui.strip_rect)
 	hud(p, e, strip, free)
 
 func move_player(dt: float, p: Ent) -> void:
@@ -397,14 +396,14 @@ func move_player(dt: float, p: Ent) -> void:
 	if near != null:
 		near_label = handlers[near.id].label
 		var who: String = near.nm if near.nm != "" else near.label
-		ui.prompt("[color=#e6bd6e][b]E[/b][/color]   %s%s" % [near_label, (" — " + who) if who != "" else ""])
+		ui.prompt("[color=#a8392a][b]E[/b][/color]   %s%s" % [near_label, (" — " + who) if who != "" else ""])
 	else:
 		near_label = ""; ui.prompt(null)
 
 func hud(p, e: float, strip: bool, free: bool) -> void:
 	ui.eye_frame.visible = strip and e < 0.5
 	ui.compass.visible = running and not free and e < 0.5 and not ui.touch
-	ui.keys_l.visible = running and not ui.touch and not ui.dlg_open and ui.size.x > 900
+	ui.keys_box.visible = running and not ui.touch and not ui.dlg_open and ui.size.x > 900 and not ui.modal()
 	ui.keys_l.text = "ratón mirar  ·  WASD volar  ·  R / F subir y bajar  ·  J inventario" if free else "V vista  ·  J inventario  ·  M sonido  ·  Esc menú"
 	ui.eye_hint.visible = e > 0.9 and running and not busy and not hide_eye_hint and not ui.dlg.visible
 	ui.eye_hint.text = "VISTA DEL PLANO  —  palanca: girar y avanzar  ·  ojo: volver a la lámina" if ui.touch else "VISTA DEL PLANO  —  A/D girar  ·  W/S avanzar  ·  V volver a la lámina"
@@ -414,5 +413,5 @@ func hud(p, e: float, strip: bool, free: bool) -> void:
 		var u := eye.bearing(p.x, p.y, p.rot, tp.x, tp.y)
 		ui.bearing_l.visible = true
 		ui.bearing_l.text = "<" if u < 0.0 else (">" if u > 1.0 else "v")
-		ui.bearing_l.position = Vector2(clampf(u, 0.03, 0.97) * ui.size.x - 5.0, ui.size.y * 0.5 - 58.0)
+		ui.bearing_l.position = Vector2(clampf(u, 0.03, 0.97) * ui.size.x, ui.size.y * 0.5 - 40.0)
 	else: ui.bearing_l.visible = false

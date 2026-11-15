@@ -23,7 +23,7 @@ func _g() -> Game:
 
 func controls_on() -> bool:
 	var g := _g()
-	if g == null or not g.running or g.player == null or ui.journal_open or ui.menu_open: return false
+	if g == null or not g.running or g.player == null or ui.modal(): return false
 	if ui.choosing or ui.picking: return false
 	if g.need_stick or g.need_act != "": return true
 	return not ui.dlg_open and not g.busy
@@ -35,17 +35,17 @@ func free_mode() -> bool:
 func buttons() -> Dictionary:
 	var s := ui.size; var out := {}
 	var g := _g()
-	if g == null or not g.running or ui.journal_open or ui.menu_open: return out
-	out.menu = [Vector2(s.x - 34, 34), 20.0]
+	if g == null or not g.running or ui.modal(): return out
+	out.menu = [Vector2(s.x - 36, 36), 24.0]
 	if not ui.dlg_open and not ui.choosing and not ui.picking and not g.busy:
-		out.inv = [Vector2(s.x - 86, 34), 20.0]
+		out.inv = [Vector2(s.x - 94, 36), 24.0]
 	if not ui.touch or not controls_on(): return out
 	if free_mode():
-		out.up = [Vector2(s.x - 76, s.y - 150), 40.0]
-		out.down = [Vector2(s.x - 76, s.y - 58), 40.0]
+		out.up = [Vector2(s.x - 74, s.y - 158), 40.0]
+		out.down = [Vector2(s.x - 74, s.y - 64), 40.0]
 	else:
-		out.act = [Vector2(s.x - 76, s.y - 82), 46.0]
-		if not g.view_lock and not g.busy: out.view = [Vector2(s.x - 164, s.y - 50), 28.0]
+		out.act = [Vector2(s.x - 74, s.y - 80), 46.0]
+		if not g.view_lock and not g.busy and not ui.dlg.visible: out.view = [Vector2(s.x - 166, s.y - 52), 30.0]
 	return out
 
 func _hit(pos: Vector2) -> String:
@@ -55,7 +55,7 @@ func _hit(pos: Vector2) -> String:
 	return ""
 
 func _input(ev: InputEvent) -> void:
-	if ui.journal_open or ui.menu_open: return
+	if ui.modal(): return
 	if ev is InputEventScreenTouch:
 		ui.set_touch(true)
 		if ev.pressed: _down(ev.index, ev.position)
@@ -135,9 +135,11 @@ func _process(_dt: float) -> void:
 		_stick_id = -99; stick = Vector2.ZERO
 	queue_redraw()
 
-func _circle(c: Vector2, r: float, col: Color, fill: Color) -> void:
-	draw_circle(c, r, fill)
-	draw_arc(c, r, 0, TAU, 48, col, 1.2, true)
+# botón de papel: sombra, relleno y filete de tinta
+func _circle(c: Vector2, r: float, col: Color, on: bool, w := 2.0) -> void:
+	draw_circle(c + Vector2(0, 2.5), r + 1.0, Color(0.05, 0.07, 0.09, 0.16))
+	draw_circle(c, r, Color("ead9c8") if on else Color(App.CARD, 0.94))
+	draw_arc(c, r, 0, TAU, 56, col, w, true)
 
 func _draw() -> void:
 	var g := _g()
@@ -146,48 +148,56 @@ func _draw() -> void:
 	for k in b:
 		var c: Vector2 = b[k][0]; var r: float = b[k][1]
 		var on := _held.has(k)
-		var fill := Color(App.GAS, 0.25) if on else Color(0.031, 0.063, 0.075, 0.55)
 		match k:
 			"menu":
-				_circle(c, r, App.LINE, fill)
-				for i in 3: draw_line(c + Vector2(-8, -6 + i * 6), c + Vector2(8, -6 + i * 6), App.DIM, 1.4)
+				_circle(c, r, App.INK, on)
+				for i in 3: draw_line(c + Vector2(-9, -7 + i * 7), c + Vector2(9, -7 + i * 7), App.INK, 2.0)
 			"inv":
-				_circle(c, r, Color(App.GAS, 0.7) if ui.new_pages else App.LINE, fill)
-				var col := App.GAS if ui.new_pages else App.DIM
-				draw_rect(Rect2(c + Vector2(-9, -7), Vector2(8.5, 14)), col, false, 1.3)
-				draw_rect(Rect2(c + Vector2(0.5, -7), Vector2(8.5, 14)), col, false, 1.3)
+				var col := App.ACC if ui.new_pages else App.INK
+				_circle(c, r, col, on)
+				draw_rect(Rect2(c + Vector2(-11, -8), Vector2(10.5, 16)), col, false, 1.8)
+				draw_rect(Rect2(c + Vector2(0.5, -8), Vector2(10.5, 16)), col, false, 1.8)
 				for i in 3:
-					draw_line(c + Vector2(-7, -3 + i * 3.5), c + Vector2(-2.5, -3 + i * 3.5), col, 1.0)
-					draw_line(c + Vector2(2.5, -3 + i * 3.5), c + Vector2(7, -3 + i * 3.5), col, 1.0)
-				if ui.new_pages: draw_circle(c + Vector2(14, -14), 4.0, App.GAS)
+					draw_line(c + Vector2(-8, -3.5 + i * 4), c + Vector2(-3, -3.5 + i * 4), col, 1.2)
+					draw_line(c + Vector2(3.5, -3.5 + i * 4), c + Vector2(8.5, -3.5 + i * 4), col, 1.2)
+				if ui.new_pages:
+					draw_circle(c + Vector2(17, -17), 6.5, App.CARD); draw_circle(c + Vector2(17, -17), 5.0, App.ACC)
 			"act":
 				var label: String = g.need_act if g.need_act != "" else (g.near_label if g.near != null else "")
 				var live := label != ""
-				_circle(c, r, App.GAS if live else App.LINE, fill)
+				_circle(c, r, App.ACC if live else App.FAINT, on, 3.0 if live else 1.6)
 				if live:
-					var fs := 15 if label.length() <= 8 else 12
+					draw_arc(c, r - 5.0, 0, TAU, 56, Color(App.ACC, 0.35), 1.0, true)
+					var fs := 16 if label.length() <= 7 else (13 if label.length() <= 10 else 11)
 					var w := ui.caps.get_string_size(label.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-					draw_string(ui.caps, c + Vector2(-w / 2.0, fs * 0.35), label.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, App.GAS)
-				else: draw_arc(c, 7, 0, TAU, 24, App.FAINT, 1.2, true)
+					draw_string(ui.caps, c + Vector2(-w / 2.0, fs * 0.35), label.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, App.ACC)
+				else: draw_arc(c, 8, 0, TAU, 24, App.FAINT, 1.6, true)
 			"view":
-				_circle(c, r, App.LINE, fill)
+				_circle(c, r, App.INK, on)
 				var pts := PackedVector2Array()
-				for i in 17: pts.append(c + Vector2(-13 + i * 26.0 / 16.0, -7.0 * sin(PI * i / 16.0)))
-				for i in 17: pts.append(c + Vector2(13 - i * 26.0 / 16.0, 7.0 * sin(PI * i / 16.0)))
+				for i in 17: pts.append(c + Vector2(-15 + i * 30.0 / 16.0, -8.0 * sin(PI * i / 16.0)))
+				for i in 17: pts.append(c + Vector2(15 - i * 30.0 / 16.0, 8.0 * sin(PI * i / 16.0)))
 				pts.append(pts[0])
-				if g.view == "eye": draw_line(c + Vector2(-13, 0), c + Vector2(13, 0), App.BONE, 1.6)
+				if g.view == "eye":
+					# en la vista del plano el botón devuelve a la lámina: un cuadrado visto desde arriba
+					draw_rect(Rect2(c - Vector2(8, 8), Vector2(16, 16)), App.INK, false, 2.0)
 				else:
-					draw_polyline(pts, App.BONE, 1.2, true); draw_circle(c, 3.2, App.BONE)
+					draw_polyline(pts, App.INK, 1.8, true); draw_circle(c, 3.6, App.INK)
 			"up", "down":
-				_circle(c, r, App.LINE, fill)
+				_circle(c, r, App.INK, on)
 				var s := -1.0 if k == "up" else 1.0
-				draw_colored_polygon(PackedVector2Array([c + Vector2(-11, -6 * s), c + Vector2(11, -6 * s), c + Vector2(0, 9 * s)]), App.BONE)
+				draw_colored_polygon(PackedVector2Array([c + Vector2(-12, -6 * s), c + Vector2(12, -6 * s), c + Vector2(0, 10 * s)]), App.INK)
 	if ui.touch and controls_on():
-		if _stick_id != -99:
-			draw_arc(_origin, R, 0, TAU, 64, App.LINE, 1.2, true)
-			draw_circle(_origin, R, Color(0.031, 0.063, 0.075, 0.28))
-			_circle(_origin + stick * R, 25, App.BONE, Color(App.BONE, 0.14))
-		else:
-			var c := Vector2(104, ui.size.y - 104)
-			draw_arc(c, R, 0, TAU, 64, Color(App.BONE, 0.10), 1.0, true)
-			draw_arc(c, 25, 0, TAU, 32, Color(App.BONE, 0.16), 1.0, true)
+		var c := _origin if _stick_id != -99 else Vector2(100, ui.size.y - 100)
+		var act := _stick_id != -99
+		draw_circle(c, R, Color(App.CARD, 0.55 if act else 0.30))
+		draw_arc(c, R, 0, TAU, 64, Color(App.INK, 0.9 if act else 0.45), 2.0, true)
+		# marcas de transportador en la base
+		for i in 8:
+			var d := Vector2(cos(TAU * i / 8.0), sin(TAU * i / 8.0))
+			draw_line(c + d * (R - 7.0), c + d * R, Color(App.INK, 0.7 if act else 0.35), 1.5, true)
+		var kc := c + stick * R
+		draw_circle(kc + Vector2(0, 2), 27, Color(0.05, 0.07, 0.09, 0.16))
+		draw_circle(kc, 26, Color(App.CARD, 0.96 if act else 0.7))
+		draw_arc(kc, 26, 0, TAU, 40, Color(App.INK, 1.0 if act else 0.55), 2.2, true)
+		draw_circle(kc, 4, Color(App.ACC, 1.0 if act else 0.6))

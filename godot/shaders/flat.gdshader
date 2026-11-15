@@ -4,6 +4,7 @@ shader_type spatial;
 render_mode unshaded, cull_disabled, depth_draw_never, blend_mix;
 uniform vec3 fill_col = vec3(0.016, 0.031, 0.039);
 uniform float alpha_mul = 1.0;
+uniform vec3 tint = vec3(1.0);
 varying vec2 vp;
 void vertex() { vp = VERTEX.xz; }
 void fragment() {
@@ -15,6 +16,6 @@ void fragment() {
 		float h = 1.0 - smoothstep(0.10 - w, 0.10 + w, l);
 		c = mix(fill_col, COLOR.rgb, h * UV.y);
 	}
-	ALBEDO = max(c, vec3(0.0));
+	ALBEDO = max(c * tint, vec3(0.0));
 	ALPHA = COLOR.a * alpha_mul;
 }

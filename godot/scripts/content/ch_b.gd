@@ -74,7 +74,7 @@ func ch4() -> void:
 			var pick = await ui.panel('Los pigmentos', 'Elige un color para tu lado %s.' % ['primero', 'segundo', 'tercero', 'cuarto', 'quinto'][i], sw)
 			cols.append(pick)
 			var all_c := cols.duplicate()
-			while all_c.size() < 5: all_c.append('#ece5d0')
+			while all_c.size() < 5: all_c.append('#3a2f24')
 			g.player.set_colors(all_c); Snd.tone(300 + i * 80, 0.5, 'sine', 0.1)
 	else: g.player.set_colors(HUES.slice(0, 5))
 	await narr('Primero pintaste tu casa. Luego a tus esclavos, a tu padre, a tus hijos, a tus nietos. Por último, a ti. Y saliste al mercado.')

@@ -6,8 +6,8 @@ func ch6() -> void:
 	g.set_map({bounds = {x0 = -52, y0 = -18, x1 = 52, y1 = 18}, fog = 22.0, palette = 'dream', zoom = 44.0,
 		labels = [{t = 'Linealandia', x = 0, y = -12.5, s = 1.5, a = 0.3}, {t = 'un sueño · penúltima noche del año 1999', x = 0, y = -14.6, s = 0.65, a = 0.4, it = true}]})
 	var W := g.world; g.spawn_player(3, -7, PI / 2)
-	var line := W.fx_quad(Color('b4a8e0'), 0.35); line.scale = Vector3(110, 1, 0.035); line.position.y = 0.006
-	var sec := W.fx_quad(World.GAS, 1.0); sec.position.y = 0.05; sec.visible = false
+	var line := W.fx_quad(W.pal.edge, 0.55); line.scale = Vector3(110, 1, 0.035); line.position.y = 0.006
+	var sec := W.fx_quad(W.pal.acc, 1.0); sec.position.y = 0.05; sec.visible = false
 	var folk := []
 	# Los habitantes de la Línea no pueden salir de ella: ni siquiera girar (fixedRot).
 	var man := func(id: String, x: float, r: float, name := 'un súbdito'):

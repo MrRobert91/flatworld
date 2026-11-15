@@ -4,13 +4,12 @@ extends Node
 var g: Game
 var ui: UIRoot
 var chapters := []       # [nombre, Callable]
-var _back_t := 0
 var _bot_t := 0.0
 var _shot_t := 0.0
 var _shot_n := 0
 
 func _ready() -> void:
-	_parse_args()
+	_parse_args(); App.load_cfg()
 	get_window().size_changed.connect(_fit); _fit()
 	ui = UIRoot.new(); App.ui = ui; add_child(ui)
 	g = Game.new(); App.g = g; add_child(g)
@@ -45,11 +44,8 @@ func _parse_args() -> void:
 		App.args[kv[0]] = kv[1] if kv.size() > 1 else "1"
 	App.args["_"] = 1
 
-# la interfaz se escala según la orientación: horizontal 1280×720, vertical 620×1100
 func _fit() -> void:
-	var px := DisplayServer.window_get_size()
-	var want := Vector2i(1280, 720) if px.x >= px.y else Vector2i(620, 1100)
-	if get_window().content_scale_size != want: get_window().content_scale_size = want
+	App.fit(get_window())
 
 # fondo vivo del menú: la ciudad vista desde arriba, a la deriva
 func _menu() -> void:
@@ -88,12 +84,7 @@ func run(i: int) -> void:
 	ui.hide_menu(); ui.fade_r.color.a = 1.0; ui._fade_to = 1.0
 	g.tickers.clear(); g.running = true
 	if g.knows("vista"): g.eye.trace = 1.0
-	g.on_menu = func():
-		var now := Time.get_ticks_msec()
-		if now - _back_t < 2500: App.pending_start = -1; get_tree().reload_current_scene()
-		else:
-			_back_t = now
-			ui.toast("", "Menú", "Pulsa otra vez para volver al menú. El progreso se guarda por capítulos.")
+	g.on_menu = func(): ui.toggle_pause(func(): App.pending_start = -1; get_tree().reload_current_scene())
 	while i < chapters.size():
 		g.state.chapter = i; g.state.max = maxi(g.state.max, i); g.save()
 		g.locked = false; g.view_lock = false; g.busy = false; g.speed_mul = 1.0; g.hide_eye_hint = false

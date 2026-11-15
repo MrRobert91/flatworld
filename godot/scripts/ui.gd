@@ -1,4 +1,4 @@
-# Interfaz: HUD, bloques de diálogo, narrador, avisos, inventario (manuscrito, saberes, posición), paneles y menú.
+# Interfaz en tinta sobre papel: HUD, bloques de diálogo, narrador, avisos, inventario (manuscrito, saberes, posición), paneles y menú.
 class_name UIRoot extends CanvasLayer
 
 signal tick(dt)
@@ -14,11 +14,13 @@ const F_FELL_IT := preload("res://assets/fonts/IMFeENit28P.ttf")
 var SPEAKERS := {
 	yo = {name = "Tú", cls = "you", voice = "yo"},
 	narr = {name = "", cls = "narr", voice = "narr"},
-	logica = {name = "Lógica", cls = "inner", color = "#8fc7d8", voice = "inner"},
-	decoro = {name = "Decoro", cls = "inner", color = "#d8b48f", voice = "inner"},
-	asombro = {name = "Asombro", cls = "inner", color = "#b79cf0", voice = "inner"},
-	recelo = {name = "Recelo", cls = "inner", color = "#e08a7a", voice = "inner"},
+	logica = {name = "Lógica", cls = "inner", color = "#1f6f8a", voice = "inner"},
+	decoro = {name = "Decoro", cls = "inner", color = "#8a5a1c", voice = "inner"},
+	asombro = {name = "Asombro", cls = "inner", color = "#5b3fa8", voice = "inner"},
+	recelo = {name = "Recelo", cls = "inner", color = "#9c2f20", voice = "inner"},
 }
+
+const ICON := {mujer = 2, iso = 1, tri = 3, cuad = 4, yo = 4, penta = 5, hexa = 6, nino = 6, circ = 24, esfera = 24, rey = 2, punto = 0}
 
 var auto := false
 var serif: FontVariation
@@ -26,25 +28,34 @@ var serif_it: FontVariation
 var caps: FontVariation
 var size := Vector2(1280, 720)
 var touch := false
+var compact := false     # pantalla baja (móvil apaisado)
+var port := false
+var strip_rect := Rect2(0, 0, 100, 40)
 
 # nodos
+var paper: ColorRect
 var hud: Control
+var hud_card: PanelContainer
 var chapter_tag_l: Label
 var objective_l: Label
 var eye_frame: Panel
 var compass: Control
 var prompt_l: RichTextLabel
 var prompt_box: PanelContainer
-var bearing_l: Label
+var bearing_l: Bearing
 var eye_hint: Label
 var keys_l: Label
+var keys_box: PanelContainer
 var pad: Pad
 var note_l: RichTextLabel
+var note_box: PanelContainer
 var toasts: VBoxContainer
 var fade_r: ColorRect
 var dock: VBoxContainer
 var dock_margin: MarginContainer
 var dlg: PanelContainer
+var dlg_head: HBoxContainer
+var dlg_icon: PolyIcon
 var dlg_who: Label
 var dlg_text: RichTextLabel
 var dlg_choices: VBoxContainer
@@ -69,9 +80,14 @@ var j_tabs := {}
 var j_list: VBoxContainer
 var j_body: VBoxContainer
 var j_split: BoxContainer
+var j_ls: ScrollContainer
 var menu: Control
+var menu_split: BoxContainer
+var menu_title: Label
 var menu_btns: VBoxContainer
 var menu_foot: Label
+var pause: Control
+var pause_btns: VBoxContainer
 
 # estado
 var dlg_open := false
@@ -79,6 +95,7 @@ var choosing := false
 var picking := false
 var journal_open := false
 var menu_open := false
+var pause_open := false
 var auto_pick := Callable()
 var last_frag := 0
 var new_pages := false
@@ -94,32 +111,35 @@ var _n_opts := 0
 var _opt_lock := []
 var _block_tw: Tween
 var _re := RegEx.new()
+var _menu_args := []
 
 # ---------- construcción ----------
 func _init() -> void:
 	layer = 5
 	_re.compile("\\*(.+?)\\*")
 	var ts := TextServerManager.get_primary_interface()
-	serif = FontVariation.new(); serif.base_font = F_SERIF; serif.variation_opentype = {ts.name_to_tag("wght"): 500}
-	serif_it = FontVariation.new(); serif_it.base_font = F_SERIF_IT; serif_it.variation_opentype = {ts.name_to_tag("wght"): 500}
+	serif = FontVariation.new(); serif.base_font = F_SERIF; serif.variation_opentype = {ts.name_to_tag("wght"): 620}
+	serif_it = FontVariation.new(); serif_it.base_font = F_SERIF_IT; serif_it.variation_opentype = {ts.name_to_tag("wght"): 620}
 	caps = FontVariation.new(); caps.base_font = F_CAPS; caps.spacing_glyph = 2
 
 func _ready() -> void:
+	paper = ColorRect.new(); paper.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(paper)
+	var pm := ShaderMaterial.new(); pm.shader = preload("res://shaders/paper.gdshader"); paper.material = pm; add_child(paper)
 	_build_hud()
 	pad = Pad.new(); pad.ui = self; _full(pad); add_child(pad)
-	note_l = _rich(22, App.BONE, F_FELL_IT, F_FELL)
-	note_l.set_anchors_preset(Control.PRESET_CENTER_TOP); note_l.visible = false
-	note_l.add_theme_constant_override("outline_size", 6); note_l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
-	add_child(note_l)
+	note_box = PanelContainer.new(); note_box.mouse_filter = Control.MOUSE_FILTER_IGNORE; note_box.visible = false
+	note_box.add_theme_stylebox_override("panel", _card(Color(App.CARD, 0.93), 18, 8, 1, 0)); add_child(note_box)
+	note_l = _rich(20, App.INK, F_FELL_IT, F_FELL); note_box.add_child(note_l)
 	toasts = VBoxContainer.new(); toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toasts.add_theme_constant_override("separation", 6); add_child(toasts)
-	fade_r = ColorRect.new(); fade_r.color = Color("030607"); fade_r.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(fade_r); add_child(fade_r)
+	fade_r = ColorRect.new(); fade_r.color = Color("e6dec8"); fade_r.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(fade_r); add_child(fade_r)
 	_build_dock()
 	_build_info()
 	_build_slate()
 	_build_title()
 	_build_journal()
 	_build_menu()
+	_build_pause()
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -140,111 +160,137 @@ func _rich(fsize: int, color: Color, font: Font = null, em_font: Font = null) ->
 	r.add_theme_font_override("bold_font", caps)
 	for k in ["normal_font_size", "italics_font_size", "bold_font_size"]: r.add_theme_font_size_override(k, fsize)
 	r.add_theme_color_override("default_color", color)
-	r.add_theme_constant_override("line_separation", 2)
+	r.add_theme_constant_override("line_separation", 3)
 	return r
 
-func _box(bg: Color, border := App.LINE, mx := 22, my := 14) -> StyleBoxFlat:
-	var s := StyleBoxFlat.new(); s.bg_color = bg; s.border_color = border; s.set_border_width_all(1)
+# cartela de papel: filete de tinta y sombra suave
+func _card(bg := App.CARD, mx := 22, my := 14, border := 2, shadow := 10) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new(); s.bg_color = bg; s.border_color = App.INK if border >= 2 else App.LINE; s.set_border_width_all(border)
+	s.set_corner_radius_all(3); s.anti_aliasing = true
 	s.content_margin_left = mx; s.content_margin_right = mx; s.content_margin_top = my; s.content_margin_bottom = my
+	if shadow > 0: s.shadow_color = Color(0.05, 0.07, 0.09, 0.22); s.shadow_size = shadow; s.shadow_offset = Vector2(0, 3)
 	return s
 
-func _flat_btn(text: String, font: Font, fsize: int, color: Color) -> Button:
-	var b := Button.new(); b.text = text; b.flat = true; b.focus_mode = Control.FOCUS_NONE
-	b.add_theme_font_override("font", font); b.add_theme_font_size_override("font_size", fsize)
-	b.add_theme_color_override("font_color", color); b.add_theme_color_override("font_hover_color", App.GAS)
-	b.add_theme_color_override("font_pressed_color", App.GAS); b.add_theme_color_override("font_disabled_color", App.FAINT)
-	b.add_theme_color_override("font_focus_color", color)
-	var e := StyleBoxEmpty.new(); e.content_margin_left = 10; e.content_margin_right = 10; e.content_margin_top = 5; e.content_margin_bottom = 5
-	for k in ["normal", "hover", "pressed", "disabled", "focus"]: b.add_theme_stylebox_override(k, e)
+# botón de interfaz. kind: primary (tinta), ghost (papel con filete), flat (sólo texto)
+func _btn(text: String, kind := "ghost", fsize := 17, min_h := 48.0) -> Button:
+	var b := Button.new(); b.text = text; b.focus_mode = Control.FOCUS_NONE
+	b.custom_minimum_size.y = min_h
+	b.add_theme_font_override("font", caps); b.add_theme_font_size_override("font_size", fsize)
+	var fg := App.CARD if kind == "primary" else App.INK
+	for k in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]: b.add_theme_color_override(k, fg)
+	b.add_theme_color_override("font_disabled_color", App.FAINT)
+	var mk := func(bg: Color, border: Color, bw: int) -> StyleBoxFlat:
+		var s := StyleBoxFlat.new(); s.bg_color = bg; s.border_color = border; s.set_border_width_all(bw); s.set_corner_radius_all(3)
+		s.content_margin_left = 18; s.content_margin_right = 18; s.content_margin_top = 6; s.content_margin_bottom = 6
+		return s
+	var n: StyleBoxFlat; var h: StyleBoxFlat; var p: StyleBoxFlat; var d: StyleBoxFlat
+	if kind == "primary":
+		n = mk.call(App.INK, App.INK, 2); h = mk.call(Color("2a3948"), App.INK, 2); p = mk.call(App.ACC, App.ACC, 2); d = mk.call(App.FAINT, App.FAINT, 2)
+	elif kind == "ghost":
+		n = mk.call(Color(App.CARD, 0.94), App.INK, 2); h = mk.call(Color("fffaf0"), App.ACC, 2); p = mk.call(Color("ead9c8"), App.ACC, 2); d = mk.call(Color(App.CARD, 0.5), App.FAINT, 1)
+	else:
+		n = mk.call(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0); h = mk.call(Color(App.ACC, 0.10), Color(0, 0, 0, 0), 0); p = mk.call(Color(App.ACC, 0.2), Color(0, 0, 0, 0), 0); d = n
+		n.content_margin_left = 10; h.content_margin_left = 10; p.content_margin_left = 10
+	b.add_theme_stylebox_override("normal", n); b.add_theme_stylebox_override("hover", h); b.add_theme_stylebox_override("pressed", p)
+	b.add_theme_stylebox_override("disabled", d); b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	return b
 
 func fmt(t: String, em := "i") -> String:
 	return _re.sub(t, "[%s]$1[/%s]" % [em, em.split("=")[0]], true)
 
+func modal() -> bool:
+	return journal_open or menu_open or pause_open
+
 func _build_hud() -> void:
 	hud = Control.new(); hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(hud); hud.visible = false; add_child(hud)
-	chapter_tag_l = _lbl("", caps, 14, App.DIM); chapter_tag_l.position = Vector2(26, 16); hud.add_child(chapter_tag_l)
-	objective_l = _lbl("", serif_it, 20, App.GAS); objective_l.position = Vector2(26, 38)
-	objective_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; objective_l.custom_minimum_size.x = 330
-	objective_l.add_theme_constant_override("outline_size", 5); objective_l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
-	hud.add_child(objective_l)
+	hud_card = PanelContainer.new(); hud_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud_card.add_theme_stylebox_override("panel", _card(Color(App.CARD, 0.90), 12, 7, 1, 0)); hud.add_child(hud_card)
+	var hv := VBoxContainer.new(); hv.mouse_filter = Control.MOUSE_FILTER_IGNORE; hv.add_theme_constant_override("separation", 0); hud_card.add_child(hv)
+	chapter_tag_l = _lbl("", caps, 12, App.SOFT); chapter_tag_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; hv.add_child(chapter_tag_l)
+	objective_l = _lbl("", serif_it, 18, App.ACC); objective_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; objective_l.visible = false
+	objective_l.add_theme_constant_override("line_spacing", -2); hv.add_child(objective_l)
 	eye_frame = Panel.new(); eye_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var fs := StyleBoxFlat.new(); fs.bg_color = Color(0, 0, 0, 0); fs.border_color = App.LINE; fs.set_border_width_all(1)
+	var fs := StyleBoxFlat.new(); fs.bg_color = Color(0, 0, 0, 0); fs.border_color = App.INK; fs.set_border_width_all(2); fs.set_corner_radius_all(2)
+	fs.shadow_color = Color(0.05, 0.07, 0.09, 0.18); fs.shadow_size = 6; fs.shadow_offset = Vector2(0, 2); fs.draw_center = false
 	eye_frame.add_theme_stylebox_override("panel", fs); hud.add_child(eye_frame)
 	compass = Compass.new(); compass.ui = self; compass.size = Vector2(46, 46); compass.mouse_filter = Control.MOUSE_FILTER_IGNORE; hud.add_child(compass)
 	prompt_box = PanelContainer.new(); prompt_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	prompt_box.add_theme_stylebox_override("panel", _box(App.PANEL, App.LINE, 18, 6)); prompt_box.visible = false
-	prompt_l = _rich(19, App.BONE); prompt_l.autowrap_mode = TextServer.AUTOWRAP_OFF
+	prompt_box.add_theme_stylebox_override("panel", _card(App.CARD, 18, 7, 2, 8)); prompt_box.visible = false
+	prompt_l = _rich(20, App.INK); prompt_l.autowrap_mode = TextServer.AUTOWRAP_OFF
 	prompt_box.add_child(prompt_l); hud.add_child(prompt_box)
-	bearing_l = _lbl("v", caps, 15, App.GAS); bearing_l.visible = false; hud.add_child(bearing_l)
-	eye_hint = _lbl("VISTA DEL PLANO", caps, 12, App.FAINT); eye_hint.visible = false
-	eye_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; hud.add_child(eye_hint)
-	keys_l = _lbl("V vista  ·  J inventario  ·  M sonido  ·  Esc menú", caps, 13, App.FAINT); hud.add_child(keys_l)
+	bearing_l = Bearing.new(); bearing_l.visible = false; bearing_l.mouse_filter = Control.MOUSE_FILTER_IGNORE; hud.add_child(bearing_l)
+	eye_hint = _lbl("VISTA DEL PLANO", caps, 13, App.SOFT); eye_hint.visible = false
+	eye_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; eye_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; hud.add_child(eye_hint)
+	keys_box = PanelContainer.new(); keys_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	keys_box.add_theme_stylebox_override("panel", _card(Color(App.CARD, 0.85), 12, 4, 1, 0)); hud.add_child(keys_box)
+	keys_l = _lbl("", caps, 12, App.SOFT); keys_box.add_child(keys_l)
 
 func _build_dock() -> void:
 	dock_margin = MarginContainer.new(); dock_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(dock_margin); add_child(dock_margin)
 	dock = VBoxContainer.new(); dock.mouse_filter = Control.MOUSE_FILTER_IGNORE; dock.alignment = BoxContainer.ALIGNMENT_END
 	dock.add_theme_constant_override("separation", 10); dock_margin.add_child(dock)
 	# panel de minijuego (elección con iconos)
-	pick = PanelContainer.new(); pick.add_theme_stylebox_override("panel", _box(App.PANEL)); pick.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	pick = PanelContainer.new(); pick.add_theme_stylebox_override("panel", _card(App.CARD, 18, 12)); pick.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	pick.visible = false; dock.add_child(pick)
 	var pv := VBoxContainer.new(); pv.add_theme_constant_override("separation", 6); pick.add_child(pv)
-	pick_title = _lbl("", caps, 15, App.DIM); pick_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; pv.add_child(pick_title)
-	pick_text = _rich(20, App.BONE, serif_it, serif); pick_text.text = ""; pv.add_child(pick_text)
+	pick_title = _lbl("", caps, 14, App.ACC); pick_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; pv.add_child(pick_title)
+	pick_text = _rich(20, App.INK, serif_it, serif); pick_text.text = ""; pv.add_child(pick_text)
 	pick_opts = HFlowContainer.new(); pick_opts.alignment = FlowContainer.ALIGNMENT_CENTER
 	pick_opts.add_theme_constant_override("h_separation", 8); pick_opts.add_theme_constant_override("v_separation", 8); pv.add_child(pick_opts)
 	# bloque de diálogo
 	dlg = PanelContainer.new(); dlg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	dlg.add_theme_stylebox_override("panel", _box(App.PANEL, App.LINE, 26, 16)); dlg.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	dlg.add_theme_stylebox_override("panel", _card(Color(App.CARD, 0.98), 24, 14)); dlg.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	dlg.visible = false; dock.add_child(dlg)
 	var dv := VBoxContainer.new(); dv.mouse_filter = Control.MOUSE_FILTER_IGNORE; dv.add_theme_constant_override("separation", 4); dlg.add_child(dv)
-	dlg_who = _lbl("", caps, 14, App.DIM); dv.add_child(dlg_who)
-	dlg_text = _rich(23, App.BONE); dv.add_child(dlg_text)
+	dlg_head = HBoxContainer.new(); dlg_head.mouse_filter = Control.MOUSE_FILTER_IGNORE; dlg_head.add_theme_constant_override("separation", 8); dv.add_child(dlg_head)
+	dlg_icon = PolyIcon.new(); dlg_icon.custom_minimum_size = Vector2(20, 20); dlg_icon.mid = true; dlg_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; dlg_head.add_child(dlg_icon)
+	dlg_who = _lbl("", caps, 14, App.SOFT); dlg_head.add_child(dlg_who)
+	dlg_text = _rich(23, App.INK); dv.add_child(dlg_text)
 	dlg_choices = VBoxContainer.new(); dlg_choices.add_theme_constant_override("separation", 0); dlg_choices.visible = false; dv.add_child(dlg_choices)
-	dlg_more = _lbl("continuar", caps, 12, App.GAS); dlg_more.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; dlg_more.visible = false; dv.add_child(dlg_more)
+	dlg_more = _lbl("continuar", caps, 13, App.ACC); dlg_more.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; dlg_more.visible = false; dv.add_child(dlg_more)
 
 func _build_info() -> void:
-	info = PanelContainer.new(); info.mouse_filter = Control.MOUSE_FILTER_IGNORE; info.add_theme_stylebox_override("panel", _box(App.PANEL, App.LINE, 20, 10))
+	info = PanelContainer.new(); info.mouse_filter = Control.MOUSE_FILTER_IGNORE; info.add_theme_stylebox_override("panel", _card(App.CARD, 20, 10, 2, 8))
 	info.visible = false; add_child(info)
-	var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; info.add_child(v)
-	info_title = _lbl("", caps, 14, App.DIM); info_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(info_title)
-	info_text = _rich(19, App.BONE, serif_it, serif); v.add_child(info_text)
+	var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_theme_constant_override("separation", 2); info.add_child(v)
+	info_title = _lbl("", caps, 13, App.ACC); info_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(info_title)
+	info_text = _rich(19, App.INK, serif_it, serif); v.add_child(info_text)
 
 func _build_slate() -> void:
 	slate_box = PanelContainer.new(); slate_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	slate_box.add_theme_stylebox_override("panel", _box(Color("0a1215"), App.LINE, 14, 12)); slate_box.visible = false; add_child(slate_box)
+	slate_box.add_theme_stylebox_override("panel", _card(Color("fbf7ea"), 12, 10)); slate_box.visible = false; add_child(slate_box)
 	var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; slate_box.add_child(v)
 	slate_board = SlateBoard.new(); slate_board.font = serif_it; slate_board.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_child(slate_board)
-	slate_cap = _lbl("", caps, 12, App.FAINT); slate_cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(slate_cap)
+	slate_cap = _lbl("", caps, 12, App.SOFT); slate_cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(slate_cap)
 
 func _build_title() -> void:
 	title_box = Control.new(); title_box.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(title_box); title_box.visible = false; add_child(title_box)
-	title_veil = ColorRect.new(); title_veil.color = Color(0.012, 0.024, 0.028, 0.86); title_veil.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(title_veil); title_box.add_child(title_veil)
+	title_veil = ColorRect.new(); title_veil.color = Color(App.PAPER, 0.93); title_veil.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(title_veil); title_box.add_child(title_veil)
 	var c := CenterContainer.new(); c.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(c); title_box.add_child(c)
 	var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_theme_constant_override("separation", 8); c.add_child(v)
-	t_num = _lbl("", caps, 16, App.GAS); t_num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(t_num)
-	t_title = _lbl("", F_FELL, 64, App.BONE); t_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	t_num = _lbl("", caps, 16, App.ACC); t_num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(t_num)
+	t_title = _lbl("", F_FELL, 64, App.INK); t_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	t_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(t_title)
-	var rule := ColorRect.new(); rule.color = Color(App.BONE, 0.5); rule.custom_minimum_size = Vector2(120, 1); rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v.add_child(rule)
-	t_sub = _lbl("", serif_it, 22, App.DIM); t_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var rule := Rule.new(); rule.custom_minimum_size = Vector2(220, 12); rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v.add_child(rule)
+	t_sub = _lbl("", serif_it, 22, App.SOFT); t_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	t_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(t_sub)
 
 func _build_journal() -> void:
 	journal = Control.new(); _full(journal); journal.visible = false; add_child(journal)
-	var bg := ColorRect.new(); bg.color = Color(0.016, 0.031, 0.039, 0.96); _full(bg); journal.add_child(bg)
+	var bg := ColorRect.new(); bg.color = Color("f3ecd9"); _full(bg); journal.add_child(bg)
 	var m := MarginContainer.new(); _full(m); journal.add_child(m)
-	for k in ["margin_left", "margin_right"]: m.add_theme_constant_override(k, 28)
-	m.add_theme_constant_override("margin_top", 18); m.add_theme_constant_override("margin_bottom", 18)
-	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 8); m.add_child(v)
-	var head := HBoxContainer.new(); head.add_theme_constant_override("separation", 6); v.add_child(head)
-	for t in [["ms", "El Manuscrito"], ["know", "Saberes"], ["pos", "Posición social"]]:
-		var b := _flat_btn(t[1], caps, 16, App.FAINT); b.pressed.connect(j_tab.bind(t[0])); head.add_child(b); j_tabs[t[0]] = b
+	for k in ["margin_left", "margin_right"]: m.add_theme_constant_override(k, 20)
+	m.add_theme_constant_override("margin_top", 10); m.add_theme_constant_override("margin_bottom", 10)
+	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 6); m.add_child(v)
+	var head := HBoxContainer.new(); head.add_theme_constant_override("separation", 4); v.add_child(head)
+	for t in [["ms", "Manuscrito"], ["know", "Saberes"], ["pos", "Posición"]]:
+		var b := _btn(t[1], "flat", 16, 46); b.pressed.connect(j_tab.bind(t[0])); head.add_child(b); j_tabs[t[0]] = b
 	var sp := Control.new(); sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL; head.add_child(sp)
-	var cl := _flat_btn("cerrar", caps, 16, App.DIM); cl.pressed.connect(func(): toggle_journal()); head.add_child(cl)
-	var rule := ColorRect.new(); rule.color = App.LINE; rule.custom_minimum_size.y = 1; v.add_child(rule)
-	j_split = BoxContainer.new(); j_split.size_flags_vertical = Control.SIZE_EXPAND_FILL; j_split.add_theme_constant_override("separation", 30); v.add_child(j_split)
-	var ls := ScrollContainer.new(); ls.custom_minimum_size = Vector2(300, 210); ls.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; j_split.add_child(ls)
-	j_list = VBoxContainer.new(); j_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL; j_list.add_theme_constant_override("separation", 0); ls.add_child(j_list)
+	var cl := _btn("Cerrar", "ghost", 15, 44); cl.pressed.connect(func(): toggle_journal()); head.add_child(cl)
+	var rule := ColorRect.new(); rule.color = App.INK; rule.custom_minimum_size.y = 2; v.add_child(rule)
+	j_split = BoxContainer.new(); j_split.size_flags_vertical = Control.SIZE_EXPAND_FILL; j_split.add_theme_constant_override("separation", 24); v.add_child(j_split)
+	j_ls = ScrollContainer.new(); j_ls.custom_minimum_size = Vector2(290, 150); j_ls.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; j_split.add_child(j_ls)
+	j_list = VBoxContainer.new(); j_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL; j_list.add_theme_constant_override("separation", 0); j_ls.add_child(j_list)
 	var ts := ScrollContainer.new(); ts.size_flags_horizontal = Control.SIZE_EXPAND_FILL; ts.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	ts.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; j_split.add_child(ts)
 	var tm := MarginContainer.new(); tm.size_flags_horizontal = Control.SIZE_EXPAND_FILL; tm.add_theme_constant_override("margin_right", 16); ts.add_child(tm)
@@ -252,74 +298,131 @@ func _build_journal() -> void:
 
 func _build_menu() -> void:
 	menu = Control.new(); _full(menu); menu.visible = false; add_child(menu)
-	var veil := ColorRect.new(); veil.color = Color(0.012, 0.024, 0.028, 0.72); veil.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(veil); menu.add_child(veil)
+	var veil := ColorRect.new(); veil.color = Color(App.PAPER, 0.80); veil.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(veil); menu.add_child(veil)
 	var sc := ScrollContainer.new(); _full(sc); sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; menu.add_child(sc)
 	var c := CenterContainer.new(); c.size_flags_horizontal = Control.SIZE_EXPAND_FILL; c.size_flags_vertical = Control.SIZE_EXPAND_FILL; sc.add_child(c)
-	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 2); c.add_child(v)
-	var over := _lbl("EDWIN A. ABBOTT  ·  1884", caps, 13, App.DIM); over.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(over)
-	var ft := FontVariation.new(); ft.base_font = F_FELL; ft.spacing_glyph = 10
-	var h := _lbl("PLANILANDIA", ft, 96, App.BONE); h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; h.name = "Title"; v.add_child(h)
-	var sub := _lbl("Un romance de muchas dimensiones", serif_it, 26, App.GAS); sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(sub)
-	var gap := Control.new(); gap.custom_minimum_size.y = 22; v.add_child(gap)
-	menu_btns = VBoxContainer.new(); menu_btns.add_theme_constant_override("separation", 0); menu_btns.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v.add_child(menu_btns)
-	var gap2 := Control.new(); gap2.custom_minimum_size.y = 18; v.add_child(gap2)
-	menu_foot = _lbl("", serif_it, 15, App.FAINT); menu_foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(menu_foot)
+	var mm := MarginContainer.new(); c.add_child(mm)
+	for k in ["margin_left", "margin_right", "margin_top", "margin_bottom"]: mm.add_theme_constant_override(k, 14)
+	menu_split = BoxContainer.new(); menu_split.add_theme_constant_override("separation", 26); menu_split.alignment = BoxContainer.ALIGNMENT_CENTER; mm.add_child(menu_split)
+	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 0); v.alignment = BoxContainer.ALIGNMENT_CENTER; menu_split.add_child(v)
+	var over := _lbl("EDWIN A. ABBOTT  ·  1884", caps, 13, App.SOFT); over.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(over)
+	var ft := FontVariation.new(); ft.base_font = F_FELL; ft.spacing_glyph = 6
+	menu_title = _lbl("PLANILANDIA", ft, 96, App.INK); menu_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(menu_title)
+	var rule := Rule.new(); rule.custom_minimum_size = Vector2(240, 14); rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v.add_child(rule)
+	var sub := _lbl("Un romance de muchas dimensiones", serif_it, 24, App.ACC); sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(sub)
+	var v2 := VBoxContainer.new(); v2.add_theme_constant_override("separation", 10); v2.alignment = BoxContainer.ALIGNMENT_CENTER; menu_split.add_child(v2)
+	menu_btns = VBoxContainer.new(); menu_btns.add_theme_constant_override("separation", 8); menu_btns.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v2.add_child(menu_btns)
+	menu_foot = _lbl("", serif_it, 15, App.SOFT); menu_foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	menu_foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v2.add_child(menu_foot)
+
+func _build_pause() -> void:
+	pause = Control.new(); _full(pause); pause.visible = false; add_child(pause)
+	var veil := ColorRect.new(); veil.color = Color(App.PAPER, 0.86); _full(veil); pause.add_child(veil)
+	var sc := ScrollContainer.new(); _full(sc); sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; pause.add_child(sc)
+	var c := CenterContainer.new(); c.size_flags_horizontal = Control.SIZE_EXPAND_FILL; c.size_flags_vertical = Control.SIZE_EXPAND_FILL; sc.add_child(c)
+	var card := PanelContainer.new(); card.add_theme_stylebox_override("panel", _card(App.CARD, 22, 16)); c.add_child(card)
+	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 8); card.add_child(v)
+	var t := _lbl("PAUSA", caps, 15, App.ACC); t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(t)
+	pause_btns = VBoxContainer.new(); pause_btns.add_theme_constant_override("separation", 8); v.add_child(pause_btns)
+
+# botones de ajustes compartidos por el menú y la pausa
+func _settings_btns(into: Container, min_h: float) -> void:
+	var bs := _btn("", "ghost", 14, min_h)
+	var upd_s := func(): bs.text = "Tamaño de interfaz: " + App.scale_name()
+	upd_s.call()
+	bs.pressed.connect(func(): Snd.sfx("ui"); App.next_scale(); App.fit(get_window()); upd_s.call(); _layout())
+	into.add_child(bs)
+	var bm := _btn("", "ghost", 14, min_h)
+	var upd_m := func(): bm.text = "Sonido: " + ("no" if Snd.muted else "sí")
+	upd_m.call()
+	bm.pressed.connect(func(): Snd.toggle_mute(); upd_m.call())
+	into.add_child(bm)
+	var bf := _btn("Pantalla completa", "ghost", 14, min_h)
+	bf.pressed.connect(func():
+		var full := DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN))
+	into.add_child(bf)
 
 # ---------- disposición ----------
 func _layout() -> void:
 	size = get_viewport().get_visible_rect().size
-	var port := size.x < size.y
-	var narrow := size.x < 760
-	objective_l.custom_minimum_size.x = minf(330, size.x * 0.5)
-	objective_l.size.x = objective_l.custom_minimum_size.x
-	var sw := 0.7 if port and size.x < 820 else 0.44
-	eye_frame.size = Vector2(size.x * sw, 44); eye_frame.position = Vector2((size.x - eye_frame.size.x) / 2.0, 14)
-	if port: chapter_tag_l.position = Vector2(14, 66); objective_l.position = Vector2(14, 86)
-	else: chapter_tag_l.position = Vector2(26, 16); objective_l.position = Vector2(26, 38)
-	compass.position = Vector2(size.x - 176, 12)
-	eye_hint.size.x = size.x; eye_hint.position = Vector2(0, 70)
-	keys_l.reset_size(); keys_l.position = Vector2(size.x - keys_l.size.x - 24, size.y - 34)
-	toasts.position = Vector2(14 if narrow else 26, 150 if port else 120)
-	var side := 16.0
-	if touch and not port: side = 170.0
-	var w := clampf(size.x - side * 2.0, 280.0, 800.0)
+	port = size.x < size.y
+	compact = size.y < 440
+	var narrow := size.x < 640
+	# la tira del ojo: centrada arriba; en pantallas estrechas baja a una segunda fila
+	if narrow:
+		strip_rect = Rect2(14, 66, size.x - 28, 40)
+		hud_card.position = Vector2(12, 10); hud_card.custom_minimum_size.x = 0
+		objective_l.custom_minimum_size.x = minf(size.x - 150, 300)
+	else:
+		var sw := clampf(size.x * 0.42, 240, 620)
+		strip_rect = Rect2((size.x - sw) / 2.0, 12, sw, 40)
+		hud_card.position = Vector2(12, 10)
+		objective_l.custom_minimum_size.x = clampf((size.x - sw) / 2.0 - 52, 130, 300)
+	chapter_tag_l.custom_minimum_size.x = objective_l.custom_minimum_size.x
+	hud_card.reset_size()
+	eye_frame.position = strip_rect.position - Vector2(2, 2); eye_frame.size = strip_rect.size + Vector2(4, 4)
+	compass.position = Vector2(strip_rect.end.x + 14, 9)
+	eye_hint.size.x = size.x - 150; eye_hint.position = Vector2(75, 16)
+	var side := 14.0
+	if touch and not port: side = 168.0
+	var w := clampf(size.x - side * 2.0, 280.0, 780.0)
 	dlg.custom_minimum_size.x = w; pick.custom_minimum_size.x = minf(size.x - 24.0, 860.0)
+	var fs := 21 if compact or narrow else 23
+	for k in ["normal_font_size", "italics_font_size"]: dlg_text.add_theme_font_size_override(k, fs)
 	dock_margin.add_theme_constant_override("margin_left", 12); dock_margin.add_theme_constant_override("margin_right", 12)
 	_dock_bottom()
-	info.custom_minimum_size.x = minf(size.x - 40.0, 620.0)
-	note_l.custom_minimum_size.x = minf(size.x - 40.0, 860.0)
+	info.custom_minimum_size.x = minf(size.x - 40.0, 600.0)
+	note_l.custom_minimum_size.x = minf(size.x - 60.0, 720.0)
 	t_title.custom_minimum_size.x = minf(size.x - 40.0, 1000.0); t_sub.custom_minimum_size.x = minf(size.x - 60.0, 680.0)
-	t_title.add_theme_font_size_override("font_size", int(clampf(size.x * 0.06, 34, 72)))
-	var sbw := minf(640.0, size.x - 60.0)
+	t_title.add_theme_font_size_override("font_size", int(clampf(minf(size.x * 0.07, size.y * 0.16), 34, 76)))
+	var sbw := minf(minf(640.0, size.x - 60.0), (size.y - 90.0) * 640.0 / 420.0)
 	slate_board.custom_minimum_size = Vector2(sbw, sbw * 420.0 / 640.0)
-	j_split.vertical = port or size.x < 820
-	var mt := menu.find_child("Title", true, false) as Label
-	if mt: mt.add_theme_font_size_override("font_size", int(clampf(size.x * 0.085, 40, 118)))
+	j_split.vertical = port or size.x < 700
+	j_ls.custom_minimum_size = Vector2(size.x - 40, minf(190, size.y * 0.3)) if j_split.vertical else Vector2(clampf(size.x * 0.32, 230, 320), 120)
+	# menú: en un móvil apaisado, título a la izquierda y botones a la derecha
+	var wide_menu := compact and not port and size.x > 620
+	menu_split.vertical = not wide_menu
+	var tfs := clampf(size.x * (0.058 if wide_menu else 0.085), 38, 112)
+	menu_title.add_theme_font_size_override("font_size", int(minf(tfs, size.y * 0.2)))
+	menu_foot.custom_minimum_size.x = minf(size.x - 40, 420)
+	if menu_open and not _menu_args.is_empty(): show_menu.callv(_menu_args)
 	pad.queue_redraw()
 
 func _dock_bottom() -> void:
-	var port := size.x < size.y
-	var b := 14.0
-	if touch and port and not dlg_open and not picking: b = 176.0
+	var b := 12.0
+	if touch and port and not dlg_open and not picking: b = 190.0
 	dock_margin.add_theme_constant_override("margin_bottom", int(b))
+
+func _top_y() -> float:
+	if size.x < 640: return hud_card.position.y + hud_card.size.y + strip_rect.size.y + 22
+	return strip_rect.end.y + 12
 
 func _process(dt: float) -> void:
 	tick.emit(dt)
 	if fade_r.color.a != _fade_to:
 		fade_r.color.a = move_toward(fade_r.color.a, _fade_to, dt * _fade_sp)
 	fade_r.visible = fade_r.color.a > 0.001
-	if note_l.visible and _note_t > 0.0:
+	if size.x < 640:
+		# fila 1: capítulo y objetivo; fila 2: la tira del ojo
+		hud_card.reset_size()
+		strip_rect.position.y = hud_card.position.y + maxf(hud_card.size.y, 52) + 8
+		eye_frame.position = strip_rect.position - Vector2(2, 2)
+	toasts.position = Vector2(12, (strip_rect.end.y if size.x < 640 else hud_card.position.y + hud_card.size.y) + 8)
+	if note_box.visible and _note_t > 0.0:
 		_note_t -= dt
-		if _note_t <= 0.0: note_l.visible = false
-	if note_l.visible:
-		note_l.reset_size(); note_l.position = Vector2((size.x - note_l.size.x) / 2.0, 96 if not info.visible else info.position.y + info.size.y + 8)
+		if _note_t <= 0.0: note_box.visible = false
+	var ty := strip_rect.end.y + 12
 	if info.visible:
-		info.reset_size(); info.position = Vector2((size.x - info.size.x) / 2.0, 74)
+		info.reset_size(); info.position = Vector2((size.x - info.size.x) / 2.0, ty); ty += info.size.y + 8
+	if note_box.visible:
+		note_box.reset_size(); note_box.position = Vector2((size.x - note_box.size.x) / 2.0, ty)
 	if slate_box.visible:
-		slate_box.reset_size(); slate_box.position = Vector2((size.x - slate_box.size.x) / 2.0, maxf(8.0, (size.y - slate_box.size.y) * 0.3))
+		slate_box.reset_size(); slate_box.position = Vector2((size.x - slate_box.size.x) / 2.0, maxf(6.0, (size.y - slate_box.size.y) * 0.3))
 	if prompt_box.visible:
 		prompt_box.reset_size(); prompt_box.position = Vector2((size.x - prompt_box.size.x) / 2.0, size.y * 0.80 - prompt_box.size.y)
-	if dlg_more.visible: dlg_more.modulate.a = 0.55 + 0.45 * sin(Time.get_ticks_msec() * 0.004)
+	keys_box.reset_size(); keys_box.position = Vector2(size.x - keys_box.size.x - 14, size.y - keys_box.size.y - 12)
+	if dlg_more.visible: dlg_more.modulate.a = 0.82 + 0.18 * sin(Time.get_ticks_msec() * 0.004)
 	_dock_bottom()
 
 func sleep(sec: float) -> void:
@@ -334,22 +437,23 @@ func set_touch(on: bool) -> void:
 # ---------- avisos y HUD ----------
 func toast(kind: String, small: String, text: String) -> void:
 	var p := PanelContainer.new(); p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var s := _box(App.PANEL, Color(0, 0, 0, 0), 14, 6); s.set_border_width_all(0); s.border_width_left = 2
-	s.border_color = {frag = App.BONE, her = App.HERESY, bad = App.BAD, good = App.GOOD}.get(kind, App.GAS)
+	var s := _card(App.CARD, 14, 6, 1, 6); s.border_width_left = 5
+	s.border_color = {frag = App.INK, her = App.HERESY, bad = App.BAD, good = App.GOOD}.get(kind, App.ACC)
 	p.add_theme_stylebox_override("panel", s)
 	var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_theme_constant_override("separation", -2); p.add_child(v)
-	v.add_child(_lbl(small.to_upper(), caps, 11, App.DIM)); v.add_child(_lbl(text, serif, 18, App.BONE))
+	v.add_child(_lbl(small.to_upper(), caps, 11, App.SOFT))
+	var tl := _lbl(text, serif, 18, App.INK); tl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; tl.custom_minimum_size.x = minf(300, size.x * 0.5); v.add_child(tl)
 	toasts.add_child(p)
-	while toasts.get_child_count() > 4: toasts.get_child(0).free()
+	while toasts.get_child_count() > (2 if compact else 4): toasts.get_child(0).free()
 	p.modulate.a = 0.0
 	var tw := p.create_tween()
 	tw.tween_property(p, "modulate:a", 1.0, 0.3); tw.tween_interval(3.6); tw.tween_property(p, "modulate:a", 0.0, 0.6); tw.tween_callback(p.queue_free)
 
 func objective(t: String) -> void:
-	objective_l.text = t; objective_l.visible = t != ""
+	objective_l.text = t; objective_l.visible = t != ""; hud_card.reset_size()
 
 func chapter_tag(t: String) -> void:
-	chapter_tag_l.text = t.to_upper()
+	chapter_tag_l.text = t.to_upper(); hud_card.reset_size()
 
 func prompt(text) -> void:
 	if text == null or touch: prompt_box.visible = false; return
@@ -402,19 +506,21 @@ func cast(map: Dictionary) -> void:
 func _show_block(who: String, text: String) -> void:
 	var sp: Dictionary = SPEAKERS.get(who, {name = who, voice = "yo"})
 	var cls: String = sp.get("cls", "")
-	var col: Color = Color(sp.color) if sp.has("color") else App.DIM
-	dlg_who.text = (sp.name as String).to_upper(); dlg_who.visible = sp.name != ""
-	dlg_who.add_theme_color_override("font_color", App.FAINT if cls == "you" else col)
+	var col: Color = App.inked(Color(sp.color), 0.46) if sp.has("color") else App.SOFT
+	dlg_who.text = (sp.name as String).to_upper(); dlg_head.visible = sp.name != ""
+	dlg_who.add_theme_color_override("font_color", App.SOFT if cls == "you" else col)
+	dlg_icon.visible = cls != "inner" and ICON.has(sp.get("voice", ""))
+	if dlg_icon.visible: dlg_icon.kind = ICON[sp.voice]; dlg_icon.col = App.SOFT if cls == "you" else col; dlg_icon.queue_redraw()
 	var body := fmt(text)
-	var tc := App.BONE
+	var tc := App.INK
 	if cls == "narr":
-		body = "[center]" + fmt(text, "color=#fff6dc") + "[/center]"; tc = Color("cfc8b2")
+		body = "[center]" + fmt(text, "color=" + App.HEX_ACC) + "[/center]"; tc = Color("2a3540")
 		dlg_text.add_theme_font_override("normal_font", F_FELL_IT)
 	elif cls == "inner":
-		body = fmt(text, "color=#ffffff"); tc = col
+		body = fmt(text, "color=#17212b"); tc = col
 		dlg_text.add_theme_font_override("normal_font", serif_it)
 	else:
-		if cls == "you": tc = Color("b9c7c2")
+		if cls == "you": tc = Color("36434e")
 		dlg_text.add_theme_font_override("normal_font", serif)
 	dlg_text.add_theme_color_override("default_color", tc)
 	dlg_text.text = body; dlg_text.visible = true
@@ -430,11 +536,15 @@ func open_dlg() -> void:
 func close_dlg() -> void:
 	dlg_open = false; dlg.visible = false; dlg_more.visible = false; _layout()
 
+func _more(on: bool) -> void:
+	dlg_more.text = "toca para continuar  ›" if touch else "espacio  ›  continuar"
+	dlg_more.visible = on
+
 func say(who: String, text: String) -> void:
 	if auto: return
 	open_dlg()
 	_show_block(who, text)
-	dlg_more.visible = true
+	_more(true)
 	await wait_advance()
 	dlg_more.visible = false; Snd.sfx("ui")
 
@@ -442,7 +552,7 @@ func say(who: String, text: String) -> void:
 func narrate(text: String, _wide := false) -> void:
 	if auto: return
 	_show_block("narr", text)
-	dlg_more.visible = true
+	_more(true)
 	await wait_advance()
 	dlg_more.visible = false; Snd.sfx("ui")
 	if not dlg_open: dlg.visible = false
@@ -450,7 +560,7 @@ func narrate(text: String, _wide := false) -> void:
 # Apunte no bloqueante
 func note(text: String, sec := 6.0) -> void:
 	if auto: return
-	note_l.text = "[center]" + fmt(text, "color=#e6bd6e") + "[/center]"; note_l.visible = true; _note_t = sec
+	note_l.text = "[center]" + fmt(text, "color=" + App.HEX_ACC) + "[/center]"; note_box.visible = true; _note_t = sec
 
 # opts: [{t, id, tag, lock}] → devuelve id (o índice)
 func choose(opts: Array, _echo := true):
@@ -468,16 +578,16 @@ func choose(opts: Array, _echo := true):
 		var o: Dictionary = opts[i]
 		var lock := _locked(o)
 		_opt_lock.append(lock)
-		var bb := "[color=#4b605f][b]%d[/b][/color]   " % (i + 1)
-		if o.get("tag", "") != "": bb += "[color=%s][b]%s[/b][/color]  " % ["#4b605f" if lock else "#b79cf0", (o.tag as String).to_upper()]
+		var bb := ""
+		if o.get("tag", "") != "": bb += "[color=%s][b]%s[/b][/color]  " % [App.HEX_FAINT if lock else "#5b3fa8", (o.tag as String).to_upper()]
 		bb += fmt(o.t)
-		if lock and o.lock is String: bb += "  [color=#4b605f][i]— %s[/i][/color]" % o.lock
-		var row := ChoiceRow.new(); row.setup(self, bb, lock, i == 0)
+		if lock and o.lock is String: bb += "  [color=%s][i]— %s[/i][/color]" % [App.HEX_FAINT, o.lock]
+		var row := ChoiceRow.new(); row.setup(self, bb, lock, i)
 		if not lock: row.chosen.connect(_pick.bind(i))
 		dlg_choices.add_child(row)
 	_n_opts = opts.size()
 	if not dlg.visible:
-		dlg_who.visible = false; dlg_text.visible = false; dlg.visible = true; dlg.modulate.a = 1.0
+		dlg_head.visible = false; dlg_text.visible = false; dlg.visible = true; dlg.modulate.a = 1.0
 	dlg_choices.visible = true; dlg_more.visible = false; choosing = true
 	_adv_ok = Time.get_ticks_msec() + 260
 	var p: int = await picked
@@ -507,7 +617,7 @@ func pick_key(n: int) -> bool:
 func panel(title_text: String, text: String, options: Array):
 	if auto: return options[0].get("id", 0)
 	for c in pick_opts.get_children(): c.free()
-	pick_title.text = title_text.to_upper(); pick_text.text = "[center]" + fmt(text, "color=#fff6dc") + "[/center]"
+	pick_title.text = title_text.to_upper(); pick_text.text = "[center]" + fmt(text, "color=" + App.HEX_ACC) + "[/center]"
 	for i in options.size():
 		var o: Dictionary = options[i]
 		var card := OptCard.new(); card.setup(self, o, i)
@@ -523,7 +633,7 @@ func panel(title_text: String, text: String, options: Array):
 func panel_info(title_text, text := "") -> void:
 	if title_text == null: info.visible = false; return
 	if auto: return
-	info_title.text = (title_text as String).to_upper(); info_text.text = "[center]" + fmt(text, "color=#fff6dc") + "[/center]"; info.visible = true
+	info_title.text = (title_text as String).to_upper(); info_text.text = "[center]" + fmt(text, "color=" + App.HEX_ACC) + "[/center]"; info.visible = true
 
 func slate(show: bool, cap := "") -> SlateBoard:
 	slate_box.visible = show and not auto; slate_cap.text = cap.to_upper()
@@ -532,16 +642,19 @@ func slate(show: bool, cap := "") -> SlateBoard:
 # ---------- inventario: manuscrito, saberes, posición ----------
 func toggle_journal(tab := "") -> void:
 	journal_open = not journal_open; journal.visible = journal_open
-	App.g.paused = journal_open
+	App.g.paused = journal_open or pause_open
 	if journal_open:
 		new_pages = false
 		j_tab(tab if tab != "" else _tab); Snd.sfx("ui")
 
 func _j_head(t: String) -> void:
-	var l := _lbl(t.to_upper(), caps, 12, App.GAS); j_list.add_child(l)
+	var l := _lbl(t.to_upper(), caps, 12, App.ACC); j_list.add_child(l)
 
 func _j_item(text: String, have: bool, cb: Callable) -> Button:
-	var b := _flat_btn(text, serif if have else serif_it, 18, App.BONE if have else App.FAINT)
+	var b := _btn(text, "flat", 18, 42)
+	b.add_theme_font_override("font", serif if have else serif_it)
+	if not have:
+		for k in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]: b.add_theme_color_override(k, App.FAINT)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT; b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; b.clip_text = true
 	b.pressed.connect(cb); j_list.add_child(b)
 	return b
@@ -551,18 +664,23 @@ func _j_clear(c: Node) -> void:
 
 func _j_text(sec: String, head: String, paras: Array, missing := "") -> void:
 	_j_clear(j_body)
-	j_body.add_child(_lbl(sec.to_upper(), caps, 12, App.GAS))
+	j_body.add_child(_lbl(sec.to_upper(), caps, 12, App.ACC))
 	if head != "":
-		var h := _lbl(head, F_FELL, 32, App.BONE); h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; j_body.add_child(h)
+		var h := _lbl(head, F_FELL, 30, App.INK); h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; j_body.add_child(h)
 	for p in paras:
-		var r := _rich(21, App.BONE); r.text = fmt(p); r.add_theme_constant_override("line_separation", 5); j_body.add_child(r)
+		var r := _rich(21, App.INK); r.text = fmt(p); r.add_theme_constant_override("line_separation", 6); j_body.add_child(r)
 	if missing != "":
-		var r := _rich(20, App.FAINT, serif_it); r.text = missing; j_body.add_child(r)
+		var r := _rich(20, App.SOFT, serif_it); r.text = missing; j_body.add_child(r)
 
 func j_tab(tab: String) -> void:
 	_tab = tab
 	var S: Dictionary = App.g.state
-	for k in j_tabs: j_tabs[k].add_theme_color_override("font_color", App.BONE if k == tab else App.FAINT)
+	for k in j_tabs:
+		var on: bool = k == tab
+		for c in ["font_color", "font_hover_color", "font_focus_color"]: j_tabs[k].add_theme_color_override(c, App.INK if on else App.SOFT)
+		var sb := StyleBoxFlat.new(); sb.bg_color = Color(App.ACC, 0.10 if on else 0.0); sb.border_color = App.ACC; sb.border_width_bottom = 3 if on else 0
+		sb.content_margin_left = 14; sb.content_margin_right = 14
+		j_tabs[k].add_theme_stylebox_override("normal", sb)
 	_j_clear(j_list); _j_clear(j_body)
 	if tab == "ms":
 		var F: Array = App.g.book.fragments
@@ -571,7 +689,7 @@ func j_tab(tab: String) -> void:
 			var sec := ("Parte I · Este mundo" if n <= 12 else "Parte II · Otros mundos") + " — § %d" % n
 			if S.frags.has(str(n)): _j_text(sec, f.title, f.text)
 			else: _j_text(sec, f.title, [], "Esta sección aún no ha sido escrita. " + f.hint)
-		var info_l := _lbl("%d de 22 secciones recuperadas" % S.frags.size(), serif_it, 16, App.DIM); j_list.add_child(info_l)
+		var info_l := _lbl("%d de 22 secciones recuperadas" % S.frags.size(), serif_it, 16, App.SOFT); j_list.add_child(info_l)
 		for i in F.size():
 			if i == 0: _j_head("Parte I — Este mundo")
 			if i == 12: _j_head("Parte II — Otros mundos")
@@ -595,11 +713,11 @@ func j_tab(tab: String) -> void:
 		show.call(first if first != "" else K.keys()[0])
 	else:
 		_j_head("Tu figura")
-		var r := _rich(18, App.BONE)
-		r.text = "Un [b]Cuadrado[/b]: cuatro lados iguales, cuatro ángulos rectos. Clase profesional. Tus hijos son Pentágonos; tus nietos, Hexágonos.\n\n[color=#8fa3a0][i]Mujeres (líneas) · Isósceles · Equiláteros · [/i][/color][b]Cuadrados[/b][color=#8fa3a0][i] · Pentágonos · Hexágonos… · Círculos[/i][/color]"
+		var r := _rich(18, App.INK)
+		r.text = "Un [b]Cuadrado[/b]: cuatro lados iguales, cuatro ángulos rectos. Clase profesional. Tus hijos son Pentágonos; tus nietos, Hexágonos.\n\n[color=#4a5761][i]Mujeres (líneas) · Isósceles · Equiláteros · [/i][/color][b]Cuadrados[/b][color=#4a5761][i] · Pentágonos · Hexágonos… · Círculos[/i][/color]"
 		j_list.add_child(r)
-		j_body.add_child(_lbl("POSICIÓN SOCIAL", caps, 12, App.GAS))
-		j_body.add_child(_lbl("Cómo te ven", F_FELL, 32, App.BONE))
+		j_body.add_child(_lbl("POSICIÓN SOCIAL", caps, 12, App.ACC))
+		j_body.add_child(_lbl("Cómo te ven", F_FELL, 30, App.INK))
 		var d := func(v: float, a: String, b: String, c: String) -> String: return a if v <= -2 else (c if v >= 2 else b)
 		var bars := [
 			["Sacerdocio", S.rep.sac, "sospechoso", "devoto", d.call(S.rep.sac, "Los Círculos te observan de reojo.", "Para los Círculos eres un Cuadrado más.", "Los Círculos te tienen por hijo fiel de la Configuración.")],
@@ -609,30 +727,61 @@ func j_tab(tab: String) -> void:
 		]
 		for b in bars:
 			var row := HBoxContainer.new(); j_body.add_child(row)
-			var l1 := _lbl((b[0] as String).to_upper(), caps, 13, App.DIM); l1.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(l1)
-			row.add_child(_lbl("%s  /  %s" % [b[2], b[3]], caps, 13, App.DIM))
-			var bar := Bar.new(); bar.v = clampf(b[1], -5, 5); bar.custom_minimum_size.y = 16; j_body.add_child(bar)
-			var ds := _lbl(b[4], serif_it, 17, App.DIM); ds.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; j_body.add_child(ds)
+			var l1 := _lbl((b[0] as String).to_upper(), caps, 13, App.INK); l1.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(l1)
+			row.add_child(_lbl("%s  /  %s" % [b[2], b[3]], caps, 12, App.SOFT))
+			var bar := Bar.new(); bar.v = clampf(b[1], -5, 5); bar.custom_minimum_size.y = 20; j_body.add_child(bar)
+			var ds := _lbl(b[4], serif_it, 18, App.SOFT); ds.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; j_body.add_child(ds)
 
 # ---------- menú ----------
 func show_menu(items: Array, chapters: Array, max_ch: int, on_chapter: Callable) -> void:
+	_menu_args = [items, chapters, max_ch, on_chapter]
 	menu.visible = true; menu_open = true; hud.visible = false
-	for c in menu_btns.get_children(): c.free()
-	var chs := GridContainer.new(); chs.columns = 1 if size.x < 720 else 2; chs.visible = false
-	chs.add_theme_constant_override("h_separation", 20); chs.add_theme_constant_override("v_separation", -4)
-	for it in items:
-		var b := _flat_btn((it[0] as String).to_upper(), caps, 19, App.BONE)
+	var chs_open := false
+	for c in menu_btns.get_children():
+		if c is GridContainer: chs_open = c.visible
+		menu_btns.remove_child(c); c.queue_free()
+	var bw := clampf(size.x - 40, 240, 340)
+	var bh := 44.0 if compact else 50.0
+	var chs := GridContainer.new(); chs.columns = 1 if size.x < 560 else 2; chs.visible = chs_open
+	chs.add_theme_constant_override("h_separation", 6); chs.add_theme_constant_override("v_separation", 4)
+	for k in items.size():
+		var it = items[k]
+		var b := _btn((it[0] as String).to_upper(), "primary" if k == 0 else "ghost", 16, bh)
+		b.custom_minimum_size.x = bw; b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; b.clip_text = true
 		if it[1] is String and it[1] == "chapters": b.pressed.connect(func(): Snd.sfx("pick"); chs.visible = not chs.visible)
 		else: b.pressed.connect(func(): Snd.sfx("pick"); it[1].call(b))
 		menu_btns.add_child(b)
 	menu_btns.add_child(chs)
 	for i in chapters.size():
-		var b := _flat_btn(chapters[i], caps, 15, App.BONE); b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		var b := _btn(chapters[i], "flat", 14, 40); b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.disabled = i > max_ch; b.pressed.connect(func(): Snd.sfx("pick"); on_chapter.call(i)); chs.add_child(b)
-	menu_foot.text = "Una aventura narrativa. Se recomienda sonido.\n" + ("Arrastra para moverte · toca para continuar · mejor en horizontal" if touch else "WASD / flechas · E interactuar · Espacio continuar · V cambiar de vista · J inventario")
+	var opts := HFlowContainer.new(); opts.alignment = FlowContainer.ALIGNMENT_CENTER; opts.custom_minimum_size.x = bw
+	opts.add_theme_constant_override("h_separation", 6); opts.add_theme_constant_override("v_separation", 6)
+	_settings_btns(opts, 40); menu_btns.add_child(opts)
+	menu_foot.text = "Una aventura narrativa. Se recomienda sonido.\n" + ("Arrastra a la izquierda para moverte · toca para continuar" if touch else "WASD / flechas · E interactuar · Espacio continuar · V vista · J inventario")
 
 func hide_menu() -> void:
-	menu.visible = false; menu_open = false; hud.visible = true
+	menu.visible = false; menu_open = false; hud.visible = true; _menu_args = []
+
+# ---------- pausa ----------
+func toggle_pause(on_quit := Callable()) -> void:
+	pause_open = not pause_open; pause.visible = pause_open
+	App.g.paused = pause_open or journal_open
+	Snd.sfx("ui")
+	if not pause_open: return
+	for c in pause_btns.get_children(): pause_btns.remove_child(c); c.queue_free()
+	var bw := clampf(size.x - 80, 220, 320); var bh := 42.0 if compact else 48.0
+	var add := func(text: String, kind: String, cb: Callable) -> Button:
+		var b := _btn(text.to_upper(), kind, 15, bh); b.custom_minimum_size.x = bw; b.pressed.connect(cb); pause_btns.add_child(b)
+		return b
+	add.call("Continuar", "primary", func(): toggle_pause())
+	add.call("Manuscrito y saberes", "ghost", func(): toggle_pause(); toggle_journal())
+	_settings_btns(pause_btns, bh)
+	var sure := {on = false}
+	var q: Button = add.call("Salir al menú", "ghost", func(): pass)
+	q.pressed.connect(func():
+		if not sure.on: sure.on = true; q.text = "¿SEGURO? SE GUARDA POR CAPÍTULOS"; return
+		if on_quit.is_valid(): on_quit.call())
 
 
 # ---------- piezas ----------
@@ -640,28 +789,38 @@ class ChoiceRow extends PanelContainer:
 	signal chosen
 	var _lock := false
 	var _hover := false
-	func setup(ui: UIRoot, bb: String, lock: bool, first: bool) -> void:
-		_lock = lock
+	var _down := false
+	var _n := 0
+	var _ui: UIRoot
+	func setup(ui: UIRoot, bb: String, lock: bool, i: int) -> void:
+		_lock = lock; _n = i + 1; _ui = ui
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		mouse_default_cursor_shape = Control.CURSOR_ARROW if lock else Control.CURSOR_POINTING_HAND
-		var e := StyleBoxEmpty.new(); e.content_margin_left = 12; e.content_margin_right = 8; e.content_margin_top = 9; e.content_margin_bottom = 9
+		var e := StyleBoxEmpty.new(); e.content_margin_left = 40; e.content_margin_right = 10; e.content_margin_top = 9; e.content_margin_bottom = 9
 		add_theme_stylebox_override("panel", e)
-		var r := ui._rich(21, App.FAINT if lock else App.GAS)
+		var r := ui._rich(20 if ui.compact else 21, App.FAINT if lock else App.INK)
 		r.add_theme_font_size_override("bold_font_size", 12)
 		r.text = bb; add_child(r)
-		custom_minimum_size.y = 44
-		set_meta("first", first)
+		custom_minimum_size.y = 46 if ui.compact else 50
 		mouse_entered.connect(func(): _hover = true; queue_redraw())
-		mouse_exited.connect(func(): _hover = false; queue_redraw())
+		mouse_exited.connect(func(): _hover = false; _down = false; queue_redraw())
 	func _draw() -> void:
 		draw_line(Vector2(0, 0), Vector2(size.x, 0), App.LINE, 1.0)
-		if _hover and not _lock:
-			draw_rect(Rect2(Vector2.ZERO, size), Color(App.GAS, 0.09))
-			draw_rect(Rect2(0, 0, 2, size.y), App.GAS)
+		var on := (_hover or _down) and not _lock
+		if on:
+			draw_rect(Rect2(Vector2.ZERO, size), Color(App.ACC, 0.16 if _down else 0.08))
+			draw_rect(Rect2(0, 0, 4, size.y), App.ACC)
+		# marcador: número en un círculo de compás
+		var c := Vector2(20, size.y / 2.0); var col := App.FAINT if _lock else (App.ACC if on else App.SOFT)
+		draw_arc(c, 11, 0, TAU, 32, col, 1.4, true)
+		var t := str(_n); var w := _ui.caps.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x
+		draw_string(_ui.caps, c + Vector2(-w / 2.0 + 0.5, 4.5), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, col)
 	func _gui_input(ev: InputEvent) -> void:
 		if _lock: return
-		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and Rect2(Vector2.ZERO, size).has_point(ev.position):
-			accept_event(); chosen.emit()
+		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
+			if ev.pressed: _down = true; queue_redraw()
+			elif Rect2(Vector2.ZERO, size).has_point(ev.position):
+				_down = false; accept_event(); chosen.emit()
 
 class OptCard extends PanelContainer:
 	signal chosen
@@ -671,52 +830,81 @@ class OptCard extends PanelContainer:
 		o = opt
 		mouse_filter = Control.MOUSE_FILTER_STOP; mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		if o.has("swatch"):
-			custom_minimum_size = Vector2(48, 48); add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+			custom_minimum_size = Vector2(54, 54); add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 		else:
-			add_theme_stylebox_override("panel", ui._box(Color(0, 0, 0, 0), App.LINE, 14, 7))
-			custom_minimum_size = Vector2(98, 48)
-			var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_theme_constant_override("separation", 0); add_child(v)
+			var sb := ui._card(Color("fffaf0"), 14, 6, 2, 0)
+			add_theme_stylebox_override("panel", sb)
+			custom_minimum_size = Vector2(104, 54)
+			var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_theme_constant_override("separation", -1); v.alignment = BoxContainer.ALIGNMENT_CENTER; add_child(v)
 			if o.has("icon"):
-				var ic := PolyIcon.new(); ic.kind = o.icon; ic.custom_minimum_size = Vector2(26, 28); ic.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_child(ic)
-			var l := ui._lbl(o.label, ui.serif, 18, App.BONE); l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(l)
-			var s := ui._lbl(o.get("sub", str(i + 1)), ui.caps, 11, App.FAINT); s.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(s)
+				var ic := PolyIcon.new(); ic.kind = o.icon; ic.custom_minimum_size = Vector2(28, 28); ic.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_child(ic)
+			var l := ui._lbl(o.label, ui.serif, 18, App.INK); l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(l)
+			var s := ui._lbl(o.get("sub", str(i + 1)), ui.caps, 11, App.SOFT); s.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(s)
 		mouse_entered.connect(func(): _hover = true; queue_redraw())
 		mouse_exited.connect(func(): _hover = false; queue_redraw())
 	func _draw() -> void:
 		if o.has("swatch"):
-			draw_circle(size / 2.0, 21, Color(o.swatch))
-			if _hover: draw_arc(size / 2.0, 23, 0, TAU, 40, App.BONE, 2.0, true)
-		elif _hover: draw_rect(Rect2(Vector2.ZERO, size), App.GAS, false, 1.0)
+			draw_circle(size / 2.0, 22, Color(o.swatch))
+			draw_arc(size / 2.0, 22, 0, TAU, 40, App.INK, 2.0, true)
+			if _hover: draw_arc(size / 2.0, 26, 0, TAU, 40, App.ACC, 2.0, true)
+		elif _hover: draw_rect(Rect2(Vector2.ZERO, size), App.ACC, false, 3.0)
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and Rect2(Vector2.ZERO, size).has_point(ev.position):
 			accept_event(); chosen.emit()
 
-# icono de clase: 2 = línea, 1 = isósceles, n = polígono
+# icono de clase: 0 = punto, 2 = línea, 1 = isósceles, n = polígono
 class PolyIcon extends Control:
 	var kind := 4
+	var col := App.INK
+	var mid := false     # centrado vertical (cabecera de diálogo)
 	func _draw() -> void:
-		var c := Vector2(size.x / 2.0, 14); var col := App.BONE
-		if kind == 2: draw_line(c + Vector2(-10, 0), c + Vector2(10, 0), col, 1.4, true); return
+		var r := minf(size.x, 22.0) / 2.0 - 1.0
+		var c := Vector2(size.x / 2.0, size.y / 2.0 if mid else 14.0)
+		if kind == 0: draw_circle(c, 3.0, col); return
+		if kind == 2: draw_line(c + Vector2(-r, 0), c + Vector2(r, 0), col, 2.0, true); return
 		var pts := PackedVector2Array()
-		if kind == 1: pts = PackedVector2Array([c + Vector2(-1.5, 9), c + Vector2(1.5, 9), c + Vector2(0, -11)])
+		if kind == 1: pts = PackedVector2Array([c + Vector2(-2.0, r * 0.9), c + Vector2(2.0, r * 0.9), c + Vector2(0, -r * 1.1)])
 		else:
-			for i in kind: pts.append(c + Vector2(cos(TAU * i / kind - PI / 2), sin(TAU * i / kind - PI / 2)) * 10.0)
+			for i in kind: pts.append(c + Vector2(cos(TAU * i / kind - PI / 2), sin(TAU * i / kind - PI / 2)) * r)
 		pts.append(pts[0])
-		draw_polyline(pts, col, 1.3, true)
+		draw_polyline(pts, col, 1.6, true)
 
 class Bar extends Control:
 	var v := 0.0
 	func _draw() -> void:
 		var y := size.y / 2.0
-		draw_rect(Rect2(0, y - 1.5, size.x, 3), App.FAINT)
-		draw_line(Vector2(size.x / 2.0, y - 5), Vector2(size.x / 2.0, y + 5), App.DIM, 1.0)
+		draw_line(Vector2(0, y), Vector2(size.x, y), App.INK, 1.5)
+		for i in 11:
+			var x := size.x * i / 10.0; var h := 6.0 if i % 5 == 0 else 3.0
+			draw_line(Vector2(x, y - h), Vector2(x, y + h), App.INK, 1.2)
 		var x := size.x * (0.5 + v * 0.1)
-		draw_colored_polygon(PackedVector2Array([Vector2(x, y - 7), Vector2(x + 7, y), Vector2(x, y + 7), Vector2(x - 7, y)]), App.BONE)
+		draw_colored_polygon(PackedVector2Array([Vector2(x, y - 9), Vector2(x + 8, y), Vector2(x, y + 9), Vector2(x - 8, y)]), App.ACC)
+
+# filete doble con rombo: adorno de rótulo
+class Rule extends Control:
+	func _draw() -> void:
+		var y := size.y / 2.0; var c := Vector2(size.x / 2.0, y)
+		draw_line(Vector2(0, y), Vector2(c.x - 10, y), App.INK, 1.5); draw_line(Vector2(c.x + 10, y), Vector2(size.x, y), App.INK, 1.5)
+		draw_polyline(PackedVector2Array([c + Vector2(-6, 0), c + Vector2(0, -6), c + Vector2(6, 0), c + Vector2(0, 6), c + Vector2(-6, 0)]), App.ACC, 1.5, true)
 
 class Compass extends Control:
 	var ui: UIRoot
 	func _draw() -> void:
 		var c := size / 2.0
-		draw_arc(c, 22, 0, TAU, 48, App.LINE, 1.0, true)
-		draw_line(c + Vector2(0, -4), c + Vector2(0, 16), Color(App.BONE, 0.5), 1.0)
-		draw_string(ui.caps, c + Vector2(-5, -8), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, App.DIM)
+		draw_circle(c, 22, Color(App.CARD, 0.9))
+		draw_arc(c, 22, 0, TAU, 48, App.INK, 1.5, true)
+		draw_line(c + Vector2(0, -3), c + Vector2(0, 16), App.INK, 1.2)
+		draw_colored_polygon(PackedVector2Array([c + Vector2(0, -19), c + Vector2(4, -11), c + Vector2(-4, -11)]), App.ACC)
+		draw_string(ui.caps, c + Vector2(-4.5, 3), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, App.INK)
+
+# señal del objetivo en la vista del plano: «v» encima, «<» «>» fuera del campo
+class Bearing extends Control:
+	var text := "v":
+		set(t): text = t; queue_redraw()
+	func _draw() -> void:
+		var p: PackedVector2Array
+		match text:
+			"<": p = PackedVector2Array([Vector2(-9, 0), Vector2(5, -9), Vector2(5, 9)])
+			">": p = PackedVector2Array([Vector2(9, 0), Vector2(-5, -9), Vector2(-5, 9)])
+			_: p = PackedVector2Array([Vector2(0, 9), Vector2(-9, -5), Vector2(9, -5)])
+		draw_colored_polygon(p, App.ACC)

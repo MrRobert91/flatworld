@@ -1,14 +1,15 @@
 # El mundo plano: mapa, muros, figuras, colisiones, cámara y aspecto («sombras duras de bordes luminosos»).
 class_name World extends Node3D
 
+# Cada mundo es una lámina distinta: papel crema, papel de calco, papel de acuarela, cianotipo, papel gris.
+# bg: papel · a/b: nubes del papel · line: cuadrícula · fog: margen · edge: tinta · fill: interior · acc: lápiz de color
 const PAL := {
-	flat = {bg = Color("05090b"), a = Color("13282f"), b = Color("24474d"), line = Color("9fb8b2"), fog = Color("2b4244"), edge = Color("ece5d0"), fill = Color("04080a"), wall = Color("aebcb4")},
-	dream = {bg = Color("07050f"), a = Color("181033"), b = Color("2c2152"), line = Color("a99ad8"), fog = Color("3a2f5c"), edge = Color("e4dcff"), fill = Color("05030b"), wall = Color("b4a8e0")},
-	color = {bg = Color("0c0906"), a = Color("2b2014"), b = Color("44331d"), line = Color("d8c49a"), fog = Color("4a3c28"), edge = Color("fff2d6"), fill = Color("0a0705"), wall = Color("d9c8a4")},
-	space = {bg = Color("0e1626"), a = Color("1d3c4c"), b = Color("3a7076"), line = Color("cfe6dc"), fog = Color("2a4a55"), edge = Color("fff7e2"), fill = Color("081016"), wall = Color("d4e2d8")},
-	cell = {bg = Color("030506"), a = Color("0b1518"), b = Color("15262a"), line = Color("6f8a84"), fog = Color("0c1416"), edge = Color("dcd5c0"), fill = Color("030506"), wall = Color("b4c0b8")},
+	flat = {bg = Color("ece4cf"), a = Color("efe8d4"), b = Color("e5dbc1"), line = Color("6d93b0"), fog = Color("ddd2b6"), edge = Color("17212b"), fill = Color("f6f0df"), wall = Color("17212b"), acc = Color("a8392a")},
+	dream = {bg = Color("e3dfee"), a = Color("e8e4f2"), b = Color("d9d3ea"), line = Color("8a7fc0"), fog = Color("cfc8e2"), edge = Color("27204c"), fill = Color("f0edf8"), wall = Color("27204c"), acc = Color("7a3fa8")},
+	color = {bg = Color("f2e7d0"), a = Color("f5ebd5"), b = Color("ecdcbb"), line = Color("c79f70"), fog = Color("e2d2b0"), edge = Color("35261a"), fill = Color("fcf5e4"), wall = Color("35261a"), acc = Color("a8392a")},
+	space = {bg = Color("12315a"), a = Color("163966"), b = Color("1c4577"), line = Color("8db6e4"), fog = Color("0f2a4e"), edge = Color("f2f6ff"), fill = Color("0f2b50"), wall = Color("e2ecfb"), acc = Color("ffd27a"), dark = true},
+	cell = {bg = Color("d8d4c8"), a = Color("dcd8cc"), b = Color("cdc8b9"), line = Color("868f96"), fog = Color("c6c1b2"), edge = Color("1e2429"), fill = Color("e7e3d7"), wall = Color("1e2429"), acc = Color("a8392a")},
 }
-const GAS := Color("e6bd6e")
 const FLAT_SH := preload("res://shaders/flat.gdshader")
 const GROUND_SH := preload("res://shaders/ground.gdshader")
 const F_CAPS := preload("res://assets/fonts/IMFeENsc28P.ttf")
@@ -65,7 +66,7 @@ func _init() -> void:
 	static_g = Node3D.new(); figs = Node3D.new(); fx = Node3D.new()
 	add_child(static_g); add_child(figs); add_child(fx)
 	var mb := Geo.MB.new()
-	mb.tri(Vector3(0.45, 0, 0), Vector3(-0.2, 0, -0.26), Vector3(-0.2, 0, 0.26), GAS)
+	mb.tri(Vector3(0.45, 0, 0), Vector3(-0.2, 0, -0.26), Vector3(-0.2, 0, 0.26), Color.WHITE)
 	arrow = MeshInstance3D.new(); arrow.mesh = mb.commit()
 	var am := ShaderMaterial.new(); am.shader = FLAT_SH; am.render_priority = 4; arrow.material_override = am
 	arrow.position.y = 0.05; add_child(arrow)
@@ -75,21 +76,24 @@ func _init() -> void:
 func mat(prio: int) -> ShaderMaterial:
 	if not _mats.has(prio):
 		var m := ShaderMaterial.new(); m.shader = FLAT_SH; m.render_priority = prio
-		m.set_shader_parameter("fill_col", _v3(App.lin(pal.fill)))
+		m.set_shader_parameter("fill_col", _v3(pal.fill))
 		_mats[prio] = m
 	return _mats[prio]
 
 static func _v3(c: Color) -> Vector3:
 	return Vector3(c.r, c.g, c.b)
 
+# tinta de un color «de luz»: sobre papel claro se oscurece; en el cianotipo se deja como está
+func ink(c: Color, vmax := 0.5) -> Color:
+	return c if pal.get("dark", false) else App.inked(c, vmax)
+
 func set_palette(pname: String) -> void:
 	pal_name = pname; pal = PAL[pname]
 	var gm: ShaderMaterial = ground.material_override
-	# colores «de pantalla»: el sombreador los devuelve tal cual
-	gm.set_shader_parameter("u_a", _v3(pal.a) * 0.62); gm.set_shader_parameter("u_b", _v3(pal.b) * 0.62)
-	gm.set_shader_parameter("u_line", _v3(pal.line) * 0.8); gm.set_shader_parameter("u_fog", _v3(pal.fog) * 0.5)
-	gm.set_shader_parameter("u_bg", _v3(pal.bg))
-	for m in _mats.values(): m.set_shader_parameter("fill_col", _v3(App.lin(pal.fill)))
+	for k in [["u_a", "a"], ["u_b", "b"], ["u_line", "line"], ["u_fog", "fog"], ["u_bg", "bg"], ["u_ink", "edge"]]:
+		gm.set_shader_parameter(k[0], _v3(pal[k[1]]))
+	for m in _mats.values(): m.set_shader_parameter("fill_col", _v3(pal.fill))
+	arrow.material_override.set_shader_parameter("tint", _v3(pal.acc))
 	for e in ents.values(): e.build()
 	if not map.is_empty(): rebuild()
 
@@ -124,7 +128,7 @@ func rebuild() -> void:
 	walls = []
 	var P := pal
 	var segs := []   # [a, b, door]
-	var fills := Geo.MB.new()
+	var fills := Geo.MB.new(); var cons := Geo.MB.new()
 	for w in map.get("walls", []): segs.append([Vector2(w[0], w[1]), Vector2(w[2], w[3]), false])
 	for B in map.get("buildings", []):
 		var a0 := deg_to_rad(B.get("rot", 0.0)); var c := cos(a0); var s := sin(a0)
@@ -147,28 +151,40 @@ func rebuild() -> void:
 			segs.append([a.lerp(b, t0), b, false])
 		for w in B.get("inner", []): segs.append([Vector2(B.x + w[0], B.y + w[1]), Vector2(B.x + w[2], B.y + w[3]), false])
 		var sealed: bool = B.get("sealed", true) != false and not known.get(B.id, false)
-		var ink := App.lin(P.wall); ink.a = 0.97 if sealed else 0.55
-		fills.fan(pts, 0.004, ink, Vector2(1.1 if sealed else 0.6, 0.42 if sealed else 0.0))
+		var ink: Color = P.wall; ink.a = 1.0 if sealed else 0.6
+		fills.fan(pts, 0.004, ink, Vector2(1.6 if sealed else 0.6, 0.30 if sealed else 0.0))
+		# trazos de construcción: circunferencia circunscrita, centro y prolongación de los lados
+		var circ := []
+		for q in Geo.make_points({n = 64, r = B.R}): circ.append(q + Vector2(B.x, B.y))
+		cons.ring(circ, 0.035, 0.006, null, P.line, 0.55)
+		cons.quad(Vector2(B.x - 0.45, B.y), Vector2(B.x + 0.45, B.y), 0.035, 0.006, Color(P.wall, 0.45))
+		cons.quad(Vector2(B.x, B.y - 0.45), Vector2(B.x, B.y + 0.45), 0.035, 0.006, Color(P.wall, 0.45))
+		for i in pts.size():
+			var a: Vector2 = pts[i]; var b: Vector2 = pts[(i + 1) % pts.size()]
+			var dn := (b - a).normalized() * minf(1.1, B.R * 0.16)
+			cons.quad(a - dn, a, 0.04, 0.006, Color(P.wall, 0.4)); cons.quad(b, b + dn, 0.04, 0.006, Color(P.wall, 0.4))
 		if B.has("label") and (sealed or B.get("sealed", true) == false):
 			static_g.add_child(text_plane(B.label, B.x, B.y + B.get("labelDy", 0.0 if sealed else -B.R * 0.55), B.get("labelSize", 1.05), 0.0, 0.75 if sealed else 0.4, false))
 	for l in map.get("labels", []):
 		static_g.add_child(text_plane(l.t, l.x, l.y, l.get("s", 1.2), l.get("rot", 0.0), l.get("a", 0.38), l.get("it", false)))
 	var fm := MeshInstance3D.new(); fm.mesh = fills.commit(); fm.material_override = mat(-4); static_g.add_child(fm)
+	var cm := MeshInstance3D.new(); cm.mesh = cons.commit(); cm.material_override = mat(-3); static_g.add_child(cm)
 	var mb := Geo.MB.new()
 	var wc: Color = P.wall
 	for sgm in segs:
 		walls.append([sgm[0].x, sgm[0].y, sgm[1].x, sgm[1].y, 0.38 if sgm[2] else 0.62])
-		if not sgm[2]: mb.quad(sgm[0], sgm[1], 0.55, 0.012, Color(wc, 0.05))
+		if not sgm[2]: mb.quad(sgm[0], sgm[1], 0.5, 0.012, Color(wc, 0.06))
 	for sgm in segs:
-		if sgm[2]: mb.quad(sgm[0], sgm[1], 0.07, 0.015, Color(wc, 0.55))
-		else: mb.quad(sgm[0], sgm[1], 0.17, 0.015, wc)
+		if sgm[2]: mb.quad(sgm[0], sgm[1], 0.06, 0.015, Color(wc, 0.6))
+		else: mb.quad(sgm[0], sgm[1], 0.16, 0.015, wc)
 	var wm := MeshInstance3D.new(); wm.mesh = mb.commit(); wm.material_override = mat(-2); static_g.add_child(wm)
 
 func text_plane(text: String, x: float, y: float, size: float, rot: float, alpha: float, italic: bool) -> Label3D:
 	var l := Label3D.new()
 	l.text = text; l.font = F_FELL_IT if italic else _caps; l.font_size = 40
 	l.pixel_size = size * (64.0 / 96.0) / 40.0
-	l.modulate = Color(pal.line, alpha); l.outline_size = 0; l.shaded = false; l.double_sided = true
+	l.modulate = Color(pal.edge, clampf(alpha * 1.5, 0.0, 0.95)); l.shaded = false; l.double_sided = true
+	l.outline_size = 14; l.outline_modulate = Color(pal.fill, 0.9); l.outline_render_priority = -4
 	l.render_priority = -3; l.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	l.basis = Basis(Vector3.UP, rot) * Basis(Vector3.RIGHT, -PI / 2)
 	l.position = Vector3(x, 0.008, -y)
@@ -202,7 +218,7 @@ func remove_spot(id: String) -> void:
 func mark(id: String) -> void:
 	if marks.has(id): return
 	var mb := Geo.MB.new()
-	mb.ring(Geo.make_points({n = 28, r = 1.0}), 0.05, 0.04, null, GAS, 0.8)
+	mb.ring(Geo.make_points({n = 40, r = 1.0}), 0.06, 0.04, null, pal.acc, 0.9)
 	var m := MeshInstance3D.new(); m.mesh = mb.commit(); m.material_override = mat(3)
 	fx.add_child(m); marks[id] = m
 
@@ -294,7 +310,7 @@ func _update_trail(dt: float, p) -> void:
 	for q in _trail_pts:
 		var k: float = 1.0 - q[2] / 0.7
 		var s := 0.06 + 0.1 * k
-		var col := Color(pal.edge, 0.32 * k)
+		var col := Color(pal.edge, 0.4 * k)
 		var c := Vector3(q[0], 0.006, -q[1])
 		for v in [Vector3(s, 0, 0), Vector3(0, 0, s), Vector3(-s, 0, 0), Vector3(s, 0, 0), Vector3(-s, 0, 0), Vector3(0, 0, -s)]:
 			im.surface_set_color(col); im.surface_set_uv(Vector2.ZERO); im.surface_add_vertex(c + v)
@@ -327,6 +343,8 @@ func update_cam(dt: float, p) -> void:
 	# en vertical la cámara se aleja para que quepa más mundo a lo ancho
 	var vs := get_viewport().get_visible_rect().size
 	var zf := clampf(vs.y / maxf(vs.x, 1.0), 1.0, 1.6)
+	# en un móvil apaisado la pantalla es pequeña: la cámara se acerca para que las figuras se lean
+	if App.ui != null and App.ui.compact: zf *= 0.74
 	var pos2 := Vector3(lerpf(cam_x, px - dx * 0.2, e), lerpf(zoom_cur * zf, 0.012, e), -lerpf(cam_y, py - dy * 0.2, e))
 	var look := Vector3(lerpf(cam_x, px + dx * 12.0, e), lerpf(0.0, 0.012, e), -lerpf(cam_y, py + dy * 12.0, e))
 	var up := Vector3(dx * e * (1.0 - e) * 2.0, e, -(1.0 - e) - dy * e * (1.0 - e) * 2.0)

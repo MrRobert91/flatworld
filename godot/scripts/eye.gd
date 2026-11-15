@@ -16,8 +16,8 @@ var _cpu := []           # segmentos relativos al ojo, para consultas puntuales:
 var _facing := 0.0
 
 func _init() -> void:
-	data.resize(N * 2 * 4)
-	img = Image.create_from_data(N, 2, false, Image.FORMAT_RGBAF, data.to_byte_array())
+	data.resize(N * 3 * 4)
+	img = Image.create_from_data(N, 3, false, Image.FORMAT_RGBAF, data.to_byte_array())
 	tex = ImageTexture.create_from_image(img)
 	vp = SubViewport.new(); vp.size = Vector2i(N, 2); vp.disable_3d = true; vp.transparent_bg = false
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
@@ -28,7 +28,7 @@ func _init() -> void:
 	r.material = cast_mat; vp.add_child(r)
 	view = ColorRect.new(); view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	view_mat = ShaderMaterial.new(); view_mat.shader = preload("res://shaders/eye_view.gdshader")
-	view_mat.set_shader_parameter("t_data", vp.get_texture())
+	view_mat.set_shader_parameter("t_data", vp.get_texture()); view_mat.set_shader_parameter("fov_tan", tan(fov / 2.0))
 	view.material = view_mat; view.visible = false
 
 func set_active(on: bool) -> void:
@@ -41,7 +41,9 @@ func cast(W: World, exclude, ox: float, oy: float, facing: float, fog: float) ->
 	var cf := cos(facing); var sf := sin(facing); var max_d := fog * 5.5
 	var k := 0; var row := N * 4
 	_cpu.clear()
-	var wc := App.lin(W.pal.wall)
+	var row2 := N * 8
+	var dark: bool = W.pal.get("dark", false)
+	var wc: Color = W.pal.wall
 	for w in W.walls:
 		if k >= N: break
 		var ax: float = w[0] - ox; var ay: float = w[1] - oy; var bx: float = w[2] - ox; var by: float = w[3] - oy
@@ -51,6 +53,10 @@ func cast(W: World, exclude, ox: float, oy: float, facing: float, fog: float) ->
 		var o := k * 4
 		data[o] = ax; data[o + 1] = ay; data[o + 2] = bx; data[o + 3] = by
 		data[row + o] = wc.r; data[row + o + 1] = wc.g; data[row + o + 2] = wc.b; data[row + o + 3] = w[4]
+		# distancia del ojo al punto más cercano del muro
+		var ex := bx - ax; var ey := by - ay
+		var tt := clampf(-(ax * ex + ay * ey) / maxf(ex * ex + ey * ey, 1e-9), 0.0, 1.0)
+		data[row2 + o] = Vector2(ax + ex * tt, ay + ey * tt).length(); data[row2 + o + 1] = 0.0
 		_cpu.append([ax, ay, bx, by, ""])
 		k += 1
 	var edge: Color = W.pal.edge
@@ -60,21 +66,29 @@ func cast(W: World, exclude, ox: float, oy: float, facing: float, fog: float) ->
 		var reach: float = e.rad * e.sc * 1.3 + 1.0
 		if sqrt(dx * dx + dy * dy) - reach > max_d or dx * cf + dy * sf < -reach: continue
 		var p: Array = e.world_pts(); var n := p.size(); var m := 1 if e.woman else n
-		var base: Color = App.lin(App.col(e.def.tint) if e.def.has("tint") else edge)
+		var base: Color = W.ink(App.col(e.def.tint)) if e.def.has("tint") else edge
+		var near := 1e9
+		for q in p: near = minf(near, Vector2(q.x - ox, q.y - oy).length())
 		for i in m:
 			if k >= N: break
 			var a: Vector2 = p[i]; var b: Vector2 = p[(i + 1) % n]
-			var c: Color = App.lin(App.col(e.side_colors[i % e.side_colors.size()])) if e.side_colors else base
+			var c: Color = W.ink(App.col(e.side_colors[i % e.side_colors.size()]), 0.74) if e.side_colors else base
 			var o := k * 4
 			data[o] = a.x - ox; data[o + 1] = a.y - oy; data[o + 2] = b.x - ox; data[o + 3] = b.y - oy
 			data[row + o] = c.r; data[row + o + 1] = c.g; data[row + o + 2] = c.b; data[row + o + 3] = e.lum
+			data[row2 + o] = near; data[row2 + o + 1] = 1.0
 			_cpu.append([a.x - ox, a.y - oy, b.x - ox, b.y - oy, e.id])
 			k += 1
-	img.set_data(N, 2, false, Image.FORMAT_RGBAF, data.to_byte_array())
+	img.set_data(N, 3, false, Image.FORMAT_RGBAF, data.to_byte_array())
 	tex.update(img)
 	cast_mat.set_shader_parameter("count", k)
 	cast_mat.set_shader_parameter("fog", fog)
 	cast_mat.set_shader_parameter("facing", Vector2(cf, sf))
+	cast_mat.set_shader_parameter("reach", max_d)
+	view_mat.set_shader_parameter("bg_col", World._v3(W.pal.bg))
+	view_mat.set_shader_parameter("ink_col", World._v3(W.pal.edge))
+	view_mat.set_shader_parameter("acc_col", World._v3(W.pal.acc))
+	view_mat.set_shader_parameter("u_dark", 1.0 if dark else 0.0)
 
 # ¿qué figura toca un rayo lanzado con desvío u (-1..1 del campo visual)?
 func _ray(u: float) -> String:
@@ -98,21 +112,20 @@ func sees(id: String) -> bool:
 		if _ray(1.0 - 2.0 * i / 40.0) == id: return true
 	return false
 
-# t: 0 = tira en el HUD, 1 = pantalla completa
-func layout(t: float, size: Vector2, time: float, strip_visible: bool) -> void:
+# t: 0 = tira en el HUD (rect), 1 = pantalla completa
+func layout(t: float, size: Vector2, time: float, strip_visible: bool, rect: Rect2) -> void:
 	var e := t * t * (3.0 - 2.0 * t)
-	var sw := 0.7 if size.x < size.y and size.x < 820.0 else 0.44
-	var w := sw + (1.0 - sw) * e
-	var h := (44.0 / size.y) + (1.0 - 44.0 / size.y) * e
-	var cy := (1.0 - 36.0 / size.y) + (0.5 - (1.0 - 36.0 / size.y)) * e
-	view.size = Vector2(w * size.x, h * size.y)
-	view.position = Vector2(0.5 * size.x - view.size.x / 2.0, (1.0 - cy) * size.y - view.size.y / 2.0)
+	view.size = rect.size.lerp(size, e)
+	view.position = rect.position.lerp(Vector2.ZERO, e)
+	# grosor de la línea: fino pero legible (unos 26 puntos en pantalla completa)
+	var full_half := clampf(13.0 / size.y, 0.022, 0.05)
 	view_mat.set_shader_parameter("u_strip", 1.0 - e)
-	view_mat.set_shader_parameter("u_half", 0.26 + (0.022 - 0.26) * e)
-	view_mat.set_shader_parameter("u_bg", 0.85 + 0.15 * e)
+	view_mat.set_shader_parameter("u_half", lerpf(0.30, full_half, e))
+	view_mat.set_shader_parameter("u_bg", 1.0)
 	view_mat.set_shader_parameter("u_alpha", 1.0 if strip_visible else e)
 	view_mat.set_shader_parameter("u_time", time)
 	view_mat.set_shader_parameter("u_trace", trace)
+	view_mat.set_shader_parameter("u_px", view.get_viewport().get_window().content_scale_factor if view.is_inside_tree() else 1.0)
 
 # rumbo en pantalla (0..1) de un punto del mundo; <0 o >1 si queda fuera del campo
 func bearing(ox: float, oy: float, facing: float, x: float, y: float) -> float:

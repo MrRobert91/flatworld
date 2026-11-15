@@ -68,6 +68,36 @@ Mismas mecánicas, capítulos y texto. Además:
   el mundo ya dibujado y se salta con un toque. Los sonidos se sintetizan en segundo plano.
 - **Vista 1D en la GPU:** el trazado de rayos de «el ojo» es un sombreador, no un bucle por fotograma.
 
+## Aspecto: el cuaderno de dibujo técnico
+
+Todo el mundo está dibujado a tinta sobre papel milimetrado: fibra y grano de papel, cuadrícula fina y
+maestra, rayado de sección en figuras y edificios, y los trazos de construcción de un delineante
+(circunferencias circunscritas, centros, lados prolongados más allá del vértice, el marco de la lámina).
+Cada mundo es una lámina distinta: papel crema (Planilandia), papel de calco (el sueño de Linealandia),
+papel de acuarela (el tiempo de los colores), papel gris (la celda) y un cianotipo (Espaciolandia).
+
+## Interfaz y accesibilidad
+
+- La interfaz se mide en puntos del dispositivo (`App.fit`), no en píxeles: en un móvil de alta densidad
+  el texto y los botones tienen el tamaño de cualquier aplicación nativa (botones de 48 puntos o más).
+- Texto oscuro sobre cartelas de papel, con contraste alto; los colores de cada personaje se oscurecen
+  para leerse sobre papel.
+- Ajustes en el menú y en la pausa: tamaño de interfaz (pequeño, normal, grande, muy grande), sonido y
+  pantalla completa. Se guardan en `user://planilandia_cfg.json`.
+- Menú de pausa (botón ☰ o Esc) con acceso al manuscrito y salida al menú.
+- Para probar un móvil en escritorio: `godot -- --touch --dpr=2.6` con una ventana de 2280×820.
+
+## La visión del ojo
+
+Sigue siendo la línea que describe el libro, y la niebla sigue siendo lo que permite leerla, pero ahora:
+
+- la claridad cae deprisa dentro de cada figura desde su punto más cercano (un ángulo agudo se pierde
+  al instante; un Pentágono, con suavidad), en vez de depender sólo de la distancia absoluta;
+- cada lado se sombrea un poco según su inclinación respecto a la mirada, y los vértices dejan una marca leve;
+- una figura delante de otra queda separada por un corte fino; los muros llevan un rayado y las figuras no;
+- bajo la línea hay una regla graduada cada 5°, y el perfil de claridad cuando se aprende el
+  Reconocimiento por la Vista.
+
 ## Estructura
 
 ```
