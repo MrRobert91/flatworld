@@ -1,4 +1,3 @@
 .godot/
 *.import.bak
-# la exportación web se versiona (la usa el Dockerfile para desplegar); el binario de Linux no
-build/linux/
+# las exportaciones web (la usa el Dockerfile) y Linux (ejecutable listo para descargar) se versionan
