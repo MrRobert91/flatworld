@@ -152,15 +152,29 @@ func ch4() -> void:
 	Snd.sfx('gavel')
 	ui.close_dlg()
 	# la matanza
+	# la cámara se abre sobre toda la plaza; los presos caen sobre el tribuno
+	W.focus = Vector2(0, 3); W.zoom = 66
 	for gd in guards: gd.move_to(-5 + randf() * 2, 11 + randf(), 9)
-	await g.wait(0.8); W.remove('agitador'); Snd.sfx('stab')
+	await g.wait(0.8); W.slay(g.npc('agitador')); Snd.sfx('stab'); g.off('agitador')
 	var isos := folk.filter(func(e): return e.def.has('iso'))
+	var women := folk.filter(func(e): return e.woman)
+	# artesanos y nobles se apartan hacia los bordes de la plaza
+	for e in folk:
+		if e.woman or e.def.has('iso'): continue
+		e.ai = {type = 'wander', home = Vector2(clampf(e.x * 1.8, -39, 39), clampf(e.y * 1.8 - 4, -24, 12)), r = 2.0}; e.speed = 4.5
+	# los Isósceles corren sin saber adónde; las mujeres retroceden de punta sobre ellos, los presos rematan
 	var k := 0
 	for e in isos:
-		g.after(0.5 + k * 0.33, func(): e.hid = true; e.no_collide = true; Snd.sfx('stab'))
+		e.speed = 6.5; e.ai = {type = 'wander', home = Vector2(randf() * 16 - 8, randf() * 10 - 5), r = 7.0}
+		var killer: Ent = women[k % women.size()] if k % 2 == 0 and not women.is_empty() else guards[k % guards.size()]
+		g.after(0.4 + k * 0.45, func():
+			if not is_instance_valid(e) or not is_instance_valid(killer): return
+			killer.ai = null; killer.move_to(e.x, e.y, 14)
+			g.after(0.32, func():
+				if is_instance_valid(e): W.slay(e); Snd.sfx('stab')))
 		k += 1
-		e.speed = 7.0; e.ai = {type = 'wander', home = Vector2(0, 0), r = 8.0}
-	await g.wait(1 + isos.size() * 0.33)
+	await g.wait(1.4 + isos.size() * 0.45)
+	W.focus = null; W.zoom = W.base_zoom
 	await narr('A una señal, las mujeres retrocedieron de punta sobre los soldados. Los artesanos las imitaron. Los presos tomaron las salidas. Los Isósceles, creyéndose traicionados, se revolvieron unos contra otros.')
 	await narr('En media hora no quedaba ninguno. Ciento cuarenta mil, muertos por los ángulos de sus compañeros.')
 	for e in W.ents.values():

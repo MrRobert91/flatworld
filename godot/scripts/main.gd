@@ -54,7 +54,7 @@ func _menu() -> void:
 	var kinds := [a.F_tri, a.F_cuad, a.F_penta, a.F_hexa, a.F_circ, a.F_mujer]
 	for i in 16:
 		var d: Dictionary = kinds[i % 6].call("m%d" % i, -50.0 + randf() * 100.0, -4.0 + randf() * 8.0)
-		d.ai = {type = "wander", home = Vector2(-40 + i * 6, 0), r = 5.0, sx = 3.0}; d.speed = 1.5
+		d.ai = {type = "stroll", pts = [Vector2(-56, 6), Vector2(-42, 2.5), Vector2(-28, -3), Vector2(-14, -9), Vector2(-4, 6.5), Vector2(7, -8.5), Vector2(18, 7), Vector2(30, -7), Vector2(40, 8)], jit = 3.0}; d.speed = 1.3 + randf() * 0.9
 		g.add(d)
 	g.world.focus = Vector2(-20, 4); g.world.cam_x = -20; g.world.cam_y = 4
 	var st := {t = 0.0}
@@ -112,6 +112,13 @@ func _process(dt: float) -> void:
 				ui._adv_ok = 0; ui._pick(ok.pick_random())
 			elif ui.waiting() or ui._title_on: ui._adv_ok = 0; ui.advance()
 			else: g.assist()
+	# prueba de pinchazos: --prick=iso|mujer|tri|cuad|penta pone una figura delante y camina hacia ella
+	if App.args.has("prick") and g.running and g.player != null and not g.busy and Time.get_ticks_msec() > 6000 and not has_meta("pricked"):
+		set_meta("pricked", true)
+		var a: Ch = get_meta("keep")[0]; var p := g.player
+		var d: Dictionary = {iso = a.F_iso("pk", p.x + 4, p.y, 12.0), mujer = a.F_mujer("pk", p.x + 4, p.y), tri = a.F_tri("pk", p.x + 4, p.y), cuad = a.F_cuad("pk", p.x + 4, p.y), penta = a.F_penta("pk", p.x + 4, p.y)}[App.args.prick]
+		d.rot = PI; g.add(d)
+		var ev := InputEventKey.new(); ev.physical_keycode = KEY_D; ev.keycode = KEY_D; ev.pressed = true; Input.parse_input_event(ev)
 	if App.args.has("open") and g.running and not ui.journal_open and Time.get_ticks_msec() > 5000 and not has_meta("opened"):
 		set_meta("opened", true); ui.toggle_journal(App.args.open)
 	if App.args.has("shots"):
