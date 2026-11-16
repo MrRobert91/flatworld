@@ -113,6 +113,21 @@ Sigue siendo la línea que describe el libro, y la niebla sigue siendo lo que pe
   Para probarlo: `godot -- --ch=2 --prick=iso` (o `mujer`, `tri`, `cuad`, `penta`).
 - **Espaciolandia:** la misma lámina de Planilandia vista desde Arriba, con el Norte arriba.
 
+## Configuración y tipo de letra
+
+El menú **Configuración** (en el menú principal y en la pausa) reúne el tipo de letra, el tamaño de
+interfaz, el sonido y la pantalla completa. Hay tres tipos de letra, y cada uno se muestra con una
+muestra escrita en esa misma letra:
+
+- **Clásica (imprenta):** Cormorant Garamond e IM Fell, con rótulos en versalitas.
+- **Ligada escolar:** [Playwrite España](https://github.com/TypeTogether/Playwrite) (OFL), la letra
+  enlazada de los cuadernos de primaria. Los rótulos dejan de ir en mayúsculas.
+- **Ligada en minúsculas:** la misma letra con todo el texto en minúscula, para quien está empezando a leer.
+
+Sólo cambia la tipografía: las palabras del juego son las mismas. El cambio se aplica al momento, sin
+reiniciar el capítulo, y se guarda en `user://planilandia_cfg.json`. Para probarlo desde la línea de
+órdenes: `godot -- --font=ligada` o `--font=minus`.
+
 ## Estructura
 
 ```

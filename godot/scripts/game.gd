@@ -109,6 +109,7 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 	if not running: return
 	if k == KEY_J and not ui.pause_open and not ui.choosing and not ui.picking and not ui.dlg_open and not busy:
 		ui.toggle_journal(); return
+	if k == KEY_ESCAPE and ui.config_open: ui.toggle_config(); return
 	if k == KEY_ESCAPE:
 		if ui.journal_open: ui.toggle_journal()
 		elif on_menu.is_valid(): on_menu.call()
@@ -473,9 +474,9 @@ func hud(p, e: float, strip: bool, free: bool) -> void:
 	ui.eye_frame.visible = strip and e < 0.5
 	ui.compass.visible = running and not free and e < 0.5 and not ui.touch
 	ui.keys_box.visible = running and not ui.touch and not ui.dlg_open and ui.size.x > 900 and not ui.modal()
-	ui.keys_l.text = "ratón mirar  ·  WASD volar  ·  R / F subir y bajar  ·  J inventario" if free else "V vista  ·  J inventario  ·  M sonido  ·  Esc menú"
+	ui.keys_l.text = ui.low("ratón mirar  ·  WASD volar  ·  R / F subir y bajar  ·  J inventario" if free else "V vista  ·  J inventario  ·  M sonido  ·  Esc menú")
 	ui.eye_hint.visible = e > 0.9 and running and not busy and not hide_eye_hint and not ui.dlg.visible
-	ui.eye_hint.text = "VISTA DEL PLANO  —  palanca: girar y avanzar  ·  ojo: volver a la lámina" if ui.touch else "VISTA DEL PLANO  —  A/D girar  ·  W/S avanzar  ·  V volver a la lámina"
+	ui.eye_hint.text = ui.up("Vista del plano") + ui.low("  —  palanca: girar y avanzar  ·  ojo: volver a la lámina" if ui.touch else "  —  A/D girar  ·  W/S avanzar  ·  V volver a la lámina")
 	var T = world.target_obj()
 	if p != null and T != null and e > 0.9:
 		var tp := World.pos_of(T)
