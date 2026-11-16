@@ -165,7 +165,18 @@ func up(t: String) -> String:
 
 # con «ligada en minúsculas» todo el texto se escribe en minúscula; las palabras no cambian
 func low(t: String) -> String:
-	return t.to_lower() if font_kind == "minus" else t
+	return lower_keep_roman(t) if font_kind == "minus" else t
+
+# Minúsculas, pero los números romanos (I, IV, VIII…) se quedan en mayúscula.
+static var _roman_re: RegEx
+static func lower_keep_roman(t: String) -> String:
+	if _roman_re == null:
+		_roman_re = RegEx.new(); _roman_re.compile("(?<![\\p{L}\\d])[IVX]+(?![\\p{L}\\d])")
+	var out := ""; var at := 0
+	for m in _roman_re.search_all(t):
+		out += t.substr(at, m.get_start() - at).to_lower() + m.get_string()
+		at = m.get_end()
+	return out + t.substr(at).to_lower()
 
 func set_font(kind: String) -> void:
 	if kind == font_kind or not FONTS.has(kind): return
@@ -175,7 +186,7 @@ func set_font(kind: String) -> void:
 	for q in _caps_lbls:
 		if is_instance_valid(q[0]): q[0].text = up(q[1])
 	objective_l.text = low(objective_l.text)
-	if font_kind == "minus": dlg_text.text = dlg_text.text.to_lower()   # el bloque que está en pantalla
+	if font_kind == "minus": dlg_text.text = lower_keep_roman(dlg_text.text)   # el bloque que está en pantalla
 	chapter_tag_l.text = up(_tag_raw)
 	if App.g != null and not App.g.world.map.is_empty(): App.g.world.rebuild()
 	_layout()
