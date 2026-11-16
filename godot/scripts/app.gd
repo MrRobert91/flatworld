@@ -5,7 +5,7 @@ static var g: Game
 static var ui: UIRoot
 static var pending_start := -1   # capítulo a lanzar tras recargar la escena (-1: menú)
 static var args := {}            # --ch=N --auto --bot --touch --shots=dir --dpr=2.6
-static var cfg := {scale = 1.0}  # ajustes del jugador (tamaño de interfaz)
+static var cfg := {scale = 1.0, font = "clasica"}  # ajustes del jugador (tamaño de interfaz)
 static var _dpr := 0.0
 
 const CFG := "user://planilandia_cfg.json"

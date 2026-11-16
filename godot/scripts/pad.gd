@@ -169,8 +169,8 @@ func _draw() -> void:
 				if live:
 					draw_arc(c, r - 5.0, 0, TAU, 56, Color(App.ACC, 0.35), 1.0, true)
 					var fs := 16 if label.length() <= 7 else (13 if label.length() <= 10 else 11)
-					var w := ui.caps.get_string_size(label.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-					draw_string(ui.caps, c + Vector2(-w / 2.0, fs * 0.35), label.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, App.ACC)
+					var w := ui.caps.get_string_size(ui.up(label), HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+					draw_string(ui.caps, c + Vector2(-w / 2.0, fs * 0.35), ui.up(label), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, App.ACC)
 				else: draw_arc(c, 8, 0, TAU, 24, App.FAINT, 1.6, true)
 			"view":
 				_circle(c, r, App.INK, on)

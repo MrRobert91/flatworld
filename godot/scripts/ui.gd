@@ -10,6 +10,10 @@ const F_SERIF_IT := preload("res://assets/fonts/CormorantGaramond-Italic.ttf")
 const F_CAPS := preload("res://assets/fonts/IMFeENsc28P.ttf")
 const F_FELL := preload("res://assets/fonts/IMFeENrm28P.ttf")
 const F_FELL_IT := preload("res://assets/fonts/IMFeENit28P.ttf")
+const F_LIGADA := preload("res://assets/fonts/PlaywriteES.ttf")   # letra escolar ligada (Playwrite España)
+# tipos de letra: nombre, y factor de tamaño (la ligada es más ancha y alta que la de imprenta)
+const FONTS := {clasica = {name = "Clásica (imprenta)", k = 1.0}, ligada = {name = "Ligada escolar", k = 0.74},
+	minus = {name = "Ligada en minúsculas", k = 0.74}}   # para quien aún sólo lee minúsculas
 
 var SPEAKERS := {
 	yo = {name = "Tú", cls = "you", voice = "yo"},
@@ -26,6 +30,16 @@ var auto := false
 var serif: FontVariation
 var serif_it: FontVariation
 var caps: FontVariation
+var fell: FontVariation       # títulos
+var fell_it: FontVariation    # narración
+var title_f: FontVariation    # el rótulo del menú
+var font_kind := "clasica"
+var fk := 1.0                 # factor de tamaño del tipo de letra actual
+var _caps_lbls := []          # [nodo, texto original]: rótulos fijos que cambian de caja con el tipo de letra
+var _tag_raw := ""
+var config: Control
+var config_box: VBoxContainer
+var config_open := false
 var size := Vector2(1280, 720)
 var touch := false
 var compact := false     # pantalla baja (móvil apaisado)
@@ -119,9 +133,63 @@ func _init() -> void:
 	layer = 5
 	_re.compile("\\*(.+?)\\*")
 	var ts := TextServerManager.get_primary_interface()
-	serif = FontVariation.new(); serif.base_font = F_SERIF; serif.variation_opentype = {ts.name_to_tag("wght"): 620}
-	serif_it = FontVariation.new(); serif_it.base_font = F_SERIF_IT; serif_it.variation_opentype = {ts.name_to_tag("wght"): 620}
-	caps = FontVariation.new(); caps.base_font = F_CAPS; caps.spacing_glyph = 2
+	serif = FontVariation.new(); serif_it = FontVariation.new(); caps = FontVariation.new()
+	fell = FontVariation.new(); fell_it = FontVariation.new(); title_f = FontVariation.new()
+	_set_fonts(App.cfg.get("font", "clasica"))
+
+# Cambia las fuentes de toda la interfaz. Las variaciones son compartidas: al cambiarles la base,
+# todo lo ya construido se redibuja con la letra nueva.
+func _set_fonts(kind: String) -> void:
+	if not FONTS.has(kind): kind = "clasica"
+	font_kind = kind; fk = FONTS[kind].k
+	var w := TextServerManager.get_primary_interface().name_to_tag("wght")
+	if kind != "clasica":
+		# una sola letra para todo, sin versalitas ni espaciado: separar las letras rompería las ligaduras
+		for f in [serif, serif_it, caps, fell, fell_it, title_f]:
+			f.base_font = F_LIGADA; f.variation_opentype = {w: 400}; f.spacing_glyph = 0
+	else:
+		serif.base_font = F_SERIF; serif.variation_opentype = {w: 620}; serif.spacing_glyph = 0
+		serif_it.base_font = F_SERIF_IT; serif_it.variation_opentype = {w: 620}; serif_it.spacing_glyph = 0
+		caps.base_font = F_CAPS; caps.variation_opentype = {}; caps.spacing_glyph = 2
+		fell.base_font = F_FELL; fell.variation_opentype = {}; fell.spacing_glyph = 0
+		fell_it.base_font = F_FELL_IT; fell_it.variation_opentype = {}; fell_it.spacing_glyph = 0
+		title_f.base_font = F_FELL; title_f.variation_opentype = {}; title_f.spacing_glyph = 6
+
+# tamaño de letra ajustado al tipo actual
+func fz(n: float) -> int:
+	return maxi(8, int(round(n * fk)))
+
+# rótulos: en la letra clásica van en versalitas; en la ligada, en minúsculas tal como se escriben
+func up(t: String) -> String:
+	return t.to_upper() if font_kind == "clasica" else low(t)
+
+# con «ligada en minúsculas» todo el texto se escribe en minúscula; las palabras no cambian
+func low(t: String) -> String:
+	return t.to_lower() if font_kind == "minus" else t
+
+func set_font(kind: String) -> void:
+	if kind == font_kind or not FONTS.has(kind): return
+	var old := fk
+	_set_fonts(kind); App.cfg.font = kind; App.save_cfg()
+	_rescale(self, fk / old)
+	for q in _caps_lbls:
+		if is_instance_valid(q[0]): q[0].text = up(q[1])
+	objective_l.text = low(objective_l.text)
+	if font_kind == "minus": dlg_text.text = dlg_text.text.to_lower()   # el bloque que está en pantalla
+	chapter_tag_l.text = up(_tag_raw)
+	if App.g != null and not App.g.world.map.is_empty(): App.g.world.rebuild()
+	_layout()
+
+func _rescale(n: Node, r: float) -> void:
+	if n is Control:
+		for k in ["font_size", "normal_font_size", "italics_font_size", "bold_font_size"]:
+			if n.has_theme_font_size_override(k): n.add_theme_font_size_override(k, maxi(8, int(round(n.get_theme_font_size(k) * r))))
+	for c in n.get_children(): _rescale(c, r)
+
+# rótulo fijo en versalitas (o minúsculas, según la letra)
+func _cl(raw: String, fsize: int, color: Color) -> Label:
+	var l := _lbl(up(raw), caps, fsize, color); _caps_lbls.append([l, raw])
+	return l
 
 func _ready() -> void:
 	paper = ColorRect.new(); paper.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(paper)
@@ -130,7 +198,7 @@ func _ready() -> void:
 	pad = Pad.new(); pad.ui = self; _full(pad); add_child(pad)
 	note_box = PanelContainer.new(); note_box.mouse_filter = Control.MOUSE_FILTER_IGNORE; note_box.visible = false
 	note_box.add_theme_stylebox_override("panel", _card(Color(App.CARD, 0.93), 18, 8, 1, 0)); add_child(note_box)
-	note_l = _rich(20, App.INK, F_FELL_IT, F_FELL); note_box.add_child(note_l)
+	note_l = _rich(20, App.INK, fell_it, fell); note_box.add_child(note_l)
 	toasts = VBoxContainer.new(); toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toasts.add_theme_constant_override("separation", 6); add_child(toasts)
 	fade_r = ColorRect.new(); fade_r.color = Color("e6dec8"); fade_r.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(fade_r); add_child(fade_r)
@@ -142,6 +210,7 @@ func _ready() -> void:
 	_build_journal()
 	_build_menu()
 	_build_pause()
+	_build_config()
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -149,8 +218,8 @@ func _full(c: Control) -> void:
 	c.set_anchors_preset(Control.PRESET_FULL_RECT)
 
 func _lbl(text: String, font: Font, fsize: int, color: Color) -> Label:
-	var l := Label.new(); l.text = text; l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	l.add_theme_font_override("font", font); l.add_theme_font_size_override("font_size", fsize)
+	var l := Label.new(); l.text = low(text); l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.add_theme_font_override("font", font); l.add_theme_font_size_override("font_size", fz(fsize))
 	l.add_theme_color_override("font_color", color)
 	return l
 
@@ -160,7 +229,7 @@ func _rich(fsize: int, color: Color, font: Font = null, em_font: Font = null) ->
 	r.add_theme_font_override("normal_font", font if font else serif)
 	r.add_theme_font_override("italics_font", em_font if em_font else serif_it)
 	r.add_theme_font_override("bold_font", caps)
-	for k in ["normal_font_size", "italics_font_size", "bold_font_size"]: r.add_theme_font_size_override(k, fsize)
+	for k in ["normal_font_size", "italics_font_size", "bold_font_size"]: r.add_theme_font_size_override(k, fz(fsize))
 	r.add_theme_color_override("default_color", color)
 	r.add_theme_constant_override("line_separation", 3)
 	return r
@@ -175,9 +244,9 @@ func _card(bg := App.CARD, mx := 22, my := 14, border := 2, shadow := 10) -> Sty
 
 # botón de interfaz. kind: primary (tinta), ghost (papel con filete), flat (sólo texto)
 func _btn(text: String, kind := "ghost", fsize := 17, min_h := 48.0) -> Button:
-	var b := Button.new(); b.text = text; b.focus_mode = Control.FOCUS_NONE
+	var b := Button.new(); b.text = low(text); b.focus_mode = Control.FOCUS_NONE
 	b.custom_minimum_size.y = min_h
-	b.add_theme_font_override("font", caps); b.add_theme_font_size_override("font_size", fsize)
+	b.add_theme_font_override("font", caps); b.add_theme_font_size_override("font_size", fz(fsize))
 	var fg := App.CARD if kind == "primary" else App.INK
 	for k in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]: b.add_theme_color_override(k, fg)
 	b.add_theme_color_override("font_disabled_color", App.FAINT)
@@ -198,10 +267,12 @@ func _btn(text: String, kind := "ghost", fsize := 17, min_h := 48.0) -> Button:
 	return b
 
 func fmt(t: String, em := "i") -> String:
+	if em == "i" and font_kind != "clasica": em = "u"
+	t = low(t)
 	return _re.sub(t, "[%s]$1[/%s]" % [em, em.split("=")[0]], true)
 
 func modal() -> bool:
-	return journal_open or menu_open or pause_open
+	return journal_open or menu_open or pause_open or config_open
 
 func _build_hud() -> void:
 	hud = Control.new(); hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(hud); hud.visible = false; add_child(hud)
@@ -221,7 +292,7 @@ func _build_hud() -> void:
 	prompt_l = _rich(20, App.INK); prompt_l.autowrap_mode = TextServer.AUTOWRAP_OFF
 	prompt_box.add_child(prompt_l); hud.add_child(prompt_box)
 	bearing_l = Bearing.new(); bearing_l.visible = false; bearing_l.mouse_filter = Control.MOUSE_FILTER_IGNORE; hud.add_child(bearing_l)
-	eye_hint = _lbl("VISTA DEL PLANO", caps, 13, App.SOFT); eye_hint.visible = false
+	eye_hint = _lbl("Vista del plano", caps, 13, App.SOFT); eye_hint.visible = false
 	eye_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; eye_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; hud.add_child(eye_hint)
 	keys_box = PanelContainer.new(); keys_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	keys_box.add_theme_stylebox_override("panel", _card(Color(App.CARD, 0.85), 12, 4, 1, 0)); hud.add_child(keys_box)
@@ -271,7 +342,7 @@ func _build_title() -> void:
 	var c := CenterContainer.new(); c.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(c); title_box.add_child(c)
 	var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_theme_constant_override("separation", 8); c.add_child(v)
 	t_num = _lbl("", caps, 16, App.ACC); t_num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(t_num)
-	t_title = _lbl("", F_FELL, 64, App.INK); t_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	t_title = _lbl("", fell, 64, App.INK); t_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	t_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(t_title)
 	var rule := Rule.new(); rule.custom_minimum_size = Vector2(220, 12); rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v.add_child(rule)
 	t_sub = _lbl("", serif_it, 22, App.SOFT); t_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -307,9 +378,8 @@ func _build_menu() -> void:
 	for k in ["margin_left", "margin_right", "margin_top", "margin_bottom"]: mm.add_theme_constant_override(k, 14)
 	menu_split = BoxContainer.new(); menu_split.add_theme_constant_override("separation", 26); menu_split.alignment = BoxContainer.ALIGNMENT_CENTER; mm.add_child(menu_split)
 	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 0); v.alignment = BoxContainer.ALIGNMENT_CENTER; menu_split.add_child(v)
-	var over := _lbl("EDWIN A. ABBOTT  ·  1884", caps, 13, App.SOFT); over.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(over)
-	var ft := FontVariation.new(); ft.base_font = F_FELL; ft.spacing_glyph = 6
-	menu_title = _lbl("PLANILANDIA", ft, 96, App.INK); menu_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(menu_title)
+	var over := _cl("Edwin A. Abbott  ·  1884", 13, App.SOFT); over.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(over)
+	menu_title = _lbl(up("Planilandia"), title_f, 96, App.INK); _caps_lbls.append([menu_title, "Planilandia"]); menu_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(menu_title)
 	var rule := Rule.new(); rule.custom_minimum_size = Vector2(240, 14); rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v.add_child(rule)
 	var sub := _lbl("Un romance de muchas dimensiones", serif_it, 24, App.ACC); sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(sub)
 	var v2 := VBoxContainer.new(); v2.add_theme_constant_override("separation", 10); v2.alignment = BoxContainer.ALIGNMENT_CENTER; menu_split.add_child(v2)
@@ -324,18 +394,52 @@ func _build_pause() -> void:
 	var c := CenterContainer.new(); c.size_flags_horizontal = Control.SIZE_EXPAND_FILL; c.size_flags_vertical = Control.SIZE_EXPAND_FILL; sc.add_child(c)
 	var card := PanelContainer.new(); card.add_theme_stylebox_override("panel", _card(App.CARD, 22, 16)); c.add_child(card)
 	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 8); card.add_child(v)
-	var t := _lbl("PAUSA", caps, 15, App.ACC); t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(t)
+	var t := _cl("Pausa", 15, App.ACC); t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(t)
 	pause_btns = VBoxContainer.new(); pause_btns.add_theme_constant_override("separation", 8); v.add_child(pause_btns)
 
-# botones de ajustes compartidos por el menú y la pausa
+# ---------- configuración: tipo de letra, tamaño, sonido, pantalla ----------
+func _build_config() -> void:
+	config = Control.new(); _full(config); config.visible = false; add_child(config)
+	var veil := ColorRect.new(); veil.color = Color(App.PAPER, 0.95); _full(veil); config.add_child(veil)
+	var sc := ScrollContainer.new(); _full(sc); sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; config.add_child(sc)
+	var c := CenterContainer.new(); c.size_flags_horizontal = Control.SIZE_EXPAND_FILL; c.size_flags_vertical = Control.SIZE_EXPAND_FILL; sc.add_child(c)
+	var m := MarginContainer.new(); c.add_child(m)
+	for k in ["margin_left", "margin_right", "margin_top", "margin_bottom"]: m.add_theme_constant_override(k, 12)
+	var card := PanelContainer.new(); card.add_theme_stylebox_override("panel", _card(App.CARD, 20, 14)); m.add_child(card)
+	config_box = VBoxContainer.new(); config_box.add_theme_constant_override("separation", 8); card.add_child(config_box)
+
+func toggle_config() -> void:
+	config_open = not config_open; config.visible = config_open
+	Snd.sfx("ui")
+	if config_open: _fill_config()
+
+func _fill_config() -> void:
+	for c in config_box.get_children(): config_box.remove_child(c); c.queue_free()
+	var w := clampf(size.x - 70, 240, 640)
+	var head := _lbl(up("Configuración"), caps, 15, App.ACC); head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; config_box.add_child(head)
+	config_box.add_child(_lbl(up("Tipo de letra"), caps, 12, App.SOFT))
+	var row := BoxContainer.new(); row.vertical = size.x < 640; row.add_theme_constant_override("separation", 8); config_box.add_child(row)
+	for kind in FONTS:
+		var card := FontCard.new(); card.setup(self, kind, kind == font_kind)
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		card.chosen.connect(func(): Snd.sfx("pick"); set_font(kind); _fill_config())
+		row.add_child(card)
+	row.custom_minimum_size.x = w
+	config_box.add_child(_lbl(up("Pantalla y sonido"), caps, 12, App.SOFT))
+	var opts := HFlowContainer.new(); opts.add_theme_constant_override("h_separation", 6); opts.add_theme_constant_override("v_separation", 6)
+	opts.custom_minimum_size.x = w; config_box.add_child(opts)
+	_settings_btns(opts, 42 if compact else 46)
+	var back := _btn(up("Volver"), "primary", 15, 44 if compact else 48); back.pressed.connect(func(): toggle_config()); config_box.add_child(back)
+
+# botones de ajustes
 func _settings_btns(into: Container, min_h: float) -> void:
 	var bs := _btn("", "ghost", 14, min_h)
-	var upd_s := func(): bs.text = "Tamaño de interfaz: " + App.scale_name()
+	var upd_s := func(): bs.text = low("Tamaño de interfaz: " + App.scale_name())
 	upd_s.call()
-	bs.pressed.connect(func(): Snd.sfx("ui"); App.next_scale(); App.fit(get_window()); upd_s.call(); _layout())
+	bs.pressed.connect(func(): Snd.sfx("ui"); App.next_scale(); App.fit(get_window()); upd_s.call(); _layout(); if config_open: _fill_config.call_deferred())
 	into.add_child(bs)
 	var bm := _btn("", "ghost", 14, min_h)
-	var upd_m := func(): bm.text = "Sonido: " + ("no" if Snd.muted else "sí")
+	var upd_m := func(): bm.text = low("Sonido: " + ("no" if Snd.muted else "sí"))
 	upd_m.call()
 	bm.pressed.connect(func(): Snd.toggle_mute(); upd_m.call())
 	into.add_child(bm)
@@ -371,13 +475,13 @@ func _layout() -> void:
 	var w := clampf(size.x - side * 2.0, 280.0, 780.0)
 	dlg.custom_minimum_size.x = w; pick.custom_minimum_size.x = minf(size.x - 24.0, 860.0)
 	var fs := 21 if compact or narrow else 23
-	for k in ["normal_font_size", "italics_font_size"]: dlg_text.add_theme_font_size_override(k, fs)
+	for k in ["normal_font_size", "italics_font_size"]: dlg_text.add_theme_font_size_override(k, fz(fs))
 	dock_margin.add_theme_constant_override("margin_left", 12); dock_margin.add_theme_constant_override("margin_right", 12)
 	_dock_bottom()
 	info.custom_minimum_size.x = minf(size.x - 40.0, 600.0)
 	note_l.custom_minimum_size.x = minf(size.x - 60.0, 720.0)
 	t_title.custom_minimum_size.x = minf(size.x - 40.0, 1000.0); t_sub.custom_minimum_size.x = minf(size.x - 60.0, 680.0)
-	t_title.add_theme_font_size_override("font_size", int(clampf(minf(size.x * 0.07, size.y * 0.16), 34, 76)))
+	t_title.add_theme_font_size_override("font_size", fz(clampf(minf(size.x * 0.07, size.y * 0.16), 34, 76)))
 	var sbw := minf(minf(640.0, size.x - 60.0), (size.y - 90.0) * 640.0 / 420.0)
 	slate_board.custom_minimum_size = Vector2(sbw, sbw * 420.0 / 640.0)
 	j_split.vertical = port or size.x < 700
@@ -386,7 +490,7 @@ func _layout() -> void:
 	var wide_menu := compact and not port and size.x > 620
 	menu_split.vertical = not wide_menu
 	var tfs := clampf(size.x * (0.058 if wide_menu else 0.085), 38, 112)
-	menu_title.add_theme_font_size_override("font_size", int(minf(tfs, size.y * 0.2)))
+	menu_title.add_theme_font_size_override("font_size", fz(minf(tfs, size.y * 0.2)))
 	menu_foot.custom_minimum_size.x = minf(size.x - 40, 420)
 	if menu_open and not _menu_args.is_empty(): show_menu.callv(_menu_args)
 	pad.queue_redraw()
@@ -443,7 +547,7 @@ func toast(kind: String, small: String, text: String) -> void:
 	s.border_color = {frag = App.INK, her = App.HERESY, bad = App.BAD, good = App.GOOD}.get(kind, App.ACC)
 	p.add_theme_stylebox_override("panel", s)
 	var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_theme_constant_override("separation", -2); p.add_child(v)
-	v.add_child(_lbl(small.to_upper(), caps, 11, App.SOFT))
+	v.add_child(_lbl(up(small), caps, 11, App.SOFT))
 	var tl := _lbl(text, serif, 18, App.INK); tl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; tl.custom_minimum_size.x = minf(300, size.x * 0.5); v.add_child(tl)
 	toasts.add_child(p)
 	while toasts.get_child_count() > (2 if compact else 4): toasts.get_child(0).free()
@@ -452,13 +556,14 @@ func toast(kind: String, small: String, text: String) -> void:
 	tw.tween_property(p, "modulate:a", 1.0, 0.3); tw.tween_interval(3.6); tw.tween_property(p, "modulate:a", 0.0, 0.6); tw.tween_callback(p.queue_free)
 
 func objective(t: String) -> void:
-	objective_l.text = t; objective_l.visible = t != ""; hud_card.reset_size()
+	objective_l.text = low(t); objective_l.visible = t != ""; hud_card.reset_size()
 
 func chapter_tag(t: String) -> void:
-	chapter_tag_l.text = t.to_upper(); hud_card.reset_size()
+	_tag_raw = t; chapter_tag_l.text = up(t); hud_card.reset_size()
 
 func prompt(text) -> void:
 	if text == null or touch: prompt_box.visible = false; return
+	text = low(text)
 	if prompt_l.text != text: prompt_l.text = text
 	prompt_box.visible = true
 
@@ -477,7 +582,7 @@ func flash(a: float) -> void:
 # rótulo de capítulo: breve, sobre un velo, y se puede saltar con un toque
 func title(num: String, title_text: String, sub := "", dur := 2.6) -> void:
 	if auto: return
-	t_num.text = num.to_upper(); t_title.text = title_text; t_sub.text = sub
+	t_num.text = up(num); t_title.text = low(title_text); t_sub.text = low(sub)
 	title_box.visible = true; title_box.modulate.a = 0.0; _title_on = true; _title_skip = false
 	Snd.sfx("bell")
 	var t := 0.0
@@ -515,7 +620,7 @@ func _show_block(who: String, text: String) -> void:
 	var sp: Dictionary = SPEAKERS.get(who, {name = who, voice = "yo"})
 	var cls: String = sp.get("cls", "")
 	var col: Color = App.inked(Color(sp.color), 0.46) if sp.has("color") else App.SOFT
-	dlg_who.text = (sp.name as String).to_upper(); dlg_head.visible = sp.name != ""
+	dlg_who.text = up(sp.name); dlg_head.visible = sp.name != ""
 	dlg_who.add_theme_color_override("font_color", App.SOFT if cls == "you" else col)
 	dlg_icon.visible = cls != "inner" and ICON.has(sp.get("voice", ""))
 	if dlg_icon.visible: dlg_icon.kind = ICON[sp.voice]; dlg_icon.col = App.SOFT if cls == "you" else col; dlg_icon.queue_redraw()
@@ -523,7 +628,7 @@ func _show_block(who: String, text: String) -> void:
 	var tc := App.INK
 	if cls == "narr":
 		body = "[center]" + fmt(text, "color=" + App.HEX_ACC) + "[/center]"; tc = Color("2a3540")
-		dlg_text.add_theme_font_override("normal_font", F_FELL_IT)
+		dlg_text.add_theme_font_override("normal_font", fell_it)
 	elif cls == "inner":
 		body = fmt(text, "color=#17212b"); tc = col
 		dlg_text.add_theme_font_override("normal_font", serif_it)
@@ -591,7 +696,7 @@ func choose(opts: Array, _echo := true):
 		var lock := _locked(o)
 		_opt_lock.append(lock)
 		var bb := ""
-		if o.get("tag", "") != "": bb += "[color=%s][b]%s[/b][/color]  " % [App.HEX_FAINT if lock else "#5b3fa8", (o.tag as String).to_upper()]
+		if o.get("tag", "") != "": bb += "[color=%s][b]%s[/b][/color]  " % [App.HEX_FAINT if lock else "#5b3fa8", up(o.tag)]
 		bb += fmt(o.t)
 		if lock and o.lock is String: bb += "  [color=%s][i]— %s[/i][/color]" % [App.HEX_FAINT, o.lock]
 		var row := ChoiceRow.new(); row.setup(self, bb, lock, i)
@@ -629,7 +734,7 @@ func pick_key(n: int) -> bool:
 func panel(title_text: String, text: String, options: Array):
 	if auto: return options[0].get("id", 0)
 	for c in pick_opts.get_children(): c.free()
-	pick_title.text = title_text.to_upper(); pick_text.text = "[center]" + fmt(text, "color=" + App.HEX_ACC) + "[/center]"
+	pick_title.text = up(title_text); pick_text.text = "[center]" + fmt(text, "color=" + App.HEX_ACC) + "[/center]"
 	for i in options.size():
 		var o: Dictionary = options[i]
 		var card := OptCard.new(); card.setup(self, o, i)
@@ -645,10 +750,10 @@ func panel(title_text: String, text: String, options: Array):
 func panel_info(title_text, text := "") -> void:
 	if title_text == null: info.visible = false; return
 	if auto: return
-	info_title.text = (title_text as String).to_upper(); info_text.text = "[center]" + fmt(text, "color=" + App.HEX_ACC) + "[/center]"; info.visible = true
+	info_title.text = up(title_text); info_text.text = "[center]" + fmt(text, "color=" + App.HEX_ACC) + "[/center]"; info.visible = true
 
 func slate(show: bool, cap := "") -> SlateBoard:
-	slate_box.visible = show and not auto; slate_cap.text = cap.to_upper()
+	slate_box.visible = show and not auto; slate_cap.text = up(cap)
 	return slate_board
 
 # ---------- inventario: manuscrito, saberes, posición ----------
@@ -660,7 +765,7 @@ func toggle_journal(tab := "") -> void:
 		j_tab(tab if tab != "" else _tab); Snd.sfx("ui")
 
 func _j_head(t: String) -> void:
-	var l := _lbl(t.to_upper(), caps, 12, App.ACC); j_list.add_child(l)
+	var l := _lbl(up(t), caps, 12, App.ACC); j_list.add_child(l)
 
 func _j_item(text: String, have: bool, cb: Callable) -> Button:
 	var b := _btn(text, "flat", 18, 42)
@@ -676,13 +781,13 @@ func _j_clear(c: Node) -> void:
 
 func _j_text(sec: String, head: String, paras: Array, missing := "") -> void:
 	_j_clear(j_body)
-	j_body.add_child(_lbl(sec.to_upper(), caps, 12, App.ACC))
+	j_body.add_child(_lbl(up(sec), caps, 12, App.ACC))
 	if head != "":
-		var h := _lbl(head, F_FELL, 30, App.INK); h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; j_body.add_child(h)
+		var h := _lbl(head, fell, 30, App.INK); h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; j_body.add_child(h)
 	for p in paras:
 		var r := _rich(21, App.INK); r.text = fmt(p); r.add_theme_constant_override("line_separation", 6); j_body.add_child(r)
 	if missing != "":
-		var r := _rich(20, App.SOFT, serif_it); r.text = missing; j_body.add_child(r)
+		var r := _rich(20, App.SOFT, serif_it); r.text = low(missing); j_body.add_child(r)
 
 func j_tab(tab: String) -> void:
 	_tab = tab
@@ -728,8 +833,8 @@ func j_tab(tab: String) -> void:
 		var r := _rich(18, App.INK)
 		r.text = "Un [b]Cuadrado[/b]: cuatro lados iguales, cuatro ángulos rectos. Clase profesional. Tus hijos son Pentágonos; tus nietos, Hexágonos.\n\n[color=#4a5761][i]Mujeres (líneas) · Isósceles · Equiláteros · [/i][/color][b]Cuadrados[/b][color=#4a5761][i] · Pentágonos · Hexágonos… · Círculos[/i][/color]"
 		j_list.add_child(r)
-		j_body.add_child(_lbl("POSICIÓN SOCIAL", caps, 12, App.ACC))
-		j_body.add_child(_lbl("Cómo te ven", F_FELL, 30, App.INK))
+		j_body.add_child(_lbl(up("Posición social"), caps, 12, App.ACC))
+		j_body.add_child(_lbl("Cómo te ven", fell, 30, App.INK))
 		var d := func(v: float, a: String, b: String, c: String) -> String: return a if v <= -2 else (c if v >= 2 else b)
 		var bars := [
 			["Sacerdocio", S.rep.sac, "sospechoso", "devoto", d.call(S.rep.sac, "Los Círculos te observan de reojo.", "Para los Círculos eres un Cuadrado más.", "Los Círculos te tienen por hijo fiel de la Configuración.")],
@@ -739,7 +844,7 @@ func j_tab(tab: String) -> void:
 		]
 		for b in bars:
 			var row := HBoxContainer.new(); j_body.add_child(row)
-			var l1 := _lbl((b[0] as String).to_upper(), caps, 13, App.INK); l1.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(l1)
+			var l1 := _lbl(up(b[0]), caps, 13, App.INK); l1.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(l1)
 			row.add_child(_lbl("%s  /  %s" % [b[2], b[3]], caps, 12, App.SOFT))
 			var bar := Bar.new(); bar.v = clampf(b[1], -5, 5); bar.custom_minimum_size.y = 20; j_body.add_child(bar)
 			var ds := _lbl(b[4], serif_it, 18, App.SOFT); ds.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; j_body.add_child(ds)
@@ -758,7 +863,7 @@ func show_menu(items: Array, chapters: Array, max_ch: int, on_chapter: Callable)
 	chs.add_theme_constant_override("h_separation", 6); chs.add_theme_constant_override("v_separation", 4)
 	for k in items.size():
 		var it = items[k]
-		var b := _btn((it[0] as String).to_upper(), "primary" if k == 0 else "ghost", 16, bh)
+		var b := _btn(up(it[0]), "primary" if k == 0 else "ghost", 16, bh)
 		b.custom_minimum_size.x = bw; b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; b.clip_text = true
 		if it[1] is String and it[1] == "chapters": b.pressed.connect(func(): Snd.sfx("pick"); chs.visible = not chs.visible)
 		else: b.pressed.connect(func(): Snd.sfx("pick"); it[1].call(b))
@@ -767,10 +872,9 @@ func show_menu(items: Array, chapters: Array, max_ch: int, on_chapter: Callable)
 	for i in chapters.size():
 		var b := _btn(chapters[i], "flat", 14, 40); b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.disabled = i > max_ch; b.pressed.connect(func(): Snd.sfx("pick"); on_chapter.call(i)); chs.add_child(b)
-	var opts := HFlowContainer.new(); opts.alignment = FlowContainer.ALIGNMENT_CENTER; opts.custom_minimum_size.x = bw
-	opts.add_theme_constant_override("h_separation", 6); opts.add_theme_constant_override("v_separation", 6)
-	_settings_btns(opts, 40); menu_btns.add_child(opts)
-	menu_foot.text = "Una aventura narrativa. Se recomienda sonido.\n" + ("Arrastra a la izquierda para moverte · toca para continuar" if touch else "WASD / flechas · E interactuar · Espacio continuar · V vista · J inventario")
+	var cfg_b := _btn(up("Configuración"), "ghost", 16, bh); cfg_b.custom_minimum_size.x = bw
+	cfg_b.pressed.connect(func(): Snd.sfx("pick"); toggle_config()); menu_btns.add_child(cfg_b)
+	menu_foot.text = low("Una aventura narrativa. Se recomienda sonido.\n") + low("Arrastra a la izquierda para moverte · toca para continuar" if touch else "WASD / flechas · E interactuar · Espacio continuar · V vista · J inventario")
 
 func hide_menu() -> void:
 	menu.visible = false; menu_open = false; hud.visible = true; _menu_args = []
@@ -784,19 +888,49 @@ func toggle_pause(on_quit := Callable()) -> void:
 	for c in pause_btns.get_children(): pause_btns.remove_child(c); c.queue_free()
 	var bw := clampf(size.x - 80, 220, 320); var bh := 42.0 if compact else 48.0
 	var add := func(text: String, kind: String, cb: Callable) -> Button:
-		var b := _btn(text.to_upper(), kind, 15, bh); b.custom_minimum_size.x = bw; b.pressed.connect(cb); pause_btns.add_child(b)
+		var b := _btn(up(text), kind, 15, bh); b.custom_minimum_size.x = bw; b.pressed.connect(cb); pause_btns.add_child(b)
 		return b
 	add.call("Continuar", "primary", func(): toggle_pause())
 	add.call("Manuscrito y saberes", "ghost", func(): toggle_pause(); toggle_journal())
-	_settings_btns(pause_btns, bh)
+	add.call("Configuración", "ghost", func(): toggle_config())
 	var sure := {on = false}
 	var q: Button = add.call("Salir al menú", "ghost", func(): pass)
 	q.pressed.connect(func():
-		if not sure.on: sure.on = true; q.text = "¿SEGURO? SE GUARDA POR CAPÍTULOS"; return
+		if not sure.on: sure.on = true; q.text = up("¿Seguro? Se guarda por capítulos"); return
 		if on_quit.is_valid(): on_quit.call())
 
 
 # ---------- piezas ----------
+# tarjeta de tipo de letra: su nombre y una muestra escrita con esa misma letra
+class FontCard extends PanelContainer:
+	signal chosen
+	var _on := false
+	var _hover := false
+	func setup(ui: UIRoot, kind: String, on: bool) -> void:
+		_on = on
+		mouse_filter = Control.MOUSE_FILTER_STOP; mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		var sb := ui._card(Color("fffaf0") if on else Color(App.CARD, 0.6), 14, 10, 2, 0)
+		sb.border_color = App.ACC if on else App.LINE; sb.set_border_width_all(3 if on else 1)
+		add_theme_stylebox_override("panel", sb)
+		custom_minimum_size = Vector2(150, 84)
+		var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_theme_constant_override("separation", 2); add_child(v)
+		var name_l := ui._lbl(("● " if on else "○ ") + UIRoot.FONTS[kind].name, ui.caps, 13, App.ACC if on else App.SOFT); v.add_child(name_l)
+		var f := FontVariation.new()
+		var wt := TextServerManager.get_primary_interface().name_to_tag("wght")
+		if kind != "clasica": f.base_font = UIRoot.F_LIGADA; f.variation_opentype = {wt: 400}
+		else: f.base_font = UIRoot.F_SERIF; f.variation_opentype = {wt: 620}
+		var sample := Label.new(); sample.text = "soy un cuadrado." if kind == "minus" else "Soy un Cuadrado."; sample.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		sample.add_theme_font_override("font", f); sample.add_theme_font_size_override("font_size", 25 if kind == "clasica" else 19)
+		sample.add_theme_color_override("font_color", App.INK); v.add_child(sample)
+		set_meta("fixed_size", true)
+		mouse_entered.connect(func(): _hover = true; queue_redraw())
+		mouse_exited.connect(func(): _hover = false; queue_redraw())
+	func _draw() -> void:
+		if _hover and not _on: draw_rect(Rect2(Vector2.ZERO, size), App.ACC, false, 2.0)
+	func _gui_input(ev: InputEvent) -> void:
+		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and Rect2(Vector2.ZERO, size).has_point(ev.position):
+			accept_event(); chosen.emit()
+
 class ChoiceRow extends PanelContainer:
 	signal chosen
 	var _lock := false
@@ -811,7 +945,7 @@ class ChoiceRow extends PanelContainer:
 		var e := StyleBoxEmpty.new(); e.content_margin_left = 40; e.content_margin_right = 10; e.content_margin_top = 9; e.content_margin_bottom = 9
 		add_theme_stylebox_override("panel", e)
 		var r := ui._rich(20 if ui.compact else 21, App.FAINT if lock else App.INK)
-		r.add_theme_font_size_override("bold_font_size", 12)
+		r.add_theme_font_size_override("bold_font_size", ui.fz(12))
 		r.text = bb; add_child(r)
 		custom_minimum_size.y = 46 if ui.compact else 50
 		mouse_entered.connect(func(): _hover = true; queue_redraw())

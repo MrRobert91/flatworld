@@ -10,6 +10,7 @@ var _shot_n := 0
 
 func _ready() -> void:
 	_parse_args(); App.load_cfg()
+	if App.args.has("font"): App.cfg.font = App.args.font   # prueba: --font=ligada
 	get_window().size_changed.connect(_fit); _fit()
 	ui = UIRoot.new(); App.ui = ui; add_child(ui)
 	g = Game.new(); App.g = g; add_child(g)
@@ -120,7 +121,11 @@ func _process(dt: float) -> void:
 		d.rot = PI; g.add(d)
 		var ev := InputEventKey.new(); ev.physical_keycode = KEY_D; ev.keycode = KEY_D; ev.pressed = true; Input.parse_input_event(ev)
 	if App.args.has("open") and g.running and not ui.journal_open and Time.get_ticks_msec() > 5000 and not has_meta("opened"):
-		set_meta("opened", true); ui.toggle_journal(App.args.open)
+		set_meta("opened", true)
+		if App.args.open == "config":
+			ui.toggle_config()
+			if App.args.has("swap"): ui.set_font(App.args.swap); ui._fill_config(); ui.toggle_config()   # prueba del cambio en caliente
+		else: ui.toggle_journal(App.args.open)
 	if App.args.has("shots"):
 		_shot_t -= dt / maxf(Engine.time_scale, 0.01)
 		if _shot_t <= 0.0:

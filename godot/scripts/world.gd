@@ -228,7 +228,9 @@ func _roof(c: int, lo: float, hi: float) -> void:
 
 func text_plane(text: String, x: float, y: float, size: float, rot: float, alpha: float, italic: bool) -> Label3D:
 	var l := Label3D.new()
-	l.text = text; l.font = F_FELL_IT if italic else _caps; l.font_size = 40
+	var u: UIRoot = App.ui
+	l.text = u.low(text) if u != null else text; l.font = (u.fell_it if u != null else F_FELL_IT) if italic else (u.caps if u != null else _caps); l.font_size = 40
+	if u != null and u.font_kind != "clasica": l.font_size = 30   # misma resolución, letra más pequeña: la ligada es más ancha
 	l.pixel_size = size * (64.0 / 96.0) / 40.0
 	l.modulate = Color(pal.edge, clampf(alpha * 1.5, 0.0, 0.95)); l.shaded = false; l.double_sided = true
 	l.outline_size = 14; l.outline_modulate = Color(pal.fill, 0.9); l.outline_render_priority = -4
