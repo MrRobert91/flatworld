@@ -63,10 +63,14 @@ Mismas mecánicas, capítulos y texto. Además:
   aceleración suave, la cámara se adelanta al movimiento y queda una estela al correr.
 - **Inventario:** el manuscrito, los saberes y la posición social se abren con un icono en la parte
   superior (o con J en teclado). El icono se oculta durante los diálogos.
-- **Diálogos:** bloques de texto completos en la parte inferior, con las respuestas en una lista
-  minimalista bajo el bloque (mismas opciones, etiquetas y bloqueos).
+- **Diálogos:** bloques breves en la parte inferior que se escriben letra a letra (un toque completa el
+  texto). Un parlamento largo se parte solo en páginas de dos o tres líneas, por frases y, si hace falta,
+  por incisos, medidas con la fuente y el ancho reales: nunca tapan la pantalla, sea cual sea el tamaño
+  de letra. Las respuestas aparecen una tras otra bajo el bloque; si no caben con el último parlamento,
+  éste se pliega, y si aún no caben, la lista se desliza con un aviso. Ninguna opción queda fuera.
 - **Sin cargas:** los capítulos se encadenan en la misma escena; el rótulo de capítulo aparece sobre
-  el mundo ya dibujado y se salta con un toque. Los sonidos se sintetizan en segundo plano.
+  el mundo ya dibujado y se salta con un toque. Los cambios de escena son un fundido de papel que se
+  empapa desde manchas con el borde a tinta.
 - **Vista 1D en la GPU:** el trazado de rayos de «el ojo» es un sombreador, no un bucle por fotograma.
 
 ## Aspecto: el cuaderno de dibujo técnico
@@ -113,6 +117,33 @@ Sigue siendo la línea que describe el libro, y la niebla sigue siendo lo que pe
   Para probarlo: `godot -- --ch=2 --prick=iso` (o `mujer`, `tri`, `cuad`, `penta`).
 - **Espaciolandia:** la misma lámina de Planilandia vista desde Arriba, con el Norte arriba.
 
+## Música y sonido
+
+- **Música generativa** (`scripts/audio.gd`): un secuenciador toca instrumentos muestreados (arpa, colchón,
+  órgano, campana, celesta, flauta, cuerdas, bajo, cristal) siguiendo el ánimo de cada escena: tonalidad,
+  modo, tempo, progresión e instrumentación propios para la calle, la casa, el templo, el sueño de
+  Linealandia, Espaciolandia, el tiempo de los colores y la celda. Hay una melodía que se repite con
+  variaciones, arpegios y conducción de voces en los acordes; nunca suena dos veces igual.
+- **Tensión** (`Snd.tension(0..1)` y golpes con `Snd.spike`): con la escena en peligro entra un latido,
+  el bajo insiste en negras y luego en corcheas, suenan timbales, la armonía pasa a su versión oscura y
+  la melodía calla. Los martillazos, los pinchazos y las caídas aprietan un momento por sí solos.
+- **Efectos** muestreados con reverberación (fragmento del manuscrito, saberes, heraldo, mazo, Esfera,
+  ascenso, caída…), murmullo de voz mientras se escribe cada parlamento, rumor de lluvia continuo y la
+  música amortiguada en la vista del plano. Un limitador en la salida evita la saturación.
+- Las muestras (`assets/audio/*.ogg`, menos de 1 MB) se generan con
+  `python3 godot/tools/make_audio.py` (numpy, scipy y ffmpeg).
+
+## Animación y cámara
+
+- La cámara llega al Espacio con un barrido desde lo alto girando alrededor de la figura; al pasar a la
+  vista del plano el objetivo «respira» con un golpe de gran angular y un soplo de aire.
+- Las figuras proyectan una sombra dura sobre el papel, aparecen con un pequeño rebote y se estiran al
+  correr. Al recuperar una sección del manuscrito hay un destello dorado, ondas de tinta y un latido de
+  cámara.
+- **Nadie atraviesa a nadie:** cada figura choca con su forma real (las Mujeres son una línea de punta a
+  punta; los Isósceles, un huso), los paseantes se esquivan con antelación y, tras cada paso, se separan
+  las parejas que se solapan. Para comprobarlo: `godot -- --overlap` informa del mayor solape cada segundo.
+
 ## Estructura
 
 ```
@@ -125,11 +156,12 @@ scripts/world.gd       mundo plano: mapa, muros, colisiones, cámara
 scripts/entity.gd      figuras · geo.gd  mallas
 scripts/eye.gd         la vista 1D · shaders/eye_*.gdshader
 scripts/ui.gd          HUD, diálogos, inventario, menú · pad.gd  controles táctiles
-scripts/audio.gd       sonido procedural · space.gd  objetos de Espaciolandia
+scripts/audio.gd       música generativa y efectos · space.gd  objetos de Espaciolandia
 scripts/content/       ch.gd (base y minijuegos) · ch_a…ch_d.gd (capítulos)
 data/book.json         las 22 secciones y los saberes
 assets/models/         espacio.glb (generado con Blender)
-tools/                 blender_assets.py · espacio.blend · export.sh
+assets/audio/          instrumentos (m_*) y efectos (s_*) generados con tools/make_audio.py
+tools/                 blender_assets.py · espacio.blend · export.sh · make_audio.py
 ```
 
 Para regenerar los modelos y el icono: `blender --background --python godot/tools/blender_assets.py`.

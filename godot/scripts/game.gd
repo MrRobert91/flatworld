@@ -78,6 +78,14 @@ func reset() -> void:
 func frag(n: int) -> void:
 	if state.frags.has(str(n)): return
 	state.frags[str(n)] = 1; ui.last_frag = n; ui.new_pages = true; save(); Snd.sfx("frag")
+	# celebración: destello cálido, ondas de tinta dorada y un leve latido de cámara
+	ui.flash(0.22, Color("e8c36a"))
+	var p := player
+	if p != null and not auto:
+		var gold := Color("c9962e")
+		world.fx_add("puff", p.x, p.y, 0.9, 1.3, gold); world.fx_add("puff", p.x, p.y, 1.3, 2.2, gold)
+		world.fx_add("spark", p.x, p.y, 0.7, 1.6, gold)
+		world.kick = 1.0
 	ui.toast("frag", "Manuscrito · sección %d de 22" % n, "«%s»" % book.fragments[n - 1].title)
 
 func learn(id: String) -> void:
@@ -131,7 +139,7 @@ func press_act() -> void:
 
 func toggle_view() -> void:
 	if view_lock or player == null or world.cam_mode != "follow" or busy: return
-	set_view("eye" if view == "top" else "top"); Snd.sfx("door")
+	set_view("eye" if view == "top" else "top"); Snd.sfx("whoosh")
 
 func set_view(v: String) -> void:
 	view = v
@@ -202,8 +210,9 @@ func hurt(sev: float, at: Vector2) -> void:
 	p.shake = maxf(p.shake, 0.35 + 0.65 * sev)
 	world.fx_add("spark", at.x, at.y, 0.3 + 0.25 * sev, 0.55 + 0.65 * sev)
 	world.shake = maxf(world.shake, 0.5 * sev)
+	Snd.spike(0.25 + 0.3 * sev)
 	if sev >= 0.8:
-		Snd.sfx("stab"); Input.vibrate_handheld(90); ui.flash(0.24)
+		Snd.sfx("hurt"); Snd.sfx("stab"); Input.vibrate_handheld(90); ui.flash(0.24)
 		world.fx_add("puff", p.x, p.y, 0.5, 0.6)
 	else:
 		Snd.tone(520.0 - 180.0 * sev, 0.09, "square", 0.05 + 0.06 * sev); Input.vibrate_handheld(25)
@@ -408,6 +417,7 @@ func _process(delta: float) -> void:
 		W.update(dt, p)
 		frame.emit(dt)
 	var e := W.eye_t; var free := W.cam_mode == "free"
+	Snd.muffle(e if not free else 0.0)
 	var bg: Color = W.pal.bg
 	RenderingServer.set_default_clear_color(bg)
 	W.visible = e < 0.995 or free
@@ -472,7 +482,7 @@ func move_player(dt: float, p: Ent) -> void:
 func hud(p, e: float, strip: bool, free: bool) -> void:
 	ui.eye_frame.visible = strip and e < 0.5
 	ui.compass.visible = running and not free and e < 0.5 and not ui.touch
-	ui.keys_box.visible = running and not ui.touch and not ui.dlg_open and ui.size.x > 900 and not ui.modal()
+	ui.keys_box.visible = running and not ui.touch and not ui.dlg_open and not ui.dlg.visible and ui.size.x > 900 and not ui.modal()
 	ui.keys_l.text = "ratón mirar  ·  WASD volar  ·  R / F subir y bajar  ·  J inventario" if free else "V vista  ·  J inventario  ·  M sonido  ·  Esc menú"
 	ui.eye_hint.visible = e > 0.9 and running and not busy and not hide_eye_hint and not ui.dlg.visible
 	ui.eye_hint.text = "VISTA DEL PLANO  —  palanca: girar y avanzar  ·  ojo: volver a la lámina" if ui.touch else "VISTA DEL PLANO  —  A/D girar  ·  W/S avanzar  ·  V volver a la lámina"

@@ -34,6 +34,8 @@ var x0 := 0.0
 var world
 var body: MeshInstance3D
 var guts: MeshInstance3D
+var shadow: MeshInstance3D
+var pop := 0.0           # 0→1: aparece con un pequeño rebote
 var _tok := 0
 var cur_sp := 0.0        # velocidad actual (arranca y frena con suavidad)
 var pause := 0.0         # se detiene un momento (saludo, susto)
@@ -67,6 +69,7 @@ func setup(w, d: Dictionary) -> Ent:
 		for p in local: m = maxf(m, p.length())
 		rad = m * 0.86
 	guts = MeshInstance3D.new(); add_child(guts)
+	shadow = MeshInstance3D.new(); add_child(shadow)
 	build()
 	return self
 
@@ -108,6 +111,17 @@ func build() -> void:
 		var f: Vector2 = local[0]
 		mb.disc(f * (1.0 - 0.2 / f.length()), 0.055, 0.03, edge_col)
 	body.mesh = mb.commit(); body.material_override = world.mat(1)
+	# sombra dura: la misma figura, desplazada hacia el Sudeste, como un recorte sobre el papel
+	var sb := Geo.MB.new()
+	var so := Vector2(0.1, -0.13)
+	var sp := []
+	for q in pts: sp.append(q * 1.04 + so)
+	var scol := Color(0, 0, 0, 0.34) if P.get("dark", false) else Color(P.edge, 0.13)
+	if woman:
+		var L: float = pts[0].x
+		sp = [Vector2(L, 0) + so, Vector2(0, 0.09) + so, Vector2(-L, 0) + so, Vector2(0, -0.09) + so]
+	sb.fan(sp, 0.004, scol)
+	shadow.mesh = sb.commit(); shadow.material_override = world.mat(0)
 	# entrañas: sólo visibles desde el Espacio
 	if not woman and not def.get("noGuts", false):
 		var s := rad * 0.42; var gp := []
@@ -150,6 +164,7 @@ func face(px: float, py: float) -> void:
 
 func update(dt: float) -> void:
 	t += dt
+	pop = minf(1.0, pop + dt / 0.38)
 	if is_spot:
 		visible = not hid
 		position = Vector3(x, 0, -y); rotation.y = world.time * 1.3
@@ -217,8 +232,11 @@ func update(dt: float) -> void:
 			elif ai.type == "stroll": ai.tgt = null; ai.wait = 2.0 + randf() * 5.0
 			elif ai.type == "path": ai.i = (ai.get("i", 0) + 1) % ai.pts.size()
 		else:
-			x += dx / d * step; y += dy / d * step
-			if not fixed_rot: rot += App.ang_diff(rot, atan2(dy, dx)) * minf(1.0, dt * (9.0 if scripted else 5.5))
+			var dir := Vector2(dx / d, dy / d)
+			# los paseantes esquivan a quien se les cruza; en escena se va derecho
+			if not scripted and d > 1.2: dir = world.steer(self, dir)
+			x += dir.x * step; y += dir.y * step
+			if not fixed_rot: rot += App.ang_diff(rot, atan2(dir.y, dir.x)) * minf(1.0, dt * (9.0 if scripted else 5.5))
 			if mv == null and ai != null and ai.type in ["wander", "stroll"]: world.collide(self)
 	else:
 		cur_sp = lerpf(cur_sp, 0.0, minf(1.0, dt * 8.0))
@@ -235,7 +253,14 @@ func update(dt: float) -> void:
 	if not has_t and not woman and not fixed_rot and not frozen and id != "yo": idle = sin(t * 1.3 + phase) * 0.035
 	position = Vector3(x + jx, alt, -y - jy); rotation.y = eff_rot() + jr + idle
 	var pulse := 1.0 + 0.07 * talk * (0.5 + 0.5 * sin(t * 15.0)) + (0.02 * sin(t * 9.0) * clampf(cur_sp / 2.5, 0.0, 1.0) if not woman else 0.0)
-	scale = Vector3.ONE * maxf(sc * pulse, 0.0001)
+	# aparición: crece con un rebote (easeOutBack)
+	var u := pop - 1.0
+	pulse *= 1.0 + 2.2 * u * u * u + 1.2 * u * u if pop < 1.0 else 1.0
+	# estirarse al correr, achatarse al frenar: a lo largo de la marcha
+	var spd: float = App.g.vel.length() if id == "yo" and App.g != null else cur_sp
+	var k := clampf(spd / 6.0, 0.0, 1.0) if not woman else 0.0
+	var s0 := maxf(sc * pulse, 0.0001)
+	scale = Vector3(s0 * (1.0 + 0.08 * k), s0, s0 * (1.0 - 0.06 * k))
 
 # vértices que pinchan: [posición en el mundo, gravedad]. Punta de mujer o de Isósceles: 1;
 # Equilátero: 0,45; Cuadrado: 0,3. Con más lados el ángulo ya no hiere.

@@ -60,6 +60,9 @@ var talker = null         # Ent o Node3D que habla ahora
 var talk_w := 0.0         # 0..1: cuánto se va la cámara hacia quien habla
 var talk_cur := Vector2.ZERO
 var shake := 0.0          # sacudida de cámara
+var kick := 0.0           # latido de cámara (se acerca y vuelve)
+var _free_intro := 1.0    # 0→1: la cámara llega al Espacio en un barrido
+var _last_mode := "follow"
 var fx_im: MeshInstance3D
 var fxs := []             # efectos sueltos: {k, x, y, t, dur, s, c}
 var rain_im: MeshInstance3D
@@ -282,27 +285,134 @@ func fx_quad(color: Color, opacity := 1.0) -> MeshInstance3D:
 	fx.add_child(m)
 	return m
 
+# Forma de choque de una figura: una cápsula [a, b, radio]. Las Mujeres son una línea (la cápsula
+# va de punta a punta), los Isósceles un huso del ápice a la base; el resto, un círculo.
+func shape(e: Ent) -> Array:
+	var c := Vector2(e.x, e.y)
+	if e.woman or e.def.has("iso"):
+		var r := e.eff_rot(); var d := Vector2(cos(r), sin(r))
+		if e.woman:
+			var L: float = e.local[0].x * e.sc
+			return [c + d * L, c - d * L, 0.1 * maxf(e.sc, 0.3)]
+		var w: Array = e.world_pts()
+		var base: Vector2 = (w[1] + w[2]) * 0.5
+		var hw: float = (w[1] as Vector2).distance_to(w[2]) * 0.5
+		var tip: Vector2 = w[0]
+		return [tip - (tip - base).normalized() * hw * 0.6, base, maxf(hw * 0.75, 0.1)]
+	return [c, c, e.rad * e.sc]
+
+# puntos más cercanos entre los segmentos p1-q1 y p2-q2 → [punto en 1, punto en 2]
+static func seg_closest(p1: Vector2, q1: Vector2, p2: Vector2, q2: Vector2) -> Array:
+	var d1 := q1 - p1; var d2 := q2 - p2; var r := p1 - p2
+	var a := d1.dot(d1); var e := d2.dot(d2); var f := d2.dot(r)
+	var s := 0.0; var t := 0.0
+	if a <= 1e-9 and e <= 1e-9: return [p1, p2]
+	if a <= 1e-9:
+		t = clampf(f / e, 0.0, 1.0)
+	else:
+		var c := d1.dot(r)
+		if e <= 1e-9:
+			s = clampf(-c / a, 0.0, 1.0)
+		else:
+			var b := d1.dot(d2); var den := a * e - b * b
+			s = clampf((b * f - c * e) / den, 0.0, 1.0) if den > 1e-9 else 0.0
+			t = (b * s + f) / e
+			if t < 0.0: t = 0.0; s = clampf(-c / a, 0.0, 1.0)
+			elif t > 1.0: t = 1.0; s = clampf((b - c) / a, 0.0, 1.0)
+	return [p1 + d1 * s, p2 + d2 * t]
+
+# separación entre dos cápsulas: [distancia que sobra (<0 si se solapan), normal de b hacia a]
+func _gap(sa: Array, sb: Array, ca: Vector2, cb: Vector2) -> Array:
+	var cp := seg_closest(sa[0], sa[1], sb[0], sb[1])
+	var v: Vector2 = cp[0] - cp[1]
+	var d := v.length()
+	var nrm := v / d if d > 1e-5 else (ca - cb).normalized()
+	if nrm == Vector2.ZERO: nrm = Vector2(1, 0)
+	return [d - sa[2] - sb[2], nrm]
+
+func _walls_push(e: Ent) -> void:
+	var sh := shape(e)
+	var c := Vector2(e.x, e.y)
+	for w in walls:
+		var a := Vector2(w[0], w[1]); var b := Vector2(w[2], w[3])
+		var cp := seg_closest(sh[0], sh[1], a, b)
+		var v: Vector2 = cp[0] - cp[1]; var d := v.length()
+		if d >= sh[2]: continue
+		var nrm: Vector2
+		if d > 1e-5: nrm = v / d
+		else:
+			# la línea cruza el muro: sale hacia el lado de su centro
+			var wn := Vector2(-(b - a).y, (b - a).x).normalized()
+			nrm = wn if (c - a).dot(wn) >= 0.0 else -wn
+		var push: float = sh[2] - d
+		e.x += nrm.x * push; e.y += nrm.y * push
+		sh = shape(e); c = Vector2(e.x, e.y)
+
 func collide(e: Ent) -> Array:
 	var hits := []
 	if e.no_collide: return hits
-	var r := e.rad * e.sc
-	for w in walls:
-		var dx: float = w[2] - w[0]; var dy: float = w[3] - w[1]
-		var l2 := dx * dx + dy * dy
-		if l2 == 0.0: l2 = 1.0
-		var tt := clampf(((e.x - w[0]) * dx + (e.y - w[1]) * dy) / l2, 0.0, 1.0)
-		var px: float = w[0] + dx * tt; var py: float = w[1] + dy * tt
-		var ox := e.x - px; var oy := e.y - py; var d := sqrt(ox * ox + oy * oy)
-		if d < r and d > 1e-6: e.x = px + ox / d * r; e.y = py + oy / d * r
+	_walls_push(e)
+	var se := shape(e)
 	for o in ents.values():
-		if o == e or o.hid or o.no_collide or absf(o.alt - e.alt) > 0.5: continue
-		var ox2: float = e.x - o.x; var oy2: float = e.y - o.y
-		var d2 := sqrt(ox2 * ox2 + oy2 * oy2); var rr: float = r + o.rad * o.sc
-		if d2 < rr + 0.45: hits.append(o)
-		if d2 < rr and d2 > 1e-6: e.x = o.x + ox2 / d2 * rr; e.y = o.y + oy2 / d2 * rr
+		if o == e or o.hid or o.no_collide or o.dying >= 0.0 or absf(o.alt - e.alt) > 0.5: continue
+		var g := _gap(se, shape(o), Vector2(e.x, e.y), Vector2(o.x, o.y))
+		if g[0] < 0.45: hits.append(o)
+		if g[0] < 0.0:
+			e.x -= g[1].x * g[0]; e.y -= g[1].y * g[0]; se = shape(e)
 	var b: Dictionary = map.bounds
 	e.x = clampf(e.x, b.x0 + 1.0, b.x1 - 1.0); e.y = clampf(e.y, b.y0 + 1.0, b.y1 - 1.0)
 	return hits
+
+# cuánto cede una figura al chocar: los paseantes ceden; el jugador, los que están en escena,
+# los que conversan y los inmóviles no
+func _give(e: Ent) -> float:
+	if e.id == "yo" or e.mv != null or e.frozen or e.fixed_rot or e.ai == null: return 0.0
+	return 1.0
+
+# nadie atraviesa a nadie: tras mover a todos, se separan las parejas que se solapan
+func separate() -> void:
+	var list := []
+	for e in ents.values():
+		if not e.hid and not e.no_collide and not e.is_spot and e.dying < 0.0: list.append(e)
+	var shapes := []
+	for e in list: shapes.append(shape(e))
+	for i in list.size():
+		var a: Ent = list[i]
+		for j in range(i + 1, list.size()):
+			var b: Ent = list[j]
+			if absf(a.alt - b.alt) > 0.5: continue
+			var ca := Vector2(a.x, a.y); var cb := Vector2(b.x, b.y)
+			# descarte rápido
+			if ca.distance_to(cb) > 4.0: continue
+			var g := _gap(shapes[i], shapes[j], ca, cb)
+			if g[0] >= 0.0: continue
+			var wa := _give(a); var wb := _give(b)
+			if wa + wb <= 0.0: continue
+			var push: Vector2 = g[1] * -g[0]
+			if wa > 0.0:
+				var k := wa / (wa + wb); a.x += push.x * k; a.y += push.y * k
+				_walls_push(a); shapes[i] = shape(a)
+			if wb > 0.0:
+				var k := wb / (wa + wb); b.x -= push.x * k; b.y -= push.y * k
+				_walls_push(b); shapes[j] = shape(b)
+
+# los paseantes esquivan con antelación a quien tienen delante (en vez de chocar)
+func steer(e: Ent, dir: Vector2) -> Vector2:
+	var out := dir
+	var me := Vector2(e.x, e.y)
+	var reach := 2.4 + e.rad
+	for o in ents.values():
+		if o == e or o.hid or o.no_collide or o.is_spot or absf(o.alt - e.alt) > 0.5: continue
+		var v := Vector2(o.x, o.y) - me
+		var d := v.length()
+		if d < 0.01 or d > reach + o.rad * o.sc: continue
+		var ahead := v.dot(dir) / d
+		if ahead < 0.2: continue
+		# se aparta hacia el lado por el que el otro queda más lejos
+		var side := Vector2(-dir.y, dir.x)
+		var sgn := -1.0 if v.dot(side) > 0.0 else 1.0
+		out += side * sgn * ahead * (1.0 - d / (reach + o.rad * o.sc)) * 1.6
+	return out.normalized() if out.length() > 0.01 else dir
 
 # ---------- efectos ----------
 # k: "spark" (pinchazo), "splash" (gota), "cross" (caído), "puff" (onda)
@@ -478,6 +588,7 @@ static func pos_of(o) -> Vector2:
 func update(dt: float, player) -> void:
 	time += dt
 	rain_cur = lerpf(rain_cur, rain, minf(1.0, dt * 0.8))
+	Snd.rain(rain_cur * (1.0 - 0.6 * eye_t))
 	var gm: ShaderMaterial = ground.material_override
 	gm.set_shader_parameter("u_rain", rain_cur)
 	# quien habla late; los que están cerca y quietos se vuelven hacia él
@@ -486,6 +597,7 @@ func update(dt: float, player) -> void:
 	for e in ents.values():
 		e.look = tp if tp != null and e != talker and Vector2(e.x, e.y).distance_to(tp) < 15.0 else null
 		e.update(dt)
+	separate()
 	_greetings(dt)
 	for s in spots.values(): s.update(dt)
 	for id in marks:
@@ -545,6 +657,11 @@ func update_cam(dt: float, p) -> void:
 	if focus == null and talk_w > 0.01:
 		f = f.lerp(talk_cur, 0.5 * talk_w); zmul = 1.0 - 0.13 * talk_w
 	shake = maxf(0.0, shake - dt * 2.2)
+	kick = maxf(0.0, kick - dt * 1.6)
+	zmul *= 1.0 - 0.07 * sin(kick * PI) * kick
+	if cam_mode != _last_mode:
+		if cam_mode == "free": _free_intro = 0.0
+		_last_mode = cam_mode
 	var sx := sin(time * 61.0) * shake * 0.5; var sy := cos(time * 47.0) * shake * 0.5
 	cam_x = lerpf(cam_x, f.x + shift_cur + lead.x, k); cam_y = lerpf(cam_y, f.y + shift_y_cur + lead.y, k)
 	zoom_cur = lerpf(zoom_cur, zoom * zmul + speed_zoom, minf(1.0, dt * 2.0))
@@ -556,7 +673,14 @@ func update_cam(dt: float, p) -> void:
 		if talk_w > 0.01: tgt = tgt.lerp(Vector3(talk_cur.x, 0.0, -talk_cur.y), 0.55 * talk_w)
 		if not _free_ok: _free_tgt = tgt; _free_ok = true
 		_free_tgt = _free_tgt.lerp(tgt, minf(1.0, dt * 5.0)); tgt = _free_tgt + Vector3(sx, 0, sy)
-		var pos := tgt + Vector3(sin(free.yaw) * cp * free.dist, sin(free.pitch) * free.dist, cos(free.yaw) * cp * free.dist)
+		# llegada al Espacio: la cámara baja desde muy alto girando alrededor de la figura
+		_free_intro = minf(1.0, _free_intro + dt / 3.2)
+		var fi := 1.0 - App.ease(_free_intro)
+		var yaw: float = free.yaw + fi * 1.9
+		var pitch: float = lerpf(free.pitch, 1.42, fi)
+		var dist: float = free.dist * (1.0 + 2.4 * fi)
+		cp = cos(pitch)
+		var pos := tgt + Vector3(sin(yaw) * cp * dist, sin(pitch) * dist, cos(yaw) * cp * dist)
 		cam.fov = 42; cam.near = 0.2
 		cam.look_at_from_position(pos, tgt, Vector3.UP)
 		gm.set_shader_parameter("u_fade", 0.0)
@@ -565,7 +689,8 @@ func update_cam(dt: float, p) -> void:
 	var px: float = p.x if p != null else f.x; var py: float = p.y if p != null else f.y
 	var r: float = p.rot if p != null else PI / 2
 	var dx := cos(r); var dy := sin(r)
-	cam.fov = lerpf(30, 62, e); cam.near = lerpf(0.5, 0.008, minf(1.0, e * 3.0))
+	# al entrar o salir de la vista del plano, el objetivo «respira»: un golpe de gran angular
+	cam.fov = lerpf(30, 62, e) + sin(e * PI) * 14.0; cam.near = lerpf(0.5, 0.008, minf(1.0, e * 3.0))
 	# en vertical la cámara se aleja para que quepa más mundo a lo ancho
 	var vs := get_viewport().get_visible_rect().size
 	var zf := clampf(vs.y / maxf(vs.x, 1.0), 1.0, 1.6)

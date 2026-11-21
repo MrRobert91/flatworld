@@ -141,7 +141,9 @@ func ch4() -> void:
 	g.npc('agitador').move_to(-5, 11, 2)
 	var guards := []
 	for i in 4: guards.append(g.add(F_iso('pg%d' % i, -9 + i * 6, 20, 14, {name = 'un preso armado', rot = -1.57})))
+	Snd.tension(0.25)
 	o = await g.talk_begin('pantociclo', 'Asamblea extraordinaria. Acude ante el Círculo Supremo', 'Escuchar')
+	Snd.tension(0.4)
 	await say('pantociclo', 'Ciudadanos. Los Círculos hemos decidido ceder. Aceptamos la Ley del Color. Sólo os pido, antes de votar, que me escuchéis una última vez.')
 	await say('narr', 'Habló casi un día entero. Nadie supo después repetir sus frases, sólo lo que hicieron.')
 	await say('pantociclo', 'Artesanos: hoy vuestros hijos pueden nacer Equiláteros y subir. Cuando nada distinga a un noble de un obrero, ¿a qué subirán? Lo que ganáis en pintura lo perdéis en hijos.')
@@ -149,7 +151,7 @@ func ch4() -> void:
 	c = await choose([{t = '(Mirar a las mujeres. Están girando.)', id = 'a'}, {t = '(Mirar a los presos armados junto a la Tribuna.)', id = 'b'}, {t = '(Gritar.) ¡Es una trampa!', id = 'c', tag = 'Cuestionar'}])
 	if c == 'c': await say('logica', 'Nadie te oye. Un día entero de discurso lo ha preparado todo; tu grito llega con un día de retraso.')
 	await say('pantociclo', '¡Antes la muerte que el Color!')
-	Snd.sfx('gavel')
+	Snd.sfx('gavel'); Snd.tension(1.0)
 	ui.close_dlg()
 	# la matanza
 	# la cámara se abre sobre toda la plaza; los presos caen sobre el tribuno
@@ -179,8 +181,9 @@ func ch4() -> void:
 	await narr('En media hora no quedaba ninguno. Ciento cuarenta mil, muertos por los ángulos de sus compañeros.')
 	for e in W.ents.values():
 		if e.side_colors != null: e.set_colors(null)
-	W.set_palette('flat'); Snd.drone('flat'); Snd.sfx('fall')
+	W.set_palette('flat'); Snd.drone('cell'); Snd.tension(0.15); Snd.sfx('fall')
 	await g.wait(1.5)
+	Snd.tension(0.0); Snd.drone('flat')
 	await narr('Después vinieron las purgas: todo Triángulo sospechoso, destruido sin medición. Y el Color quedó abolido. Hoy sólo un viviente conoce el secreto de fabricarlo: el Círculo Supremo.')
 	g.frag(10); g.learn('color')
 	g.talk_end(o)
