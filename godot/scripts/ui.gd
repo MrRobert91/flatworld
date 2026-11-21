@@ -398,7 +398,8 @@ func _layout() -> void:
 	compass.position = Vector2(strip_rect.end.x + 14, 9)
 	eye_hint.size.x = size.x - 150; eye_hint.position = Vector2(75, 16)
 	var side := 14.0
-	if touch and not port: side = 168.0
+	# la palanca sólo ocupa los lados cuando se puede andar; en una conversación el bloque usa el ancho
+	if touch and not port and not dlg_open and not picking: side = 168.0
 	var w := clampf(size.x - side * 2.0, 280.0, 780.0)
 	dlg.custom_minimum_size.x = w; pick.custom_minimum_size.x = minf(size.x - 24.0, 860.0)
 	var fs := 21 if compact or narrow else 23
