@@ -7,6 +7,7 @@ var chapters := []       # [nombre, Callable]
 var _bot_t := 0.0
 var _shot_t := 0.0
 var _shot_n := 0
+var _ov_t := 0.0
 
 func _ready() -> void:
 	_parse_args(); App.load_cfg()
@@ -88,7 +89,7 @@ func run(i: int) -> void:
 	while i < chapters.size():
 		g.state.chapter = i; g.state.max = maxi(g.state.max, i); g.save()
 		g.locked = false; g.view_lock = false; g.busy = false; g.speed_mul = 1.0; g.hide_eye_hint = false
-		g.need_act = ""; g.need_stick = false
+		g.need_act = ""; g.need_stick = false; Snd.tension(0.0)
 		if App.args.has("log"): print("== capítulo ", i, " ", chapters[i][0])
 		await chapters[i][1].call()
 		g.tickers.clear(); g.handlers.clear(); g.epoch += 1
@@ -119,6 +120,22 @@ func _process(dt: float) -> void:
 		var d: Dictionary = {iso = a.F_iso("pk", p.x + 4, p.y, 12.0), mujer = a.F_mujer("pk", p.x + 4, p.y), tri = a.F_tri("pk", p.x + 4, p.y), cuad = a.F_cuad("pk", p.x + 4, p.y), penta = a.F_penta("pk", p.x + 4, p.y)}[App.args.prick]
 		d.rot = PI; g.add(d)
 		var ev := InputEventKey.new(); ev.physical_keycode = KEY_D; ev.keycode = KEY_D; ev.pressed = true; Input.parse_input_event(ev)
+	# prueba de choques: --overlap informa cada segundo del mayor solape entre figuras
+	if App.args.has("overlap"):
+		_ov_t += dt
+		if _ov_t > 1.0:
+			_ov_t = 0.0
+			var W := g.world; var L := []
+			for e in W.ents.values():
+				if not e.hid and not e.no_collide and not e.is_spot and e.dying < 0.0: L.append(e)
+			var worst := 0.0; var who := ""
+			for i in L.size():
+				for j in range(i + 1, L.size()):
+					var a: Ent = L[i]; var b: Ent = L[j]
+					if W._give(a) + W._give(b) <= 0.0: continue
+					var gg: Array = W._gap(W.shape(a), W.shape(b), Vector2(a.x, a.y), Vector2(b.x, b.y))
+					if -gg[0] > worst: worst = -gg[0]; who = a.id + "/" + b.id
+			print("overlap ", snappedf(worst, 0.001), " ", who, " n=", L.size())
 	if App.args.has("open") and g.running and not ui.journal_open and Time.get_ticks_msec() > 5000 and not has_meta("opened"):
 		set_meta("opened", true); ui.toggle_journal(App.args.open)
 	if App.args.has("shots"):

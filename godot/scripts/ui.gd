@@ -60,6 +60,8 @@ var dlg_icon: PolyIcon
 var dlg_who: Label
 var dlg_text: RichTextLabel
 var dlg_choices: VBoxContainer
+var dlg_scroll: ScrollContainer
+var dlg_scroll_hint: Label
 var dlg_more: Label
 var pick: PanelContainer
 var pick_title: Label
@@ -76,6 +78,7 @@ var title_veil: ColorRect
 var t_num: Label
 var t_title: Label
 var t_sub: Label
+var title_rule: Rule
 var journal: Control
 var j_tabs := {}
 var j_list: VBoxContainer
@@ -113,6 +116,14 @@ var _opt_lock := []
 var _block_tw: Tween
 var _re := RegEx.new()
 var _menu_args := []
+var _typing := false      # el bloque se va escribiendo
+var _type_n := 0.0
+var _type_total := 0
+var _type_voice := "yo"
+var _type_blip := 0
+var _type_pause := 0.0
+var _fit_n := 0
+var _page_info := ""      # «2 / 3» cuando un parlamento ocupa varias páginas
 
 # ---------- construcción ----------
 func _init() -> void:
@@ -134,6 +145,7 @@ func _ready() -> void:
 	toasts = VBoxContainer.new(); toasts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toasts.add_theme_constant_override("separation", 6); add_child(toasts)
 	fade_r = ColorRect.new(); fade_r.color = Color("e6dec8"); fade_r.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(fade_r); add_child(fade_r)
+	var fm := ShaderMaterial.new(); fm.shader = preload("res://shaders/fade.gdshader"); fade_r.material = fm
 	hurt_r = ColorRect.new(); hurt_r.color = Color(App.ACC, 0.0); hurt_r.mouse_filter = Control.MOUSE_FILTER_IGNORE; hurt_r.visible = false; _full(hurt_r); add_child(hurt_r)
 	_build_dock()
 	_build_info()
@@ -197,6 +209,14 @@ func _btn(text: String, kind := "ghost", fsize := 17, min_h := 48.0) -> Button:
 	b.add_theme_stylebox_override("disabled", d); b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	return b
 
+# barra de desplazamiento fina, a tinta
+func _ink_scrollbar(sb: ScrollBar) -> void:
+	var tr := StyleBoxFlat.new(); tr.bg_color = Color(App.INK, 0.08); tr.set_corner_radius_all(3); tr.content_margin_left = 3; tr.content_margin_right = 3
+	var gr := StyleBoxFlat.new(); gr.bg_color = Color(App.INK, 0.55); gr.set_corner_radius_all(3)
+	var gh := StyleBoxFlat.new(); gh.bg_color = App.ACC; gh.set_corner_radius_all(3)
+	sb.add_theme_stylebox_override("scroll", tr); sb.add_theme_stylebox_override("grabber", gr)
+	sb.add_theme_stylebox_override("grabber_highlight", gh); sb.add_theme_stylebox_override("grabber_pressed", gh)
+
 func fmt(t: String, em := "i") -> String:
 	return _re.sub(t, "[%s]$1[/%s]" % [em, em.split("=")[0]], true)
 
@@ -248,7 +268,15 @@ func _build_dock() -> void:
 	dlg_icon = PolyIcon.new(); dlg_icon.custom_minimum_size = Vector2(20, 20); dlg_icon.mid = true; dlg_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; dlg_head.add_child(dlg_icon)
 	dlg_who = _lbl("", caps, 14, App.SOFT); dlg_head.add_child(dlg_who)
 	dlg_text = _rich(23, App.INK); dv.add_child(dlg_text)
-	dlg_choices = VBoxContainer.new(); dlg_choices.add_theme_constant_override("separation", 0); dlg_choices.visible = false; dv.add_child(dlg_choices)
+	dlg_text.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING   # el texto ya está compuesto: nada salta al escribirse
+	# las respuestas van en un contenedor con desplazamiento: si no caben, se desliza, nunca se cortan
+	dlg_scroll = ScrollContainer.new(); dlg_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	dlg_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO; dlg_scroll.visible = false; dlg_scroll.mouse_filter = Control.MOUSE_FILTER_PASS
+	dv.add_child(dlg_scroll); _ink_scrollbar(dlg_scroll.get_v_scroll_bar())
+	dlg_choices = VBoxContainer.new(); dlg_choices.add_theme_constant_override("separation", 0); dlg_choices.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	dlg_choices.mouse_filter = Control.MOUSE_FILTER_PASS; dlg_scroll.add_child(dlg_choices)
+	dlg_scroll_hint = _lbl("desliza para ver más respuestas", caps, 12, App.ACC); dlg_scroll_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	dlg_scroll_hint.visible = false; dv.add_child(dlg_scroll_hint)
 	dlg_more = _lbl("continuar", caps, 13, App.ACC); dlg_more.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; dlg_more.visible = false; dv.add_child(dlg_more)
 
 func _build_info() -> void:
@@ -274,6 +302,7 @@ func _build_title() -> void:
 	t_title = _lbl("", F_FELL, 64, App.INK); t_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	t_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(t_title)
 	var rule := Rule.new(); rule.custom_minimum_size = Vector2(220, 12); rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v.add_child(rule)
+	title_rule = rule
 	t_sub = _lbl("", serif_it, 22, App.SOFT); t_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	t_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(t_sub)
 
@@ -362,12 +391,15 @@ func _layout() -> void:
 		hud_card.position = Vector2(12, 10)
 		objective_l.custom_minimum_size.x = clampf((size.x - sw) / 2.0 - 52, 130, 300)
 	chapter_tag_l.custom_minimum_size.x = objective_l.custom_minimum_size.x
+	objective_l.add_theme_font_size_override("font_size", 15 if compact else 18)
+	chapter_tag_l.add_theme_font_size_override("font_size", 11 if compact else 12)
 	hud_card.reset_size()
 	eye_frame.position = strip_rect.position - Vector2(2, 2); eye_frame.size = strip_rect.size + Vector2(4, 4)
 	compass.position = Vector2(strip_rect.end.x + 14, 9)
 	eye_hint.size.x = size.x - 150; eye_hint.position = Vector2(75, 16)
 	var side := 14.0
-	if touch and not port: side = 168.0
+	# la palanca sólo ocupa los lados cuando se puede andar; en una conversación el bloque usa el ancho
+	if touch and not port and not dlg_open and not picking: side = 168.0
 	var w := clampf(size.x - side * 2.0, 280.0, 780.0)
 	dlg.custom_minimum_size.x = w; pick.custom_minimum_size.x = minf(size.x - 24.0, 860.0)
 	var fs := 21 if compact or narrow else 23
@@ -398,7 +430,9 @@ func _dock_bottom() -> void:
 
 func _top_y() -> float:
 	if size.x < 640: return hud_card.position.y + hud_card.size.y + strip_rect.size.y + 22
-	return strip_rect.end.y + 12
+	var y := strip_rect.end.y + 12
+	if hud.visible: y = maxf(y, hud_card.position.y + hud_card.size.y + 8)
+	return y
 
 func _process(dt: float) -> void:
 	tick.emit(dt)
@@ -414,7 +448,10 @@ func _process(dt: float) -> void:
 	if note_box.visible and _note_t > 0.0:
 		_note_t -= dt
 		if _note_t <= 0.0: note_box.visible = false
-	var ty := strip_rect.end.y + 12
+	# durante un diálogo el objetivo se pliega: la cartela del HUD ocupa sólo el rótulo del capítulo
+	var obj_on := objective_l.text != "" and not ((dlg_open or picking) and compact)
+	if objective_l.visible != obj_on: objective_l.visible = obj_on; hud_card.reset_size()
+	var ty := maxf(strip_rect.end.y, hud_card.position.y + hud_card.size.y if hud.visible else 0.0) + 10
 	if info.visible:
 		info.reset_size(); info.position = Vector2((size.x - info.size.x) / 2.0, ty); ty += info.size.y + 8
 	if note_box.visible:
@@ -426,6 +463,28 @@ func _process(dt: float) -> void:
 	keys_box.reset_size(); keys_box.position = Vector2(size.x - keys_box.size.x - 14, size.y - keys_box.size.y - 12)
 	if dlg_more.visible: dlg_more.modulate.a = 0.82 + 0.18 * sin(Time.get_ticks_msec() * 0.004)
 	_dock_bottom()
+	_type_step(dt)
+	if dlg_scroll.visible: _fit_choices()
+
+# Las respuestas siempre caben: si con el último parlamento no hay sitio, el parlamento (ya leído) se
+# pliega; y si ni así, la lista se desliza con un aviso. Nunca queda una opción fuera de la pantalla.
+func _fit_choices() -> void:
+	var avail := size.y - _top_y() - 12.0 - 30.0
+	var head := dlg_head.size.y + 4.0 if dlg_head.visible else 0.0
+	var ch := dlg_choices.get_combined_minimum_size().y
+	_fit_n += 1
+	# las filas tardan un par de fotogramas en conocer su anchura (y su altura real)
+	if _fit_n < 4 or dlg_choices.size.x < 100.0: return
+	if dlg_text.visible:
+		var th := dlg_text.get_content_height() + 4.0
+		if head + th + ch > avail: dlg_text.visible = false
+		else: head += th
+	var room := maxf(avail - head - 20.0, 90.0)
+	var want := minf(ch, room)
+	if absf(dlg_scroll.custom_minimum_size.y - want) > 0.5: dlg_scroll.custom_minimum_size.y = want
+	var more := ch > room + 1.0
+	dlg_scroll_hint.visible = more and dlg_scroll.scroll_vertical < int(ch - room) - 4
+	if dlg_scroll_hint.visible: dlg_scroll_hint.modulate.a = 0.7 + 0.3 * sin(Time.get_ticks_msec() * 0.006)
 
 func sleep(sec: float) -> void:
 	if auto: return
@@ -447,11 +506,15 @@ func toast(kind: String, small: String, text: String) -> void:
 	var tl := _lbl(text, serif, 18, App.INK); tl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; tl.custom_minimum_size.x = minf(300, size.x * 0.5); v.add_child(tl)
 	toasts.add_child(p)
 	while toasts.get_child_count() > (2 if compact else 4): toasts.get_child(0).free()
-	p.modulate.a = 0.0
+	p.modulate.a = 0.0; p.modulate = Color(1.25, 1.25, 1.25, 0.0)
 	var tw := p.create_tween()
-	tw.tween_property(p, "modulate:a", 1.0, 0.3); tw.tween_interval(3.6); tw.tween_property(p, "modulate:a", 0.0, 0.6); tw.tween_callback(p.queue_free)
+	tw.tween_property(p, "modulate", Color.WHITE, 0.35).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT); tw.tween_interval(3.6); tw.tween_property(p, "modulate:a", 0.0, 0.6); tw.tween_callback(p.queue_free)
 
 func objective(t: String) -> void:
+	if t != "" and t != objective_l.text and not auto:
+		# el objetivo nuevo se subraya con un destello
+		objective_l.pivot_offset = Vector2(0, 10); objective_l.modulate = Color(1.6, 1.3, 1.3, 0.0)
+		var tw := objective_l.create_tween(); tw.tween_property(objective_l, "modulate", Color.WHITE, 0.5)
 	objective_l.text = t; objective_l.visible = t != ""; hud_card.reset_size()
 
 func chapter_tag(t: String) -> void:
@@ -469,9 +532,9 @@ func fade(on: bool, sec := 0.3) -> void:
 	await sleep(sec + 0.03)
 
 # destello de dolor: un velo rojo que se apaga
-func flash(a: float) -> void:
+func flash(a: float, c := App.ACC) -> void:
 	if auto: return
-	hurt_r.color = Color(App.ACC, a); hurt_r.visible = true
+	hurt_r.color = Color(c, a); hurt_r.visible = true
 	var tw := create_tween(); tw.tween_property(hurt_r, "color:a", 0.0, 0.45); tw.tween_callback(func(): hurt_r.visible = false)
 
 # rótulo de capítulo: breve, sobre un velo, y se puede saltar con un toque
@@ -479,11 +542,23 @@ func title(num: String, title_text: String, sub := "", dur := 2.6) -> void:
 	if auto: return
 	t_num.text = num.to_upper(); t_title.text = title_text; t_sub.text = sub
 	title_box.visible = true; title_box.modulate.a = 0.0; _title_on = true; _title_skip = false
-	Snd.sfx("bell")
+	Snd.sfx("title"); Snd.duck(0.8)
 	var t := 0.0
+	var parts: Array = [t_num, t_title, title_rule, t_sub]
+	for k in parts.size(): parts[k].modulate.a = 0.0
+	title_rule.grow = 0.0
 	while t < dur and not (_title_skip and t > 0.45):
 		t += await tick
-		title_box.modulate.a = minf(1.0, t / 0.35)
+		title_box.modulate.a = minf(1.0, t / 0.3)
+		# entrada escalonada: número, título (sube), filete (se traza), subtítulo
+		for k in parts.size():
+			var u := clampf((t - 0.12 - k * 0.22) / 0.5, 0.0, 1.0)
+			if _title_skip: u = 1.0
+			parts[k].modulate.a = App.ease(u)
+		title_rule.grow = App.ease(clampf((t - 0.5) / 0.6, 0.0, 1.0)) if not _title_skip else 1.0
+		title_rule.queue_redraw()
+		t_title.pivot_offset = t_title.size / 2.0
+		t_title.scale = Vector2.ONE * (1.0 + 0.06 * (1.0 - App.ease(clampf((t - 0.34) / 0.7, 0.0, 1.0)))) if not _title_skip else Vector2.ONE
 	var a := 1.0
 	_title_on = false
 	while a > 0.0:
@@ -494,6 +569,7 @@ func title(num: String, title_text: String, sub := "", dur := 2.6) -> void:
 # ---------- avance ----------
 func advance() -> bool:
 	if _title_on: _title_skip = true; return true
+	if _typing: _finish_type(); return true
 	if _adv_wait:
 		if Time.get_ticks_msec() >= _adv_ok:
 			_adv_wait = false; advanced.emit()
@@ -511,8 +587,11 @@ func waiting() -> bool:
 func cast(map: Dictionary) -> void:
 	SPEAKERS.merge(map, true)
 
-func _show_block(who: String, text: String) -> void:
-	var sp: Dictionary = SPEAKERS.get(who, {name = who, voice = "yo"})
+func _speaker(who: String) -> Dictionary:
+	return SPEAKERS.get(who, {name = who, voice = "yo"})
+
+func _show_block(who: String, text: String, cont := false) -> void:
+	var sp := _speaker(who)
 	var cls: String = sp.get("cls", "")
 	var col: Color = App.inked(Color(sp.color), 0.46) if sp.has("color") else App.SOFT
 	dlg_who.text = (sp.name as String).to_upper(); dlg_head.visible = sp.name != ""
@@ -532,42 +611,184 @@ func _show_block(who: String, text: String) -> void:
 		dlg_text.add_theme_font_override("normal_font", serif)
 	dlg_text.add_theme_color_override("default_color", tc)
 	dlg_text.text = body; dlg_text.visible = true
-	dlg_choices.visible = false; dlg.visible = true
+	dlg_scroll.visible = false; dlg_scroll_hint.visible = false
 	if App.g != null: App.g.speaking(who)
 	if _block_tw: _block_tw.kill()
-	dlg.modulate.a = 0.0
-	_block_tw = create_tween(); _block_tw.tween_property(dlg, "modulate:a", 1.0, 0.16)
-	Snd.blip(sp.get("voice", "yo"))
+	_block_tw = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if cont or dlg.visible:
+		# página siguiente o nuevo parlamento: sólo el texto se renueva, con un leve desliz
+		dlg.modulate.a = 1.0; dlg_text.modulate.a = 0.0
+		_block_tw.tween_property(dlg_text, "modulate:a", 1.0, 0.14)
+	else:
+		# el bloque entra: sube desde abajo y aparece
+		dlg.modulate.a = 0.0; dlg_text.modulate.a = 1.0; dlg.pivot_offset = Vector2(dlg.size.x / 2.0, dlg.size.y)
+		dlg.scale = Vector2(0.97, 0.97)
+		_block_tw.set_parallel(true)
+		_block_tw.tween_property(dlg, "modulate:a", 1.0, 0.18)
+		_block_tw.tween_property(dlg, "scale", Vector2.ONE, 0.26).set_trans(Tween.TRANS_BACK)
+	dlg.visible = true
+	# se escribe letra a letra (un toque lo completa)
+	_type_voice = sp.get("voice", "yo") if cls != "narr" else "narr"
+	_type_total = _plain(text).length(); _type_n = 0.0; _type_blip = 0
+	dlg_text.visible_characters = 0; _typing = true
+	if not cont: Snd.blip(sp.get("voice", "yo"))
+
+func _plain(t: String) -> String:
+	return t.replace("*", "")
+
+func _finish_type() -> void:
+	_typing = false; dlg_text.visible_characters = -1
+	_adv_ok = Time.get_ticks_msec() + 140
+
+func _type_step(dt: float) -> void:
+	if not _typing: return
+	if _type_pause > 0.0: _type_pause -= dt; return
+	var plain := dlg_text.get_parsed_text()
+	var before := int(_type_n)
+	_type_n += dt * 62.0
+	var n := mini(int(_type_n), plain.length())
+	# las pausas de la puntuación: el texto respira
+	for i in range(before, n):
+		var c := plain[i]
+		if c in ".!?…:;" or c in ",—":
+			n = i + 1; _type_n = float(n); _type_pause = 0.17 if c in ".!?…:;" else 0.06
+			break
+	if n / 3 != before / 3 and _type_voice != "narr": Snd.talk(_type_voice)
+	if n >= plain.length(): _finish_type()
+	else: dlg_text.visible_characters = n
 
 func open_dlg() -> void:
 	if not dlg_open: dlg_open = true; _layout()
 
 func close_dlg() -> void:
 	if App.g != null: App.g.speaking("")
+	_typing = false
 	dlg_open = false; dlg.visible = false; dlg_more.visible = false; _layout()
 
 func _more(on: bool) -> void:
-	dlg_more.text = "toca para continuar  ›" if touch else "espacio  ›  continuar"
+	dlg_more.text = ("toca para continuar  ›" if touch else "espacio  ›  continuar") + _page_info
 	dlg_more.visible = on
+
+# ---------- páginas ----------
+# Un parlamento largo se parte en páginas breves (por frases, y si hace falta por incisos o palabras)
+# que siempre caben en pantalla, sea cual sea el tamaño de letra.
+func _dlg_font(cls: String) -> Font:
+	if cls == "narr": return F_FELL_IT
+	if cls == "inner": return serif_it
+	return serif
+
+func _text_h(t: String, cls: String) -> float:
+	var fs := dlg_text.get_theme_font_size("normal_font_size")
+	var w := maxf(dlg.custom_minimum_size.x - 52.0, 120.0)
+	return _dlg_font(cls).get_multiline_string_size(_plain(t), HORIZONTAL_ALIGNMENT_LEFT, w, fs).y
+
+func _max_lines() -> int:
+	var fs := dlg_text.get_theme_font_size("normal_font_size")
+	var lh := _dlg_font("").get_height(fs) + 3.0
+	# lo que queda bajo el HUD, descontando cabecera, márgenes y «continuar»
+	var avail := size.y - _top_y() - 12.0 - 28.0 - 24.0 - 26.0
+	return clampi(int(avail * 0.62 / lh), 2, 3)
+
+func _paginate(text: String, cls: String) -> Array:
+	var fs := dlg_text.get_theme_font_size("normal_font_size")
+	var lh := _dlg_font(cls).get_height(fs)
+	var max_h := lh * _max_lines() + 2.0
+	var max_c := 190
+	var fits := func(t: String) -> bool: return t.length() <= max_c and _text_h(t, cls) <= max_h
+	var pages := []
+	var cur := ""
+	for snt in _sentences(text):
+		var pieces: Array = [snt] if fits.call(snt) else _split_long(snt, fits)
+		for pc in pieces:
+			var cand: String = pc if cur == "" else cur + " " + pc
+			if cur == "" or fits.call(cand): cur = cand
+			else: pages.append(cur); cur = pc
+	if cur != "": pages.append(cur)
+	# el énfasis (*…*) que cruza una frontera de página se cierra y se vuelve a abrir
+	var open := false
+	for i in pages.size():
+		var p: String = pages[i]
+		if open: p = "*" + p
+		open = p.count("*") % 2 == 1
+		if open: p += "*"
+		pages[i] = p
+	return pages if not pages.is_empty() else [text]
+
+func _sentences(t: String) -> Array:
+	var out := []
+	var cur := ""
+	var i := 0
+	var n := t.length()
+	while i < n:
+		var c := t[i]
+		cur += c
+		if c in ".!?…":
+			# absorbe cierres: comillas, paréntesis, asteriscos
+			while i + 1 < n and t[i + 1] in "»”\")*":
+				i += 1; cur += t[i]
+			if i + 2 < n and t[i + 1] == " ":
+				var nx := t[i + 2]
+				if nx == nx.to_upper() and nx != nx.to_lower() or nx in "¿¡«(—*\"":
+					out.append(cur.strip_edges()); cur = ""; i += 1
+		i += 1
+	if cur.strip_edges() != "": out.append(cur.strip_edges())
+	return out
+
+func _split_long(snt: String, fits: Callable) -> Array:
+	# por incisos
+	var parts := []
+	var cur := ""
+	for i in snt.length():
+		cur += snt[i]
+		if snt[i] in ",;:" and i + 1 < snt.length() and snt[i + 1] == " ":
+			parts.append(cur.strip_edges()); cur = ""
+	if cur.strip_edges() != "": parts.append(cur.strip_edges())
+	var out := []
+	var acc := ""
+	for pc in parts:
+		var cand: String = pc if acc == "" else acc + " " + pc
+		if acc == "" or fits.call(cand): acc = cand
+		else: out.append(acc); acc = pc
+	if acc != "": out.append(acc)
+	# y si un inciso sigue sin caber, por palabras
+	var res := []
+	for o in out:
+		if fits.call(o): res.append(o); continue
+		var line := ""
+		for wd in (o as String).split(" "):
+			var cand: String = wd if line == "" else line + " " + wd
+			if line == "" or fits.call(cand + " …"): line = cand
+			else: res.append(line + " …"); line = wd
+		if line != "": res.append(line)
+	return res
 
 func say(who: String, text: String) -> void:
 	if auto: return
 	open_dlg()
-	_show_block(who, text)
-	_more(true)
-	await wait_advance()
-	dlg_more.visible = false; Snd.sfx("ui")
+	var pages := _paginate(text, _speaker(who).get("cls", ""))
+	for i in pages.size():
+		_page_info = "" if pages.size() == 1 else "   ·   %d / %d" % [i + 1, pages.size()]
+		_show_block(who, pages[i], i > 0)
+		_more(true)
+		await wait_advance()
+		dlg_more.visible = false; Snd.sfx("page" if i < pages.size() - 1 else "ui")
+	_page_info = ""
 
 # Narración del preso (bloqueante: espera a que el jugador continúe)
 func narrate(text: String, _wide := false) -> void:
 	if auto: return
-	_show_block("narr", text)
-	_more(true)
-	await wait_advance()
-	dlg_more.visible = false; Snd.sfx("ui")
+	var pages := _paginate(text, "narr")
+	for i in pages.size():
+		_page_info = "" if pages.size() == 1 else "   ·   %d / %d" % [i + 1, pages.size()]
+		_show_block("narr", pages[i], i > 0)
+		_more(true)
+		await wait_advance()
+		dlg_more.visible = false; Snd.sfx("page" if i < pages.size() - 1 else "ui")
+	_page_info = ""
 	if not dlg_open:
 		dlg.visible = false
 		if App.g != null: App.g.speaking("")
+
 
 # Apunte no bloqueante
 func note(text: String, sec := 6.0) -> void:
@@ -597,14 +818,17 @@ func choose(opts: Array, _echo := true):
 		var row := ChoiceRow.new(); row.setup(self, bb, lock, i)
 		if not lock: row.chosen.connect(_pick.bind(i))
 		dlg_choices.add_child(row)
+		# las respuestas entran una tras otra
+		row.modulate.a = 0.0
+		var tw := row.create_tween(); tw.tween_interval(0.05 * i); tw.tween_property(row, "modulate:a", 1.0, 0.18)
 	_n_opts = opts.size()
 	if not dlg.visible:
 		dlg_head.visible = false; dlg_text.visible = false; dlg.visible = true; dlg.modulate.a = 1.0
-	dlg_choices.visible = true; dlg_more.visible = false; choosing = true
+	dlg_scroll.visible = true; dlg_scroll.scroll_vertical = 0; _fit_n = 0; dlg_scroll.custom_minimum_size.y = 0; dlg_more.visible = false; choosing = true
 	_adv_ok = Time.get_ticks_msec() + 260
 	var p: int = await picked
 	choosing = false; _n_opts = 0
-	dlg_choices.visible = false
+	dlg_scroll.visible = false; dlg_scroll_hint.visible = false
 	Snd.sfx("pick")
 	return opts[p].get("id", p)
 
@@ -763,6 +987,8 @@ func show_menu(items: Array, chapters: Array, max_ch: int, on_chapter: Callable)
 		if it[1] is String and it[1] == "chapters": b.pressed.connect(func(): Snd.sfx("pick"); chs.visible = not chs.visible)
 		else: b.pressed.connect(func(): Snd.sfx("pick"); it[1].call(b))
 		menu_btns.add_child(b)
+		b.modulate.a = 0.0
+		var tw := b.create_tween(); tw.tween_interval(0.25 + 0.08 * k); tw.tween_property(b, "modulate:a", 1.0, 0.35)
 	menu_btns.add_child(chs)
 	for i in chapters.size():
 		var b := _btn(chapters[i], "flat", 14, 40); b.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -802,11 +1028,12 @@ class ChoiceRow extends PanelContainer:
 	var _lock := false
 	var _hover := false
 	var _down := false
+	var _at := Vector2.ZERO
 	var _n := 0
 	var _ui: UIRoot
 	func setup(ui: UIRoot, bb: String, lock: bool, i: int) -> void:
 		_lock = lock; _n = i + 1; _ui = ui
-		mouse_filter = Control.MOUSE_FILTER_STOP
+		mouse_filter = Control.MOUSE_FILTER_PASS
 		mouse_default_cursor_shape = Control.CURSOR_ARROW if lock else Control.CURSOR_POINTING_HAND
 		var e := StyleBoxEmpty.new(); e.content_margin_left = 40; e.content_margin_right = 10; e.content_margin_top = 9; e.content_margin_bottom = 9
 		add_theme_stylebox_override("panel", e)
@@ -830,9 +1057,12 @@ class ChoiceRow extends PanelContainer:
 	func _gui_input(ev: InputEvent) -> void:
 		if _lock: return
 		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
-			if ev.pressed: _down = true; queue_redraw()
-			elif Rect2(Vector2.ZERO, size).has_point(ev.position):
+			if ev.pressed: _down = true; _at = ev.global_position; queue_redraw()
+			elif _down and Rect2(Vector2.ZERO, size).has_point(ev.position) and ev.global_position.distance_to(_at) < 14.0:
 				_down = false; accept_event(); chosen.emit()
+			else: _down = false; queue_redraw()
+		elif ev is InputEventMouseMotion and _down and ev.global_position.distance_to(_at) > 14.0:
+			_down = false; queue_redraw()
 
 class OptCard extends PanelContainer:
 	signal chosen
@@ -894,9 +1124,11 @@ class Bar extends Control:
 
 # filete doble con rombo: adorno de rótulo
 class Rule extends Control:
+	var grow := 1.0
 	func _draw() -> void:
 		var y := size.y / 2.0; var c := Vector2(size.x / 2.0, y)
-		draw_line(Vector2(0, y), Vector2(c.x - 10, y), App.INK, 1.5); draw_line(Vector2(c.x + 10, y), Vector2(size.x, y), App.INK, 1.5)
+		var L := (c.x - 10.0) * grow
+		draw_line(Vector2(c.x - 10 - L, y), Vector2(c.x - 10, y), App.INK, 1.5); draw_line(Vector2(c.x + 10, y), Vector2(c.x + 10 + L, y), App.INK, 1.5)
 		draw_polyline(PackedVector2Array([c + Vector2(-6, 0), c + Vector2(0, -6), c + Vector2(6, 0), c + Vector2(0, 6), c + Vector2(-6, 0)]), App.ACC, 1.5, true)
 
 class Compass extends Control:

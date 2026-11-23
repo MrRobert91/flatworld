@@ -92,7 +92,9 @@ func ch6() -> void:
 		await say('narr', 'Lo dije así, palabra por palabra. Infinitamente superior. Guarda esa frase: volverá.'); g.flag('soberbia', 1)
 	else:
 		await say('narr', 'Me habría gustado decir eso. Dije otra cosa: que yo era infinitamente superior a él. Guarda esa frase: volverá.'); g.her(1)
+	Snd.tension(0.5)
 	await say('rey', '¡A mí, mis Líneas! ¡A mí, mis Puntos! ¡Guerra al intruso!')
+	Snd.tension(1.0)
 	ui.close_dlg(); st.osc = 0.0; Snd.sfx('herald')
 	var i := 0
 	for e in folk:
@@ -100,7 +102,7 @@ func ch6() -> void:
 	await g.tween(2.2, func(k): st.osc = k * 3.0; W.zoom = 44 - k * 14)
 	g.frag(14)
 	g.end_scene()
-	Snd.sfx('bell')
+	Snd.sfx('bell'); Snd.tension(0.0)
 	await ui.fade(true, 0.5)
 	stop_line.call(); line.queue_free(); sec.queue_free()
 	await narr('…y me despertó la campana del desayuno.', true)
@@ -198,9 +200,10 @@ func ch7() -> void:
 	if c == 'h': await say('narr', 'Ojalá hubiera dicho eso. Me acuerdo de mis ángulos temblando, de la certeza de que se reían de mí en mi propia casa. Embestí.'); g.her(1)
 	W.focus = null; W.zoom = W.base_zoom
 	g.end_scene()
+	Snd.tension(0.75)
 	g.objective('Embiste al Forastero con tu ángulo más duro', 'esfera'); W.mark('esfera'); sph.no_collide = true
 	await g.until(func(): return Vector2(g.player.x - sph.x, g.player.y - sph.y).length() < 2.1, func(): pass)
-	W.unmark('esfera'); g.objective('', null); Snd.sfx('bad')
+	W.unmark('esfera'); g.objective('', null); Snd.sfx('bad'); Snd.tension(0.45)
 	g.begin_scene()
 	await emerge(sph, 0.001, 0.5); sph.x = -28.4; sph.y = 16.6; await g.wait(0.6); await emerge(sph, 1, 1.2)
 	await say('esfera', '¿Por qué te niegas a oír razones? Esperaba hallar en ti, hombre de juicio y matemático, un apóstol del Evangelio de las Tres Dimensiones. Sólo se me permite predicarlo una vez cada mil años.')
@@ -215,13 +218,14 @@ func ch7() -> void:
 	Snd.sfx('stab'); Input.vibrate_handheld(120); g.player.guts.visible = true; W.zoom = 20; await g.wait(1.6); g.player.guts.visible = false; W.zoom = W.base_zoom
 	await say('yo', '¡Ah! Un dolor… *dentro*. Nada me ha tocado el perímetro. Me ha tocado por dentro.')
 	await say('asombro', 'Por un instante tú también lo has visto: lo que hay dentro de ti, desde un sitio que no es ningún sitio.')
+	Snd.tension(0.8)
 	c = await choose([{t = '(Lanzarte otra vez sobre él, gritando.)', id = 'a'}, {t = '(Quedarte inmóvil.) ¿Qué sois?', id = 'h'}])
 	if c == 'h': await say('narr', 'No me quedé inmóvil. Grité como un Isósceles y cargué.')
 	Snd.sfx('peace')
 	await say('esposa', '(Desde sus aposentos.) ¿Esposo? ¿Qué son esas voces? ¡Paz, paz! Voy para allá.')
 	await say('esfera', 'O esto termina aquí, o vienes conmigo adonde no hacen falta palabras. ¡Fuera de tu Plano! Una… dos… tres. ¡Hecho!')
 	g.frag(17)
-	ui.close_dlg(); Snd.sfx('rise'); Snd.drone('none')
+	ui.close_dlg(); Snd.sfx('rise'); Snd.drone('none'); Snd.tension(0.0)
 	g.tween(1.8, func(t): W.zoom = W.base_zoom - t * 40; g.player.rot += 0.2)
 	await ui.fade(true, 1.7)
 	g.end_scene()
