@@ -21,7 +21,7 @@ POT = os.path.join(I18N, "planilandia.pot")
 LANGS = ["en"]
 
 # ficheros cuyos literales de texto se extraen enteros (además de tr() en todos)
-TEXT_FILES = ("scripts/content/", "scripts/ui.gd", "scripts/ui/", "scripts/main.gd", "scripts/game.gd", "scripts/sys/keys.gd")
+TEXT_FILES = ("scripts/content/", "scripts/minigames/", "scripts/ui.gd", "scripts/ui/", "scripts/main.gd", "scripts/game.gd", "scripts/sys/keys.gd")
 LIT = re.compile(r"""(?P<q>['"])(?P<s>(?:\\.|(?!(?P=q)).)*)(?P=q)""")
 TR = re.compile(r"""\b(?:tr|T|I18n\.t)\(\s*(?P<q>['"])(?P<s>(?:\\.|(?!(?P=q)).)*)(?P=q)""")
 FMT = re.compile(r"%[-+0-9.]*[sdf]")

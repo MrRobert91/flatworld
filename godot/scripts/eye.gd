@@ -79,6 +79,29 @@ func cast(W: World, exclude, ox: float, oy: float, facing: float, fog: float) ->
 			data[row2 + o] = near; data[row2 + o + 1] = 1.0
 			_cpu.append([a.x - ox, a.y - oy, b.x - ox, b.y - oy, e.id])
 			k += 1
+	# notas al margen (S-04): una chispa de lápiz rojo, perpendicular a la mirada
+	var acc: Color = W.pal.acc
+	for s in W.spots.values():
+		if k >= N: break
+		if not s.margin or s.hid: continue
+		var dx: float = s.x - ox; var dy: float = s.y - oy
+		var dd := sqrt(dx * dx + dy * dy)
+		if dd > 6.0 or dd < 0.05 or dx * cf + dy * sf < 0.0: continue
+		var px := -dy / dd * 0.04; var py := dx / dd * 0.04
+		_put(k, dx - px, dy - py, dx + px, dy + py, acc, 0.7, dd, 0.0); k += 1
+	# lluvia (S-06): cada gota es un trazo corto en la dirección de su caída (hacia el Sur) y otro aún
+	# más corto de través. Como todas caen al Sur, su centelleo se desliza por la línea; mirando al
+	# Norte se queda quieto y se aviva (las gotas vienen hacia ti).
+	var drops: Array = W.drops if W.eye_t > 0.6 else []
+	var rr := fog * 3.0; var nd := 0
+	for d in drops:
+		if k >= N - 1 or nd >= 40: break
+		var dx: float = d[0] - ox; var dy: float = d[1] - oy
+		if dx * cf + dy * sf < 0.1 or dx * dx + dy * dy > rr * rr: continue
+		var dl := sqrt(dx * dx + dy * dy)
+		_put(k, dx, dy, dx, dy + 0.12, edge, 0.35, dl, 0.0); k += 1
+		_put(k, dx - 0.03, dy + 0.04, dx + 0.03, dy + 0.04, edge, 0.35, dl, 0.0); k += 1
+		nd += 1
 	img.set_data(N, 3, false, Image.FORMAT_RGBAF, data.to_byte_array())
 	tex.update(img)
 	cast_mat.set_shader_parameter("count", k)
@@ -89,6 +112,12 @@ func cast(W: World, exclude, ox: float, oy: float, facing: float, fog: float) ->
 	view_mat.set_shader_parameter("ink_col", World._v3(W.pal.edge))
 	view_mat.set_shader_parameter("acc_col", World._v3(W.pal.acc))
 	view_mat.set_shader_parameter("u_dark", 1.0 if dark else 0.0)
+
+func _put(k: int, ax: float, ay: float, bx: float, by: float, c: Color, lum: float, near: float, fig: float) -> void:
+	var o := k * 4; var row := N * 4; var row2 := N * 8
+	data[o] = ax; data[o + 1] = ay; data[o + 2] = bx; data[o + 3] = by
+	data[row + o] = c.r; data[row + o + 1] = c.g; data[row + o + 2] = c.b; data[row + o + 3] = lum
+	data[row2 + o] = near; data[row2 + o + 1] = fig
 
 # ¿qué figura toca un rayo lanzado con desvío u (-1..1 del campo visual)?
 func _ray(u: float) -> String:

@@ -43,6 +43,14 @@ func tx(kb: String, touch: String, pad := '') -> String:
 	if ui.touch: return touch
 	return pad if Glyphs.pad() and pad != '' else kb
 
+# notas al margen del capítulo (S-04): [[id, x, y], ...]. Fuera del camino obligatorio; --auto no las coge
+func margins(list: Array) -> void:
+	for m in list:
+		var id: String = m[0]
+		if g.state.margins.has(id): continue
+		g.world.add_spot({id = id, x = m[1], y = m[2], margin = true, label = 'una nota al margen'})
+		g.on(id, 'Examinar', func(): await g.margin(id))
+
 # ---------- figuras ----------
 func _f(base: Dictionary, o: Dictionary) -> Dictionary:
 	base.merge(o, true); return base
@@ -63,7 +71,10 @@ func town(open := {}) -> Dictionary:
 		return h
 	var hospital: Dictionary = house.call('hospital', 56, 18, 8, 'Hospital de Reconfiguración'); hospital.labelSize = 0.7
 	return {
-		bounds = {x0 = -84, y0 = -46, x1 = 76, y1 = 46}, fog = 13.0,
+		bounds = {x0 = -120, y0 = -46, x1 = 76, y1 = 46}, fog = 13.0,
+		# el campo al Oeste de la Puerta, con árboles (§2, C2-07)
+		trees = [[-78, 9, 1.4], [-83, 15, 1.2], [-88, 7, 1.5], [-92, 18, 1.3], [-97, 10, 1.4], [-103, 14, 1.2], [-108, 6, 1.5],
+			[-80, -10, 1.3], [-86, -16, 1.4], [-91, -8, 1.2], [-96, -19, 1.5], [-101, -11, 1.3], [-106, -17, 1.2], [-112, -9, 1.4]],
 		walls = [[-70, -46, -70, -3.4], [-70, 3.4, -70, 46]],
 		buildings = [
 			{id = 'home', x = -28, y = 17, R = 12, n = 5, rot = 90, sealed = false, label = 'Tu casa', labelDy = -8.4, labelSize = 0.8,
@@ -83,49 +94,94 @@ func town(open := {}) -> Dictionary:
 			{t = 'puerta de los varones', x = -42.6, y = 15, s = 0.62, a = 0.45, it = true}, {t = 'puerta de las mujeres', x = -13.6, y = 15, s = 0.62, a = 0.45, it = true}],
 	}
 
-# ---------- Reconocimiento por la Vista ----------
+# ---------- Reconocimiento por la Vista (M-02) ----------
 # Una figura emerge de la niebla frente al jugador. Devuelve la respuesta elegida.
+#   o: options, options_extra, title, text, verdict(Callable), reveal, keep, near, turn, wobble, colors, deg
+#      spin (rad/s: la figura gira mientras se acerca), cloak (capa de viaje: apaga su brillo),
+#      arc (llega en curva), next (clase de la figura que espera en la cola), trace (forzar/quitar la traza),
+#      ok (Callable ans -> bool), split (s de plano partido antes de responder, C3-03)
+const BOW := {id = 'bow', label = 'Inclinarse', sub = 'ante un Círculo'}
+
+func _sight_def(kind: String, o := {}) -> Dictionary:
+	var big := {r = 1.45}
+	match kind:
+		'mujer': return F_mujer('_s', 0, 0, {r = 1.5})
+		'iso': return F_iso('_s', 0, 0, o.get('deg', 12.0), big)
+		'tri': return F_tri('_s', 0, 0, big)
+		'cuad': return F_cuad('_s', 0, 0, big)
+		'penta': return F_penta('_s', 0, 0, big)
+		'hexa': return F_hexa('_s', 0, 0, big)
+		'circ': return F_circ('_s', 0, 0, {r = 1.5})
+	return {id = '_s', pts = [[1.5, 0], [-0.5, 1.25], [-1.0, -0.55]], voice = 'tri', name = 'Irregular'}
+
 func sight_round(kind: String, o := {}):
-	var p := g.player; var W := g.world; var dir := p.rot; var big := {r = 1.45}
-	var irr := {id = '_s', pts = [[1.5, 0], [-0.5, 1.25], [-1.0, -0.55]], voice = 'tri', name = 'Irregular'}
+	var p := g.player; var W := g.world; var dir := p.rot
 	if g.auto:
 		if o.get('keep', false):
-			irr.x = p.x + cos(dir) * 3.4; irr.y = p.y + sin(dir) * 3.4; irr.noCollide = true; g.add(irr)
+			var irr := _sight_def('irr'); irr.x = p.x + cos(dir) * 3.4; irr.y = p.y + sin(dir) * 3.4; irr.noCollide = true; g.add(irr)
 		if o.has('options'): return (o.options[1] if o.options.size() > 1 else o.options[0]).id
 		return kind
-	var d: Dictionary
-	match kind:
-		'mujer': d = F_mujer('_s', 0, 0, {r = 1.5})
-		'iso': d = F_iso('_s', 0, 0, o.get('deg', 12.0), big)
-		'tri': d = F_tri('_s', 0, 0, big)
-		'cuad': d = F_cuad('_s', 0, 0, big)
-		'penta': d = F_penta('_s', 0, 0, big)
-		'hexa': d = F_hexa('_s', 0, 0, big)
-		'circ': d = F_circ('_s', 0, 0, {r = 1.5})
-		_: d = irr
+	W.remove('_q')
+	var d := _sight_def(kind, o)
 	d.noCollide = true
 	_sn += 1
 	d.id = '_s' if o.get('keep', false) else '_s%d' % _sn
 	var sid: String = d.id
+	if o.get('cloak', false): d.noEye = true; d.lum = 0.55
 	var far := 15.0; var near: float = o.get('near', 3.4)
-	d.x = p.x + cos(dir) * far; d.y = p.y + sin(dir) * far; d.rot = dir + PI + o.get('turn', 0.0)
+	var side := dir + PI / 2
+	var sx := (cos(side) * 5.0 if o.get('arc', false) else 0.0); var sy := (sin(side) * 5.0 if o.get('arc', false) else 0.0)
+	d.x = p.x + cos(dir) * far + sx; d.y = p.y + sin(dir) * far + sy; d.rot = dir + PI + o.get('turn', 0.0)
 	var e := g.add(d)
 	if o.has('colors'): e.set_colors(o.colors)
-	var base := e.rot; var st := {t = 0.0}
-	var wob: float = o.get('wobble', 0.22)
+	# la cola de la Puerta: la siguiente figura espera más atrás, en la niebla
+	if o.has('next'):
+		var q := _sight_def(o.next); q.id = '_q'; q.noCollide = true; q.lum = 0.7
+		q.x = p.x + cos(dir) * 19.0 - sx; q.y = p.y + sin(dir) * 19.0 - sy; q.rot = dir + PI
+		g.add(q)
+	var trace_was := g.eye.trace
+	if o.has('trace'): g.eye.trace = 1.0 if o.trace else 0.0
+	var base := e.rot; var st := {t = 0.0, wait = 0.0, chimed = 0}
+	var wob: float = o.get('wobble', 0.22); var spin: float = o.get('spin', 0.0)
 	var stop := g.tick(func(dt):
 		st.t += dt
-		if not e.woman: e.rot = base + sin(st.t * 0.7) * wob)
+		if e.woman: return
+		if spin != 0.0: e.rot = base + st.t * spin
+		else: e.rot = base + sin(st.t * 0.7) * wob
+		# la campanilla de la cola: el sargento se impacienta (sin castigo)
+		if ui.picking:
+			st.wait += dt
+			if st.wait > 15.0 + 10.0 * st.chimed: st.chimed += 1; Snd.sfx('chime'))
 	var approach := func():
+		if o.get('arc', false): await e.move_to(p.x + cos(dir) * 8.0 + sx * 0.6, p.y + sin(dir) * 8.0 + sy * 0.6, 3.2)
 		await e.move_to(p.x + cos(dir) * near, p.y + sin(dir) * near, 3.2)
-		e.rot = base
+		if spin == 0.0: e.rot = base
 	approach.call()
 	if e.woman: Snd.sfx_at('peace', e.x, e.y, 0.0, 'Grito de Paz')
-	var ans = await ui.panel(o.get('title', 'Reconocimiento por la vista'), o.get('text', '¿Qué figura se acerca? Observa cómo se apagan sus extremos en la niebla.'), o.get('options', CLASSES))
-	stop.call(); e.mv = null; e.rot = base
+	if o.has('split'):
+		await g.wait(3.8)
+		ui.split_view(true, Vector2((e.x + p.x) / 2.0, (e.y + p.y) / 2.0), 14.0)
+		await g.wait(float(o.split))
+		ui.split_view(false)
+	var opts: Array = o.get('options', CLASSES).duplicate()
+	opts.append_array(o.get('options_extra', []))
+	var is_ok := func(a) -> bool:
+		if o.has('ok'): return o.ok.call(a)
+		if kind == 'circ': return a is String and (a == 'circ' or a == 'bow')
+		return a is String and a == kind
+	var ans = await ui.panel(o.get('title', 'Reconocimiento por la vista'), o.get('text', '¿Qué figura se acerca? Observa cómo se apagan sus extremos en la niebla.'), opts)
+	# deducciones relajadas: una segunda oportunidad, con una pista
+	if o.get('reveal', true) and not is_ok.call(ans) and g.difficulty() == 'relaxed':
+		Snd.sfx('bad')
+		await say('logica', 'Mira otra vez cómo caen los extremos: deprisa, ángulo agudo; despacio, muchos lados. Y si no cae nada, inclínate.')
+		ui.close_dlg()
+		ans = await ui.panel(o.get('title', 'Reconocimiento por la vista'), o.get('text', '¿Qué figura se acerca?'), opts)
+	stop.call(); e.mv = null
+	if spin == 0.0: e.rot = base
+	g.eye.trace = trace_was
 	if o.get('reveal', true):
 		g.set_view('top'); W.focus = Vector2((e.x + p.x) / 2.0, (e.y + p.y) / 2.0); W.zoom = 20
-		var ok: bool = ans is String and ans == kind
+		var ok: bool = is_ok.call(ans)
 		Snd.sfx('good' if ok else 'bad')
 		var msg: String
 		if o.has('verdict'): msg = o.verdict.call(ans)
@@ -135,7 +191,6 @@ func sight_round(kind: String, o := {}):
 		await g.wait(3.6)
 		g.set_view('eye'); W.focus = null; W.zoom = W.base_zoom
 	if not o.get('keep', false):
-		var side := dir + PI / 2
 		var leave := func():
 			await e.move_to(e.x + cos(side) * 3 - cos(dir) * 12, e.y + sin(side) * 3 - sin(dir) * 12, 6)
 			W.remove(sid)
@@ -144,51 +199,11 @@ func sight_round(kind: String, o := {}):
 	return ans
 
 # ---------- Reconocimiento por el Tacto ----------
-func feel(e: Ent, text := '') -> bool:
-	if g.auto: return true
-	var W := g.world; var p := g.player
-	ui.close_dlg()
-	# vértice más cercano
-	var pts := e.world_pts(); var bi := 0; var bd := 1e9
-	for i in pts.size():
-		var dd: float = (pts[i] as Vector2).distance_to(Vector2(p.x, p.y))
-		if dd < bd: bd = dd; bi = i
-	var n := pts.size(); var v: Vector2 = pts[bi]; var pa: Vector2 = pts[(bi + n - 1) % n]; var pb: Vector2 = pts[(bi + 1) % n]
-	var a0 := atan2(pa.y - v.y, pa.x - v.x); var a1 := atan2(pb.y - v.y, pb.x - v.x)
-	var da := App.ang_diff(a0, a1)
-	var arc := MeshInstance3D.new(); arc.mesh = ImmediateMesh.new(); arc.material_override = W.mat(3); W.fx.add_child(arc)
-	W.focus = v; W.zoom = 13
-	ui.panel_info('Reconocimiento por el tacto', text if text != '' else tx('Mantén pulsado {act} para recorrer el ángulo con tu lado. *Despacio: un ángulo agudo hiere.*', 'Mantén pulsado el botón «Palpar» para recorrer el ángulo con tu lado. *Despacio: un ángulo agudo hiere.*'))
-	g.need_act = 'Palpar'
-	var st := {prog = 0.0}
-	await g.tick_until(func(dt) -> bool:
-		if g.bot: st.prog = 1.0
-		if g.act_held():
-			st.prog = minf(1.0, st.prog + dt * 0.7)
-			if randf() < 0.3: Snd.sfx('chalk')
-		var im: ImmediateMesh = arc.mesh
-		im.clear_surfaces()
-		var steps := 24; var cnt := int(steps * st.prog)
-		if cnt > 0:
-			im.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
-			for i in cnt:
-				var t0 := a0 + da * i / steps; var t1 := a0 + da * (i + 1) / steps
-				var q := [Vector2(cos(t0), sin(t0)) * 0.34, Vector2(cos(t1), sin(t1)) * 0.34, Vector2(cos(t1), sin(t1)) * 0.42, Vector2(cos(t0), sin(t0)) * 0.34, Vector2(cos(t1), sin(t1)) * 0.42, Vector2(cos(t0), sin(t0)) * 0.42]
-				for k in q:
-					im.surface_set_color(W.pal.acc); im.surface_set_uv(Vector2.ZERO); im.surface_add_vertex(Geo.v3(v + k, 0.05))
-			im.surface_end()
-		return st.prog >= 1.0)
-	g.need_act = ''
-	ui.panel_info(null)
-	var deg := roundi(absf(da) * 180.0 / PI)
-	var opts := [{id = 'iso', label = 'Agudo, menor de 60°', sub = 'Isósceles'}, {id = 60, label = '60°', sub = 'Equilátero'}, {id = 90, label = '90°', sub = 'Cuadrado'}, {id = 108, label = '108°', sub = 'Pentágono'}, {id = 120, label = '120°', sub = 'Hexágono'}]
-	var ans = await ui.panel('Has palpado el ángulo', '¿Cuánto mide la abertura que has recorrido?', opts)
-	var ok: bool
-	if deg < 58: ok = ans is String
-	else: ok = ans is int and absi(ans - deg) < 4
-	arc.queue_free(); W.focus = null; W.zoom = W.base_zoom
-	Snd.sfx('good' if ok else 'bad')
-	return ok
+# (M-01, minigames/feel.gd) Devuelve si se acertó el ángulo.
+func feel(e: Ent, text := '', opts := {}) -> bool:
+	if text != '': opts.text = text
+	var r: Dictionary = await Feel.run(self, e, opts)
+	return r.ok
 
 # Pizarra: anima un dibujo de tiza. draw(board, t 0..1)
 func slate_anim(cap: String, sec: float, draw: Callable) -> void:

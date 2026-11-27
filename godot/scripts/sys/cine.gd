@@ -31,13 +31,17 @@ static func play(W: World, keys: Array, skippable := true) -> void:
 		_apply(W, keys[-1], keys[-1], 1.0); return
 	var ts := _times(keys)
 	var total: float = ts[-1]
-	var free := W.cam_mode == "free"
-	ui.letterbox.show_bands(true, skippable)
-	var was_busy := g.busy; g.busy = true
+	var rail: bool = keys[0].has("pos") or keys[-1].has("pos")
+	var bands: bool = keys[0].get("bands", true)
+	if bands: ui.letterbox.show_bands(true, skippable)
+	# sólo bloquea al jugador si nadie lo había bloqueado ya (un raíl puede correr bajo un diálogo)
+	var took := not g.busy and bands
+	if took: g.busy = true
 	var t := 0.0; var held := 0.0; var ep := g.epoch
 	while t < total:
 		var dt: float = await g.frame
 		if ep != g.epoch: break
+		if keys[0].has("stop") and keys[0].stop.call(): return
 		t += dt
 		if skippable and (Input.is_action_pressed("advance") or ui.pad.held("act") or Input.is_action_pressed("skip_hold")):
 			held += dt
@@ -51,9 +55,9 @@ static func play(W: World, keys: Array, skippable := true) -> void:
 		var u := clampf((t - ts[i - 1]) / span, 0.0, 1.0)
 		_apply(W, a, b, _ease(b, u))
 	_apply(W, keys[-1], keys[-1], 1.0)
-	if free: W.rail = {}
-	ui.letterbox.show_bands(false)
-	g.busy = was_busy
+	if rail and not keys[-1].get("hold", false): W.rail = {}
+	if bands: ui.letterbox.show_bands(false)
+	if took: g.busy = false
 
 static func _apply(W: World, a: Dictionary, b: Dictionary, u: float) -> void:
 	if a.has("focus") or b.has("focus"):
@@ -65,7 +69,7 @@ static func _apply(W: World, a: Dictionary, b: Dictionary, u: float) -> void:
 	if a.has("pos") or b.has("pos"):
 		var pa: Vector3 = a.get("pos", b.get("pos")); var pb: Vector3 = b.get("pos", pa)
 		var la: Vector3 = a.get("look", b.get("look", Vector3.ZERO)); var lb: Vector3 = b.get("look", la)
-		W.rail = {pos = pa.lerp(pb, u), look = la.lerp(lb, u), fov = lerpf(float(a.get("fov", 42.0)), float(b.get("fov", a.get("fov", 42.0))), u)}
+		W.rail = {pos = pa.lerp(pb, u), look = la.lerp(lb, u), fov = lerpf(float(a.get("fov", 42.0)), float(b.get("fov", a.get("fov", 42.0))), u), up = b.get("up", a.get("up", Vector3.UP))}
 
 # órbita lenta (P-03): la cámara mira a `center` desde una distancia fija y su inclinación pasa de
 # from_pitch a to_pitch (radianes sobre el plano: PI/2 es la vertical, 0 el ras del suelo) en `sec`.

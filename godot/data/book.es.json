@@ -310,6 +310,18 @@
   "estilete_en_poder": {
    "who": "prefecto",
    "text": "Registro. Al detenido se le encuentra un estilete de calderero, del que no sabe explicar la procedencia."
+  },
+  "hija_cuenta": {
+   "who": "esposa",
+   "text": "Casa del perito. Se le sorprende enseñando a contar a una hija. La esposa lo comunica a la institutriz, y la institutriz a quien corresponde."
+  },
+  "gate_circle_offense": {
+   "who": "circulo",
+   "text": "Puerta Oeste. El perito de guardia llama «Hexágono» a un Círculo que viajaba de incógnito. El Círculo pidió su nombre."
+  },
+  "mala_presentacion": {
+   "who": "medico",
+   "text": "Calle Mayor. El Cuadrado incumple el orden de una presentación ante un facultativo del Hospital de Reconfiguración."
   }
  },
  "people": {
@@ -383,5 +395,99 @@
     "2": "Te ha dicho, en voz baja, que él también lo piensa."
    }
   }
+ },
+ "margins": [
+  {
+   "id": "m_p_muescas",
+   "ch": 0,
+   "title": "Las muescas",
+   "text": "Siete años. Al principio contaba días; luego, visitas de mi hermano; ahora cuento sólo años, que son menos y pesan igual."
+  },
+  {
+   "id": "m_p_puerta",
+   "ch": 0,
+   "title": "La puerta de la celda",
+   "text": "No tiene cerradura por dentro. ¿Para qué? ¿Adónde iría un Cuadrado que ha visto el Arriba?"
+  },
+  {
+   "id": "m_p_cantaro",
+   "ch": 0,
+   "title": "El cántaro",
+   "text": "Mi cántaro de agua. Yo sólo veo su borde; tú ves el agua de dentro. Es la primera vez que miras un interior que su dueño no puede ver. No será la última."
+  },
+  {
+   "id": "m_c1_puerta_este",
+   "ch": 1,
+   "title": "La puerta del Este",
+   "text": "Estrecha. Ellas entran de lado; nosotros no entraríamos ni de lado. Así lo quiere la ley: que cada cual sepa por dónde le corresponde entrar en su propia casa."
+  },
+  {
+   "id": "m_c1_reloj",
+   "ch": 1,
+   "title": "El reloj de arena",
+   "text": "El reloj de arena del salón. Lo vuelvo cada noche al acostarme. La arena cae del Norte al Sur, como todo en este mundo, y nadie se pregunta por qué."
+  },
+  {
+   "id": "m_c1_cuentas",
+   "ch": 1,
+   "title": "El libro de cuentas del criado",
+   "text": "Las cuentas de la casa, en la letra torcida del criado. Al margen, con otra letra, un inspector anotó su ángulo: «10°, sin variación». Un hombre, y al margen su ángulo."
+  },
+  {
+   "id": "m_c2_charlatan",
+   "ch": 2,
+   "title": "Los polvos para crecer",
+   "text": "Un charlatán vendía polvos «para crecer un lado». El tendero de al lado me dijo, sin bajar la voz, que eran tiza molida. Se vendían muy bien entre los Isósceles."
+  },
+  {
+   "id": "m_c2_banco",
+   "ch": 2,
+   "title": "El banco del calderero",
+   "text": "El banco de piedra donde se sienta el calderero. Cuarenta años de marcas: el roce de un lado más largo que los otros, siempre en el mismo sitio."
+  },
+  {
+   "id": "m_c2_cartel",
+   "ch": 2,
+   "title": "El cartel de la Junta",
+   "text": "Un cartel de la Junta Sanitaria: la tabla de ángulos legales, con su margen de tolerancia. Debajo, en pequeño: «Toda desviación será corregida por el bien del desviado»."
+  },
+  {
+   "id": "m_c2_hospital",
+   "ch": 2,
+   "title": "El muro del Hospital",
+   "text": "A través del muro del Hospital se oye un golpe rítmico, como de prensa, y algo que podría ser un quejido. Los transeúntes aprietan el paso. Yo también lo apretaba."
+  },
+  {
+   "id": "m_c2_viajeros",
+   "ch": 2,
+   "title": "Los viajeros del campo",
+   "text": "Fuera de la ciudad no hay casas que señalen el Norte. Los viajeros que se pierden se quedan quietos, a veces durante horas, esperando la lluvia para saber hacia dónde ir."
+  },
+  {
+   "id": "m_c3_registro",
+   "ch": 3,
+   "title": "El registro del sargento",
+   "text": "El registro de la Puerta, con las faltas de ortografía de un Isósceles: «Cuadrao. Pentagono. Muger». Lo que escribe lo escribe bien; lo que ve, mejor."
+  },
+  {
+   "id": "m_c3_poligono",
+   "ch": 3,
+   "title": "El estudiante a escondidas",
+   "text": "Un estudiante del Colegio practica a escondidas en la Puerta: mira a los que llegan y apunta lo que cree que son. Me dijo que en el Colegio no le dejan equivocarse, y aquí sí."
+  },
+  {
+   "id": "m_c3_miliar",
+   "ch": 3,
+   "title": "La piedra miliar",
+   "text": "La piedra miliar del camino de las aldeas. Marca una distancia, no una dirección: para eso está la lluvia."
+  }
+ ],
+ "achievements": {
+  "ACH_COIN": "La moneda de canto",
+  "ACH_COUNT": "Hasta diez",
+  "ACH_STREET": "Cruzar sin un rasguño",
+  "ACH_EAR": "Buen oído",
+  "ACH_GATE_P": "Ojo de Colegio",
+  "ACH_HOME": "A casa por la lluvia"
  }
 }

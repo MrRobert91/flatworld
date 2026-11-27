@@ -290,7 +290,47 @@ def sfx():
 	return S
 
 
+# Efectos añadidos en el hito M1. Se escriben como WAV (no necesitan ffmpeg): el juego carga .ogg o .wav.
+#   python3 godot/tools/make_audio.py --extra
+def extra_sfx():
+	S = {}
+	r2 = np.random.default_rng(1999)
+	# cerrojo: un clic metálico doble y el giro de la llave
+	t = t_(0.42)
+	click = lambda d: bp(r2.standard_normal(len(t_(d))), 2500, 7000) * np.exp(-t_(d) * 90) + np.sin(2 * np.pi * 1800 * t_(d)) * np.exp(-t_(d) * 70) * 0.4
+	S["lock"] = reverb(seq([(0, click(0.08), 0.9), (0.06, lp(r2.standard_normal(int(0.2 * SR)), 900) * np.linspace(0.5, 0, int(0.2 * SR)), 0.5), (0.28, click(0.1), 1.0)], 0.42), 0.4, 0.15)
+	# pluma: un trazo rasgado sobre el papel
+	t = t_(0.55)
+	scr = bp(r2.standard_normal(len(t)), 3000, 8000) * (0.55 + 0.45 * np.sin(2 * np.pi * 23 * t) ** 2)
+	S["quill"] = scr * np.sin(np.pi * t / 0.55) ** 1.5 * 0.55
+	# compresiones del Hospital: golpes sordos rítmicos y un quejido
+	def thud():
+		d = t_(0.35)
+		return lp(r2.standard_normal(len(d)), 300) * np.exp(-d * 14) + np.sin(2 * np.pi * 55 * d) * np.exp(-d * 9)
+	g = t_(1.0); f = 180 * (1 - 0.25 * g)
+	groan = np.sin(2 * np.pi * np.cumsum(f) / SR) * env(len(g), 0.15, 0.5) * 0.25 * (1 + 0.3 * np.sin(2 * np.pi * 5 * g))
+	S["compress"] = reverb(seq([(0, thud(), 1.0), (0.45, thud(), 1.0), (0.9, thud(), 1.0), (0.6, lp(groan, 1200), 0.8)], 1.8), 1.2, 0.3)
+	# campanilla de la cola de la Puerta
+	S["chime"] = reverb(seq([(0, bell(mtof(88), 1.4), 0.7), (0.12, bell(mtof(95), 1.2), 0.4)], 1.4), 1.0, 0.25)
+	# lámpara y reloj de la mesa del lector
+	t = t_(2.0)
+	hum = (np.sin(2 * np.pi * 100 * t) + 0.4 * np.sin(2 * np.pi * 200 * t) + 0.15 * np.sin(2 * np.pi * 300 * t)) * 0.18
+	S["hum"] = hum * np.minimum(1, np.minimum(t / 0.05, (2.0 - t) / 0.05))
+	return S
+
+
+def write_wav(name, x, peak=0.8):
+	from scipy.io import wavfile
+	y = norm(trim(x), peak)
+	wavfile.write(os.path.join(OUT, name + ".wav"), SR, (y * 32767).astype(np.int16))
+
+
 def main():
+	import sys
+	if "--extra" in sys.argv:
+		for k, x in extra_sfx().items():
+			write_wav("s_" + k, x); print("s_" + k + ".wav")
+		return
 	os.makedirs(OUT, exist_ok=True)
 	inst = {
 		"harp": (harp, [48, 60, 72]), "pad": (pad, [48, 60]), "organ": (organ, [48, 60]), "bell": (bell, [72, 84]),

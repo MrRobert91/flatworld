@@ -137,6 +137,11 @@ var settings: SettingsPanel
 var letterbox: Letterbox
 var caption_l: Label
 var _cap_t := 0.0
+var blind: ColorRect      # venda (palpar sin ver)
+var black: ColorRect      # negro (el gancho del juicio)
+var tally_l: Label        # las muescas del sargento (C3-02)
+var split: SubViewportContainer   # plano partido: la lámina bajo la línea (C3-03)
+var split_cam: Camera3D
 
 # ---------- construcción ----------
 func _init() -> void:
@@ -170,6 +175,16 @@ func _ready() -> void:
 	letterbox = Letterbox.new(); letterbox.ui = self; _full(letterbox); add_child(letterbox); move_child(letterbox, hud.get_index() + 1)
 	caption_l = _lbl("", caps, 13, App.ACC); caption_l.visible = false; hud.add_child(caption_l)
 	settings = SettingsPanel.new(); settings.ui = self; _full(settings); settings.visible = false; add_child(settings)
+	blind = ColorRect.new(); blind.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(blind); blind.visible = false
+	var bm := ShaderMaterial.new(); bm.shader = preload("res://shaders/blindfold.gdshader"); blind.material = bm
+	add_child(blind); move_child(blind, dock_margin.get_index())
+	black = ColorRect.new(); black.color = Color("0b0d10"); black.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(black); black.visible = false
+	add_child(black); move_child(black, dock_margin.get_index())
+	tally_l = _lbl("", caps, 15, App.INK); tally_l.visible = false; hud.add_child(tally_l)
+	split = SubViewportContainer.new(); split.stretch = true; split.visible = false; split.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sv := SubViewport.new(); sv.render_target_update_mode = SubViewport.UPDATE_WHEN_VISIBLE; split.add_child(sv)
+	split_cam = Camera3D.new(); split_cam.fov = 30; split_cam.far = 400; sv.add_child(split_cam)
+	add_child(split); move_child(split, 1)
 	Glyphs.changed = _on_device
 	get_viewport().size_changed.connect(_layout)
 	_layout()
@@ -547,6 +562,49 @@ func _read_step(dt: float) -> void:
 	if _auto_t >= 0.0 and _adv_wait and not _typing:
 		_auto_t -= dt
 		if _auto_t < 0.0: _adv_ok = 0; advance()
+
+# venda: todo a oscuras salvo el centro, donde se dibuja el arco que palpas
+func blindfold(on: bool) -> void:
+	if auto: return
+	blind.visible = true
+	(blind.material as ShaderMaterial).set_shader_parameter("aspect", size.x / maxf(size.y, 1.0))
+	var tw := create_tween(); var m := blind.material as ShaderMaterial
+	tw.tween_method(func(v): m.set_shader_parameter("alpha", v), 0.0 if on else 1.0, 1.0 if on else 0.0, 0.6)
+	if not on: tw.tween_callback(func(): blind.visible = false)
+
+func blackout(on: bool, sec := 0.6) -> void:
+	if auto: return
+	black.visible = true; black.modulate.a = 0.0 if on else 1.0
+	var tw := create_tween(); tw.tween_property(black, "modulate:a", 1.0 if on else 0.0, sec)
+	if not on: tw.tween_callback(func(): black.visible = false)
+	await sleep(sec)
+
+# las muescas del sargento: una raya por acierto, un aspa por fallo
+func eye_tally(marks: Array) -> void:
+	if marks.is_empty(): tally_l.visible = false; return
+	var t := ""
+	for m in marks: t += ("|" if m else "×") + " "
+	tally_l.text = T("PERITO") + "   " + t.strip_edges()
+	tally_l.reset_size()
+	tally_l.position = Vector2(size.x - tally_l.size.x - 18, strip_rect.end.y + 30)
+	tally_l.visible = true
+
+# plano partido: abajo, la lámina (lo que ve el jugador); arriba, la línea (lo que ve el Cuadrado)
+func split_view(on: bool, center := Vector2.ZERO, zoom := 16.0) -> void:
+	if auto: return
+	var g := App.g
+	g.force_world = on
+	if on:
+		(split.get_child(0) as SubViewport).world_3d = get_viewport().world_3d
+		split.position = Vector2(0, size.y * 0.56); split.size = Vector2(size.x, size.y * 0.44)
+		var pos := Vector3(center.x, zoom, -center.y)
+		split_cam.look_at_from_position(pos, Vector3(center.x, 0.0, -center.y), Vector3(0, 0, -1))
+		split_cam.fov = 30
+		split.visible = true; split.modulate.a = 0.0
+		create_tween().tween_property(split, "modulate:a", 1.0, 0.35)
+	else:
+		var tw := create_tween(); tw.tween_property(split, "modulate:a", 0.0, 0.35)
+		tw.tween_callback(func(): split.visible = false)
 
 # rótulo de sonido junto a la línea del ojo (T-11): dir < 0 izquierda, > 0 derecha, 0 al frente
 func caption(text: String, dir: float) -> void:
@@ -1081,6 +1139,11 @@ func j_tab(tab: String) -> void:
 			if i == 12: _j_head("Parte II — Otros mundos")
 			var have: bool = S.frags.has(str(i + 1))
 			_j_item("§%d   %s" % [i + 1, F[i].title if have else "· · ·"], have, show.bind(i + 1))
+		# notas al margen recogidas (S-04)
+		var got := (App.g.book.get("margins", []) as Array).filter(func(m): return S.get("margins", {}).has(m.id))
+		if not got.is_empty():
+			_j_head(T("Notas al margen") + "  ·  %d" % got.size())
+			for m in got: _j_item(m.title, true, func(): _j_text(T("Nota al margen"), m.title, [m.text]))
 		var first := 1
 		if last_frag > 0 and S.frags.has(str(last_frag)): first = last_frag
 		elif not S.frags.is_empty(): first = int(S.frags.keys()[0])
@@ -1108,6 +1171,12 @@ func _j_people(S: Dictionary) -> void:
 	var r := _rich(18, App.INK)
 	r.text = T("Un [b]Cuadrado[/b]: cuatro lados iguales, cuatro ángulos rectos. Clase profesional. Tus hijos son Pentágonos; tus nietos, Hexágonos.") + "\n\n[color=#4a5761][i]" + T("Mujeres (líneas) · Isósceles · Equiláteros · ") + "[/i][/color][b]" + T("Cuadrados") + "[/b][color=#4a5761][i] · " + T("Pentágonos · Hexágonos… · Círculos") + "[/i][/color]"
 	j_list.add_child(r)
+	var inv: Dictionary = S.get("inv", {})
+	if not inv.is_empty():
+		_j_head(T("Lo que llevas"))
+		var names := {estilete = "El estilete del calderero"}
+		for k in inv:
+			var l := _lbl(T(names.get(k, k)), serif_it, 17, App.INK); l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; j_list.add_child(l)
 	j_body.add_child(_lbl(T("PERSONAS").to_upper(), caps, 12, App.ACC))
 	j_body.add_child(_lbl(T("Quién te recuerda, y cómo"), F_FELL, 30, App.INK))
 	for id in P:

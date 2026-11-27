@@ -23,7 +23,8 @@ func _ready() -> void:
 	if App.args.has("speed"): Engine.time_scale = float(App.args.speed)
 	if App.args.has("mute"): AudioServer.set_bus_mute(0, true)
 	var a := ChA.new(g, ui); var b := ChB.new(g, ui); var c := ChC.new(g, ui); var d := ChD.new(g, ui)
-	b.a = a; c.a = a; d.a = a
+	var fr := ChFrame.new(g, ui)
+	b.a = a; c.a = a; d.a = a; fr.a = a
 	ui.cast(Ch.CAST)
 	chapters = [
 		["Prólogo · La celda", a.prologue], ["I · La casa de cinco lados", a.ch1], ["II · La Calle Mayor", a.ch2],
@@ -31,11 +32,12 @@ func _ready() -> void:
 		["VI · El Rey de la Línea", c.ch6], ["VII · El Forastero", c.ch7], ["VIII · Espaciolandia", d.ch8],
 		["IX · Hacia Arriba, no hacia el Norte", d.ch9], ["X · El juicio", d.ch10],
 	]
-	set_meta("keep", [a, b, c, d])
+	set_meta("keep", [a, b, c, d, fr])
 	var start := App.pending_start
 	App.pending_start = -1
 	if start < 0 and App.args.has("ch"): start = int(App.args.ch); App.args.erase("ch")
-	if start >= 0: run(start)
+	if App.args.has("try"): _try(App.args.try)
+	elif start >= 0: run(start)
 	else: _menu()
 
 func _parse_args() -> void:
@@ -108,11 +110,23 @@ func _start(i: int) -> void:
 	App.pending_start = i
 	get_tree().reload_current_scene()
 
+# --try=cross|voices|orient|rain|angles|count: un minijuego suelto, para probarlo y capturarlo
+func _try(name: String) -> void:
+	ui.hide_menu(); ui.fade_r.color.a = 0.0; ui._fade_to = 0.0
+	g.running = true
+	g.on_menu = func(): ui.toggle_pause(func(): get_tree().quit())
+	await (get_meta("keep")[0] as ChA).try_mini(name)
+	print("TRY OK ", name)
+	if App.args.has("quit"): get_tree().quit()
+
 func run(i: int) -> void:
 	ui.hide_menu(); ui.fade_r.color.a = 1.0; ui._fade_to = 1.0
 	g.tickers.clear(); g.running = true
 	if g.knows("vista"): g.eye.trace = 1.0
 	g.on_menu = func(): ui.toggle_pause(func(): App.pending_start = -1; get_tree().reload_current_scene())
+	# la mesa del lector (P-01): antes del Prólogo, al empezar una partida
+	if i == 0 and not g.auto and not App.args.has("noframe"):
+		await (get_meta("keep")[4] as ChFrame).opening()
 	while i < chapters.size():
 		g.state.chapter = i; g.state.max = maxi(g.state.max, i); g.save(); Profile.unlock_chapter(i)
 		g.locked = false; g.view_lock = false; g.busy = false; g.speed_mul = 1.0; g.hide_eye_hint = false
@@ -121,6 +135,7 @@ func run(i: int) -> void:
 		await chapters[i][1].call()
 		g.tickers.clear(); g.handlers.clear(); g.epoch += 1
 		i += 1
+		if App.args.has("until") and i > int(App.args.until): break
 	g.state.chapter = 0; g.state.max = chapters.size() - 1; g.save()
 	if App.args.has("quit"):
 		var out := "FIN OK frags=%d margins=%d record=%d" % [g.state.frags.size(), g.state.margins.size(), g.state.record.size()]  # notr
@@ -160,8 +175,10 @@ func _inject(dt: float) -> void:
 			_:
 				var e := InputEventKey.new(); e.physical_keycode = OS.find_keycode_from_string(f[2]); e.keycode = e.physical_keycode; e.pressed = true; ev = e
 				var u := InputEventKey.new(); u.physical_keycode = e.physical_keycode; u.keycode = e.keycode; u.pressed = false; up = u
+		# segundo:hold:TECLA:duración mantiene la tecla pulsada
+		var hold := float(f[3]) if f[1] == "hold" and f.size() > 3 else 0.12
 		Input.parse_input_event(ev)
-		get_tree().create_timer(0.12, true, false, true).timeout.connect(func(): Input.parse_input_event(up))
+		get_tree().create_timer(hold, true, false, true).timeout.connect(func(): Input.parse_input_event(up))
 
 # --script=heretic|orthodox: el autómata elige por política (S-03, pruebas del expediente)
 const HERETIC := ["Herejía", "Cuestionar", "Osadía", "Atreverse", "La verdad", "Apelar"]
@@ -191,7 +208,7 @@ func _process(dt: float) -> void:
 	# autómata de pruebas: avanza textos, elige al azar y salta a los objetivos
 	if g.bot and g.running:
 		_bot_t += dt / maxf(Engine.time_scale, 0.01)
-		if _bot_t > 0.05:
+		if _bot_t > float(App.args.get("botdt", "0.05")):
 			_bot_t = 0.0
 			if (ui.choosing or ui.picking) and App.args.has("nopick"): pass
 			elif ui.choosing or ui.picking:

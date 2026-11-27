@@ -4,6 +4,7 @@ class_name Game extends Node
 signal frame(dt)
 signal talk_started(id)
 signal all_done
+signal hurt_taken(sev)
 
 const KEEP := &"__keep"
 # día del año de cada bloque (el expediente fecha sus anotaciones); el X ocurre en el año 2000
@@ -45,6 +46,9 @@ var stun := 0.0
 var _fwd := 0.0
 var slot := 1            # hueco de partida (1–3)
 var script_policy := ""  # --script=heretic|orthodox: política de elección del autómata
+var pull := Vector2.ZERO # deriva por segundo mientras se anda (el tirón del Sur, C3-05)
+var no_guides := false   # sin brújula, flecha ni rumbo del objetivo (orientarse a ciegas)
+var force_world := false # el mundo se dibuja aunque el ojo ocupe la pantalla (plano partido)
 
 static func fresh() -> Dictionary:
 	return Profile.fresh_state()
@@ -136,6 +140,30 @@ func record_top(n := 5) -> Array:
 func record_text(r: Dictionary) -> String:
 	var t: String = book.get("record", {}).get(r.id, {}).get("text", r.id)
 	return tr("Día %d.") % int(r.day) + " " + t
+
+# notas al margen (S-04): sonido de pluma y la nota del narrador; sin aviso. Se guardan en la partida y
+# en la galería del perfil
+func margin(id: String) -> void:
+	var M := margin_def(id)
+	Snd.sfx("quill"); world.remove_spot(id); off(id)
+	if not state.margins.has(id):
+		state.margins[id] = 1; Profile.unlock_gallery(id); ui.new_pages = true; save()
+	if M.has("text"): await ui.narrate(M.text)
+
+func margin_def(id: String) -> Dictionary:
+	for m in book.get("margins", []):
+		if m.id == id: return m
+	return {}
+
+# logros (Steam en M6): por ahora, el perfil los recuerda y un aviso discreto los anuncia
+func achieve(id: String) -> void:
+	if auto or Profile.data.ach.has(id): return
+	Profile.data.ach[id] = 1; Profile.touch(0.0)
+	ui.toast("frag", tr("Logro"), tr(book.get("achievements", {}).get(id, id)))
+
+# dificultad de las deducciones: relaxed | normal | expert (T-11)
+func difficulty() -> String:
+	return String(App.cfg.get("difficulty", "normal"))
 
 # relaciones con nombre, de −2 a 2, sin aviso (T-02)
 func rel(who: String, d: int) -> void:
@@ -278,6 +306,8 @@ func hurt(sev: float, at: Vector2) -> void:
 	var p := player
 	if p == null or hurt_cd > 0.0: return
 	hurt_cd = 0.9
+	hurt_taken.emit(sev)
+	state.stats.pricks = int(state.stats.get("pricks", 0)) + 1
 	var away := Vector2(p.x - at.x, p.y - at.y)
 	away = away.normalized() if away.length() > 0.01 else Vector2(0, -1)
 	vel = away * (3.5 + 6.5 * sev); stun = 0.12 + 0.3 * sev
@@ -495,7 +525,7 @@ func _process(delta: float) -> void:
 	Snd.muffle(e if not free else 0.0)
 	var bg: Color = W.pal.bg
 	RenderingServer.set_default_clear_color(bg)
-	W.visible = e < 0.995 or free
+	W.visible = e < 0.995 or free or force_world
 	var strip := show_strip and p != null and not free and running
 	var eye_on := p != null and (strip or e > 0.0) and not free
 	eye.set_active(eye_on)
@@ -536,12 +566,14 @@ func move_player(dt: float, p: Ent) -> void:
 			_fwd = lerpf(_fwd, ax.y * (2.0 + 5.6 * absf(ax.y)) * speed_mul, 1.0 - exp(-dt * 10.0))
 			vel = Vector2(cos(p.rot), sin(p.rot)) * _fwd
 			p.x += vel.x * dt; p.y += vel.y * dt
+			if pull != Vector2.ZERO and absf(_fwd) > 0.2: p.x += pull.x * dt; p.y += pull.y * dt
 			_check_pricks(p, W.collide(p))
 		else:
 			var want := dir * sp
 			vel = vel.lerp(want, 1.0 - exp(-dt * (13.0 if m > 0.01 else 9.0)))
 			if m <= 0.01 and vel.length() < 0.08: vel = Vector2.ZERO
 			p.x += vel.x * dt; p.y += vel.y * dt
+			if pull != Vector2.ZERO and m > 0.01: p.x += pull.x * dt; p.y += pull.y * dt
 			if m > 0.01: p.rot += App.ang_diff(p.rot, atan2(dir.y, dir.x)) * minf(1.0, dt * 12.0)
 			moved += vel.length() * dt
 			_check_pricks(p, W.collide(p))
@@ -560,7 +592,7 @@ func move_player(dt: float, p: Ent) -> void:
 
 func hud(p, e: float, strip: bool, free: bool) -> void:
 	ui.eye_frame.visible = strip and e < 0.5
-	ui.compass.visible = running and not free and e < 0.5 and not ui.touch
+	ui.compass.visible = running and not free and e < 0.5 and not ui.touch and not no_guides
 	ui.keys_box.visible = running and not ui.touch and not ui.dlg_open and not ui.dlg.visible and ui.size.x > 900 and not ui.modal()
 	ui.keys_l.text = Glyphs.fill(tr("{look} mirar  ·  {move} volar  ·  {rise} / {sink} subir y bajar  ·  {journal} inventario") if free else tr("{view} vista  ·  {journal} inventario  ·  {history} historial  ·  {pause} menú"))
 	ui.eye_hint.visible = e > 0.9 and running and not busy and not hide_eye_hint and not ui.dlg.visible
@@ -568,7 +600,7 @@ func hud(p, e: float, strip: bool, free: bool) -> void:
 	elif Glyphs.pad(): ui.eye_hint.text = Glyphs.fill(tr("VISTA DEL PLANO  —  stick: girar y avanzar  ·  {view} volver a la lámina"))
 	else: ui.eye_hint.text = Glyphs.fill(tr("VISTA DEL PLANO  —  {move_left}/{move_right} girar  ·  {move_up}/{move_down} avanzar  ·  {view} volver a la lámina"))
 	var T = world.target_obj()
-	if p != null and T != null and e > 0.9:
+	if p != null and T != null and e > 0.9 and not no_guides:
 		var tp := World.pos_of(T)
 		var u := eye.bearing(p.x, p.y, p.rot, tp.x, tp.y)
 		ui.bearing_l.visible = true

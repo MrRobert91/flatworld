@@ -7,7 +7,7 @@ static var pending_start := -1   # capítulo a lanzar tras recargar la escena (-
 static var args := {}            # --ch=N --auto --bot --touch --shots=dir --dpr=2.6
 # ajustes del jugador: tamaño de interfaz, velocidad de texto (0 lenta, 1 normal, 2 rápida, 3 instantánea),
 # avance automático, reducir movimiento, subtítulos de sonido, sensibilidad de la mirada y teclas reasignadas
-static var cfg := {scale = 1.0, text_speed = 1, auto_adv = false, reduce_motion = false, sound_captions = true, look_sens = 1.0, bindings = {}}
+static var cfg := {scale = 1.0, text_speed = 1, auto_adv = false, reduce_motion = false, sound_captions = true, look_sens = 1.0, bindings = {}, difficulty = "normal"}
 static var _dpr := 0.0
 
 const CFG := "user://planilandia_cfg.json"

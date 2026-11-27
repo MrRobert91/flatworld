@@ -10,6 +10,8 @@ var _wait_btn: Button
 
 const SPEEDS := ["lenta", "normal", "rápida", "instantánea"]
 const SENS := [0.5, 1.0, 1.5, 2.0]
+const DIFF := ["relaxed", "normal", "expert"]
+const DIFF_NAME := ["relajadas (segunda oportunidad)", "normales", "de perito (sin traza)"]
 
 func _ready() -> void:
 	var veil := ColorRect.new(); veil.color = Color(App.PAPER, 0.92); veil.set_anchors_preset(Control.PRESET_FULL_RECT); add_child(veil)
@@ -51,6 +53,8 @@ func _main() -> void:
 	_add(ui.T("Avance automático: ") + _yn(C.auto_adv), _toggle("auto_adv"))
 	_add(ui.T("Subtítulos de sonido: ") + _yn(C.get("sound_captions", true)), func(_b): C.sound_captions = not bool(C.get("sound_captions", true)); App.save_cfg(); _main())
 	_add(ui.T("Reducir movimiento: ") + _yn(C.reduce_motion), _toggle("reduce_motion"))
+	var di := DIFF.find(String(C.get("difficulty", "normal")))
+	_add(ui.T("Deducciones: ") + ui.T(DIFF_NAME[maxi(di, 1)]), func(_b): C.difficulty = DIFF[(maxi(di, 1) + 1) % 3]; App.save_cfg(); _main())
 	var si := SENS.find(float(C.get("look_sens", 1.0)))
 	_add(ui.T("Mirada con el stick: ") + "×" + str(SENS[maxi(si, 1)]), func(_b): C.look_sens = SENS[(maxi(si, 1) + 1) % SENS.size()]; App.save_cfg(); _main())
 	if not ui.touch: _add(ui.T("Teclas"), func(_b): _keys())

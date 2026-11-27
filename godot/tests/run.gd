@@ -18,6 +18,7 @@ func _ready() -> void:
 	print("== test_i18n"); test_i18n()
 	print("== test_keys"); test_keys()
 	print("== test_cine"); test_cine()
+	print("== test_refs"); test_refs()
 	print("%d comprobaciones, %d fallos" % [count, fails])
 	get_tree().quit(1 if fails > 0 else 0)
 
@@ -126,3 +127,24 @@ func test_cine() -> void:
 	ok(Cine._times(keys) == [0.0, 2.0, 4.0], "reducir movimiento: las llaves rápidas duran el doble")
 	App.cfg.reduce_motion = false
 	ok(absf(Cine._ease({ease = "linear"}, 0.3) - 0.3) < 1e-6, "interpolación lineal")
+
+# todo id que usa el guion (notas al margen, expediente, logros) tiene su texto en el libro
+func test_refs() -> void:
+	var book = JSON.parse_string(FileAccess.get_file_as_string("res://data/book.es.json"))
+	var margins := {}
+	for m in book.margins: margins[m.id] = m
+	var code := ""
+	for dir in ["res://scripts/content/", "res://scripts/minigames/"]:
+		for f in DirAccess.get_files_at(dir):
+			if f.ends_with(".gd"): code += FileAccess.get_file_as_string(dir + f)
+	var re := RegEx.new()
+	re.compile("\\['(m_[a-z0-9_]+)'")
+	var n := 0
+	for m in re.search_all(code):
+		n += 1; ok(margins.has(m.get_string(1)), "nota al margen con texto: " + m.get_string(1))
+	ok(n >= 12, "el guion declara notas al margen (%d)" % n)
+	re.compile("g\\.note\\('([a-z_]+)'")
+	for m in re.search_all(code): ok(book.record.has(m.get_string(1)), "anotación con texto: " + m.get_string(1))
+	re.compile("g\\.achieve\\('([A-Z_]+)'")
+	for m in re.search_all(code): ok(book.achievements.has(m.get_string(1)), "logro con nombre: " + m.get_string(1))
+	for m in book.margins: ok(m.has("title") and m.has("text") and m.has("ch"), "nota completa: " + m.id)

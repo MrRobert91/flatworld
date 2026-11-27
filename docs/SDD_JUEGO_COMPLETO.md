@@ -641,6 +641,43 @@ Rama `diseno-juego-completo`. Lo hecho, y en qué se aparta de lo especificado a
 | S-10 Localización | Infraestructura | `I18n.t()` dentro de `say/narrate/choose/note/panel/panel_info/objective/title/toast/chapter_tag` y en los nombres de quien habla. `book.json` → `book.es.json` (y `book.<lang>.json` opcional). `tools/extract_strings.py` (910 textos) y `--check`. `en.po` sin traducir (M6); `--lang=en` informa de cuántos textos faltan. |
 | Pruebas | Hecho | `-- --test` (86 comprobaciones: migración, perfil, i18n, teclas y glifos, raíles), `--script=heretic/orthodox`, `--lang=en`, y el autómata `--bot` recorre el juego entero. Para probar el mando sin mando: `--inject`. |
 
+### 9.4 Estado: M1 implementado
+
+Prólogo y capítulos I–III con las mejoras del diseño. Lo hecho y en qué se aparta:
+
+| Id | Estado | Notas |
+|---|---|---|
+| P-01 Mesa del lector | Hecho | `content/ch_frame.gd`. En lugar de una escena aparte con un render a textura, la mesa (madera, libro abierto por la portada de 1884 y la dedicatoria, lápiz rojo, regla, lámpara con luz) se construye **en el mismo espacio 3D que el Plano**, alrededor del suelo recortado al tamaño de un folio. El último encuadre del descenso es exactamente el de la cámara de lámina (`ChFrame.lamina_cam`), así que no hace falta fundido cruzado. Sin modelos de Blender. Se ve al empezar el Prólogo y se salta manteniendo pulsado. `--noframe` la omite. |
+| P-02 Muescas | Hecho | 7 grupos «IIII» en la pared Norte y nota al margen. |
+| P-03 Moneda | Hecho | `Cine.orbit` alrededor de la moneda (3,5 s) desde el lado del jugador, con «círculo», «elipse» y «línea» de tiza, y fundido a la línea del ojo. |
+| P-04 Gancho | Hecho | En negro, una sola vez por perfil (`Profile.data.seen_hook`). |
+| P-05 Tutorial | Hecho | Girar → avanzar → mirar → lente → acción, cada aviso se va al cumplirse. |
+| P-06 Tablilla | Hecho | «Quizá ya me estás leyendo». |
+| C1-01 Alacena | Hecho | Obligatoria; llave mantenida (0,8 s, `s_lock`); desde la lámina se ven `cofre1/2` y `tab1/2`. |
+| C1-02 Lluvia | Hecho, con cambio | Se hace **fuera de casa**, al salir por la puerta Oeste: bajo techo no llueve y el centelleo no se vería. |
+| C1-03 Juego de los ángulos | Hecho | `minigames/feel.gd` con `toy` y `blind` (venda: `shaders/blindfold.gdshader`). |
+| C1-04 Hasta diez | Hecho | La esposa patrulla; descubierto → mentira o verdad (`hija_cuenta`). `ACH_COUNT`. |
+| C1-05 Esposa | Hecho | Va y viene de punta con su Grito de Paz (`Ent.cry`); si te pincha, «¿No me oías?». |
+| C1-06 Casa viva | Hecho | Nietos que se persiguen, hijos que van y vienen, uno sale a su consulta, criado barriendo. |
+| C2-01 Escala viva | Hecho | `Cine.play` sin franjas bajo el diálogo (parámetros nuevos `bands` y `stop`). El diagrama del inventario queda para P1. |
+| C2-02 Cruzar la calle | Hecho | `minigames/cross_street.gd`. El comerciante está en la acera Norte; al acercarse, se cruza en el ojo con niebla 5. `ACH_STREET`. |
+| C2-03 Comerciante | Hecho | `feel` con `risky`. |
+| C2-04 Presentación | Hecho | Colega del médico; tres pasos en orden; fallo → `mala_presentacion`. |
+| C2-05 Voces | Hecho | `minigames/voices.gd`; `Snd.voice_at` con vibrato (38 centésimas) en las falsas. `ACH_EAR`. |
+| C2-06 Hospital | Hecho | Celador, nota al margen y golpes posicionales (`s_compress`). |
+| C2-07 Árboles | Hecho | `map.trees` (trazo y dos ramas), `bounds.x0 = -120`, nota de los viajeros. |
+| C3-01 Cola de la Puerta | Hecho | 8 rondas: quietas, girando (`spin`, `arc`), de incógnito (`cloak`, «Inclinarse»); la siguiente espera en la niebla; campanilla a los 15 s. Ofensa al Círculo → `gate_circle_offense`. |
+| C3-02 Nota del perito | Hecho | `ui.eye_tally`; 8/8 en «perito» (sin traza) → `ACH_GATE_P`. Ajuste nuevo: dificultad de las deducciones (relajada con segundo intento, normal, perito). |
+| C3-03 Plano partido | Hecho | `ui.split_view`: un `SubViewport` con la cámara de lámina en el 44 % inferior durante 3 s. |
+| C3-04 Estilete | Hecho | Si fuiste amable con el calderero: lo deja caer, se recoge, `state.inv.estilete`; se ve en «Personas». |
+| C3-05 A casa sin lámina | Hecho | `minigames/orient.gd`, paleta `flat_night`, tirón del Sur (`g.pull`), lluvia a mitad de camino, la esposa grita en la puerta del Este, el criado llama a los 90 s. `ACH_HOME`. |
+| C3-06 Cena tarde | Hecho | Elección contar/callar; `rel nieto +1`. |
+| S-04 Marginalia | Hecho | 14 notas en Prólogo–III (`book.margins`): brillo de tinta a menos de 6 u, chispa en la línea del ojo, pluma (`s_quill`). Se leen en el Manuscrito, «Notas al margen». |
+| S-06 Lluvia en el ojo | Hecho | Hasta 64 gotas como dos trazos cortos (en la caída y de través). Las lentes `point` y `flood`, en M3. |
+| Logros | Local | `g.achieve` guarda en el perfil y avisa; la subida a Steam llega con `Platform` (M6). |
+
+Efectos nuevos (`tools/make_audio.py --extra`, en WAV porque no requiere ffmpeg): `lock`, `quill`, `compress`, `chime`, `hum`. Pruebas: `-- --test` (130 comprobaciones, incluida la de que todo id de nota, anotación y logro tenga texto), las cuatro pasadas `--auto` y el autómata. Parámetros nuevos para probar: `--until=N` (para después del capítulo N), `--botdt=s` (autómata más lento, para capturas) y `--noframe`.
+
 ---
 
 ## 10. Riesgos

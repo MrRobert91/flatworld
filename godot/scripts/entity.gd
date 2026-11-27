@@ -45,6 +45,10 @@ var talk := 0.0          # 1 mientras habla: late
 var shake := 0.0         # sacudida de dolor
 var dying := -1.0        # >= 0: animación de muerte en curso
 var phase := 0.0
+var cry := false         # grita «¡Paz!» cada pocos segundos, desde donde está (S-07)
+var cry_range := 14.0
+var cry_t := 0.0
+var margin := false      # nota al margen (S-04): un brillo de tinta que sólo se ve de cerca
 
 func setup(w, d: Dictionary) -> Ent:
 	world = w; def = d
@@ -55,11 +59,18 @@ func setup(w, d: Dictionary) -> Ent:
 	sway = d.get("sway", 1.0) if woman else 0.0
 	no_collide = d.get("noCollide", false); fixed_rot = d.get("fixedRot", false)
 	t = randf() * 10.0; phase = randf() * TAU
+	cry = d.get("cry", false); cry_range = d.get("cryRange", 14.0); cry_t = 0.5 + randf() * 2.5
 	body = MeshInstance3D.new(); add_child(body)
 	if d.get("spot", false):
-		is_spot = true; rad = 0.2; no_collide = true
+		is_spot = true; rad = 0.2; no_collide = true; margin = d.get("margin", false)
 		var mb := Geo.MB.new()
-		mb.ring(Geo.make_points({n = 4, r = 0.36}), 0.08, 0.02, null, world.pal.acc, 0.95)
+		if margin:
+			# brillo de tinta: una estrella de cuatro trazos finos
+			for k in 4:
+				var a := PI / 4.0 * k; var v := Vector2(cos(a), sin(a)) * (0.42 if k % 2 == 0 else 0.26)
+				mb.quad(-v, v, 0.045, 0.02, world.pal.acc)
+		else:
+			mb.ring(Geo.make_points({n = 4, r = 0.36}), 0.08, 0.02, null, world.pal.acc, 0.95)
 		body.mesh = mb.commit(); body.material_override = world.mat(3)
 		return self
 	local = Geo.make_points(d)
@@ -169,6 +180,13 @@ func update(dt: float) -> void:
 		visible = not hid
 		position = Vector3(x, 0, -y); rotation.y = world.time * 1.3
 		scale = Vector3.ONE * (1.0 + 0.15 * sin(world.time * 3.0))
+		if margin:
+			# sólo de cerca (6 u), con un ciclo de 2,4 s
+			var p = App.g.player if App.g != null else null
+			var near: bool = p != null and Vector2(p.x - x, p.y - y).length() < 6.0
+			visible = not hid and near
+			rotation.y = 0.0
+			scale = Vector3.ONE * (0.75 + 0.35 * pow(0.5 + 0.5 * sin(world.time * TAU / 2.4 + phase), 3.0))
 		return
 	greet_cd = maxf(0.0, greet_cd - dt); talk = maxf(0.0, talk - dt * 2.5); shake = maxf(0.0, shake - dt * 2.6)
 	if dying >= 0.0:

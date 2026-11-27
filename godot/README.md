@@ -213,6 +213,9 @@ python3 godot/tools/extract_strings.py --check                  # textos y tradu
 godot --path godot -- --bot --speed=5 --ch=0 --quit --log     # un autómata juega con la interfaz real
 ```
 
+Para probar un tramo: `--ch=1 --until=3` juega del capítulo I al III; `--botdt=0.7` ralentiza el autómata (para
+`--shots`); `--noframe` se salta la mesa del lector.
+
 `--auto` empieza siempre de cero y no toca las partidas del jugador. Al terminar imprime
 `FIN OK frags=22 margins=… record=…` y, con `--log`, las anotaciones de más peso del expediente.
 
