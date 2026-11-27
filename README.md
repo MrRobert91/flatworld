@@ -14,3 +14,8 @@ El repositorio contiene dos versiones del mismo juego, cada una en su carpeta:
 | [`web/`](web/) | three.js (original) | Sitio estático sin compilación; se conserva tal cual. |
 
 Las dos comparten guion, capítulos y mecánicas. Cada carpeta tiene su propio README con cómo ejecutarla.
+
+## Diseño del juego completo
+
+- [`docs/DISENO_JUEGO_COMPLETO.md`](docs/DISENO_JUEGO_COMPLETO.md): análisis del estado actual y mejoras, capítulo a capítulo, para llegar a un juego de ~70 minutos para Steam.
+- [`docs/SDD_JUEGO_COMPLETO.md`](docs/SDD_JUEGO_COMPLETO.md): especificación técnica para implementarlas (componentes, datos, pruebas, hitos).
