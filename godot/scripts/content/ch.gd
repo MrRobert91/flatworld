@@ -207,6 +207,17 @@ func feel(e: Ent, text := '', opts := {}) -> bool:
 	var r: Dictionary = await Feel.run(self, e, opts)
 	return r.ok
 
+# la llave de la alacena y otras acciones que se mantienen
+func _hold(title: String, text: String, label: String, sec: float) -> void:
+	if g.auto: return
+	ui.panel_info(title, text); g.need_act = label
+	var st := {t = 0.0}
+	await g.tick_until(func(dt) -> bool:
+		if g.bot: st.t = sec
+		if g.act_held(): st.t += dt
+		return st.t >= sec)
+	g.need_act = ''; ui.panel_info(null)
+
 # Pizarra: anima un dibujo de tiza. draw(board, t 0..1)
 func slate_anim(cap: String, sec: float, draw: Callable) -> void:
 	if g.auto: return

@@ -13,6 +13,10 @@ var tex: ImageTexture
 var fov := 1.75
 var trace := 0.0
 var desat := 0.0         # la línea en gris (C4-03)
+# lentes (S-06): line | point (el ojo del Rey: un punto) | flood (el ojo del Punto: todo un color)
+var lens := "line"
+var squeeze := 0.0
+var grow := 0.0
 var _cpu := []           # segmentos relativos al ojo, para consultas puntuales: [ax, ay, bx, by, id]
 var _facing := 0.0
 
@@ -80,6 +84,19 @@ func cast(W: World, exclude, ox: float, oy: float, facing: float, fog: float) ->
 			data[row2 + o] = near; data[row2 + o + 1] = 1.0
 			_cpu.append([a.x - ox, a.y - oy, b.x - ox, b.y - oy, e.id])
 			k += 1
+	# el ojo del Rey (lente point): en la Recta todo se ve de punta, y un segmento de punta no ocupa nada
+	# en la línea. Cada habitante se ve por su extremo más cercano: un punto que brilla más cuanto más cerca
+	if lens == "point":
+		for e in W.ents.values():
+			if k >= N: break
+			if e == exclude or e.hid or not e.woman: continue
+			var best := Vector2.ZERO; var bd := 1e9
+			for q in e.world_pts():
+				var dq := Vector2(q.x - ox, q.y - oy)
+				if dq.dot(Vector2(cf, sf)) > 0.05 and dq.length() < bd: bd = dq.length(); best = dq
+			if bd > max_d: continue
+			var px := -sf * 0.05; var py := cf * 0.05
+			_put(k, best.x - px, best.y - py, best.x + px, best.y + py, edge, e.lum, bd, 1.0); k += 1
 	# notas al margen (S-04): una chispa de lápiz rojo, perpendicular a la mirada
 	var acc: Color = W.pal.acc
 	for s in W.spots.values():
@@ -158,6 +175,23 @@ func layout(t: float, size: Vector2, time: float, strip_visible: bool, rect: Rec
 	view_mat.set_shader_parameter("u_time", time)
 	view_mat.set_shader_parameter("u_trace", trace)
 	view_mat.set_shader_parameter("u_px", view.get_viewport().get_window().content_scale_factor if view.is_inside_tree() else 1.0)
+	view_mat.set_shader_parameter("u_size", view.size)
+
+# transición entre lentes: la línea se encoge en 1,2 s; el punto crece hasta la pantalla en 1,2 s
+func step(dt: float) -> void:
+	var sp := dt / (1.8 if bool(App.cfg.get("reduce_motion", false)) else 1.2)
+	var want_sq := 0.0 if lens == "line" else 1.0
+	var want_gr := 1.0 if lens == "flood" else 0.0
+	# primero se deshace el crecimiento; después se encoge o se abre la línea; por último crece el punto
+	if grow != want_gr and (want_gr < grow or squeeze >= 0.999): grow = move_toward(grow, want_gr, sp)
+	else: squeeze = move_toward(squeeze, want_sq, sp)
+	view_mat.set_shader_parameter("u_squeeze", App.ease(squeeze))
+	view_mat.set_shader_parameter("u_grow", App.ease(grow))
+
+func set_lens(l: String, instant := false) -> void:
+	lens = l
+	if instant:
+		squeeze = 0.0 if l == "line" else 1.0; grow = 1.0 if l == "flood" else 0.0
 
 # rumbo en pantalla (0..1) de un punto del mundo; <0 o >1 si queda fuera del campo
 func bearing(ox: float, oy: float, facing: float, x: float, y: float) -> float:

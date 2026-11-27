@@ -379,7 +379,7 @@ func _build_title() -> void:
 	t_sub = _lbl("", serif_it, 22, App.SOFT); t_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	t_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(t_sub)
 
-const JTABS := [["ms", "Manuscrito"], ["know", "Saberes"], ["pos", "Personas"], ["log", "Historial"]]
+const JTABS := [["ms", "Manuscrito"], ["know", "Saberes"], ["tab", "Analogías"], ["pos", "Personas"], ["log", "Historial"]]
 
 func _build_journal() -> void:
 	journal = Control.new(); _full(journal); journal.visible = false; add_child(journal)
@@ -1079,7 +1079,22 @@ func panel_info(title_text, text := "") -> void:
 
 func slate(show: bool, cap := "") -> SlateBoard:
 	slate_box.visible = show and not auto; slate_cap.text = T(cap).to_upper()
+	if draw_b != null: draw_b.visible = false
+	slate_board.visible = true; slate_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return slate_board
+
+# la pizarra en la que dibuja el jugador (S-11): ocupa el sitio de la de tiza
+var draw_b: DrawBoard
+func draw_board(show: bool, cap := "") -> DrawBoard:
+	if draw_b == null:
+		draw_b = DrawBoard.new(); draw_b.font = serif_it
+		slate_board.get_parent().add_child(draw_b); slate_board.get_parent().move_child(draw_b, 0)
+		slate_board.get_parent().mouse_filter = Control.MOUSE_FILTER_PASS
+	draw_b.custom_minimum_size = slate_board.custom_minimum_size
+	slate_box.visible = show and not auto; slate_cap.text = T(cap).to_upper()
+	slate_board.visible = not show; draw_b.visible = show and not auto
+	slate_box.mouse_filter = Control.MOUSE_FILTER_PASS if show else Control.MOUSE_FILTER_IGNORE
+	return draw_b
 
 # ---------- inventario: manuscrito, saberes, posición ----------
 func toggle_journal(tab := "") -> void:
@@ -1162,6 +1177,7 @@ func j_tab(tab: String) -> void:
 			if have and first == "": first = id
 			_j_item(K[id].title if have else "· · ·", have, show.bind(id))
 		show.call(first if first != "" else K.keys()[0])
+	elif tab == "tab": _j_ledger(S)
 	elif tab == "pos": _j_people(S)
 	else: _j_history()
 	focus_first()
@@ -1186,6 +1202,48 @@ func _j_people(S: Dictionary) -> void:
 		var row := VBoxContainer.new(); row.add_theme_constant_override("separation", 0); j_body.add_child(row)
 		row.add_child(_lbl(String(P[id].name).to_upper(), caps, 13, App.INK))
 		var ds := _lbl(P[id].lv.get(str(lv), ""), serif_it, 19, App.SOFT); ds.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; row.add_child(ds)
+
+# la tabla de analogías (S-05, T-04): se rellena sola a medida que se vive cada mundo. Las celdas nuevas
+# se escriben con una animación de pluma al abrir la pestaña; la fila «desde arriba» son dibujos en bucle
+func _j_ledger(S: Dictionary) -> void:
+	var L: Dictionary = App.g.book.get("ledger", {})
+	var got: Dictionary = S.get("ledger", {})
+	_j_head(T("La tabla de analogías"))
+	var r := _rich(18, App.INK, serif_it, serif)
+	r.text = fmt(T("Lo que cada mundo ve, y lo que no puede ver. Las casillas se escriben solas, en el momento en que lo vives.")) + "\n\n[color=#4a5761]" + T("%d casillas de 29") % got.size() + "[/color]"
+	j_list.add_child(r)
+	if L.is_empty(): return
+	j_body.add_child(_lbl(T("ANALOGÍAS"), caps, 12, App.ACC))
+	var grid := GridContainer.new(); grid.columns = 1 + (L.cols as Array).size()
+	grid.add_theme_constant_override("h_separation", 10); grid.add_theme_constant_override("v_separation", 8)
+	j_body.add_child(grid)
+	var cw := clampf((size.x - (80.0 if j_split.vertical else 420.0)) / 6.4, 64.0, 150.0)
+	grid.add_child(Control.new())
+	for c in L.cols:
+		var h := VBoxContainer.new(); h.add_theme_constant_override("separation", -2)
+		var n := _lbl(T(c.name), caps, 12, App.INK); n.custom_minimum_size.x = cw; n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; h.add_child(n)
+		h.add_child(_lbl(c.sub, serif_it, 14, App.SOFT)); grid.add_child(h)
+	var delay := 0.0
+	for row in L.rows:
+		var rn := _lbl(T(row.name), serif_it, 15, App.SOFT); rn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; rn.custom_minimum_size.x = cw * 0.9
+		grid.add_child(rn)
+		for c in L.cols:
+			var id: String = c.id + "." + row.id
+			var v = L.cells.get(id, null)
+			if v == null: grid.add_child(Control.new()); continue
+			var have := got.has(id)
+			var fresh := have and int(got[id]) == 1
+			if v is Dictionary and have:
+				var an := LedgerAnim.new(); an.kind = v.anim; an.custom_minimum_size = Vector2(minf(cw, 96.0), 60); grid.add_child(an)
+				if fresh: an.modulate.a = 0.0; create_tween().tween_property(an, "modulate:a", 1.0, 0.8).set_delay(delay); delay += 0.5
+			else:
+				var l := _lbl(T(str(v)) if have else "· · ·", serif if have else serif_it, 17, App.INK if have else App.FAINT)
+				l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; l.custom_minimum_size.x = cw; grid.add_child(l)
+				if fresh:
+					l.visible_ratio = 0.0
+					var tw := create_tween(); tw.tween_interval(delay); tw.tween_callback(func(): Snd.sfx("chalk"))
+					tw.tween_property(l, "visible_ratio", 1.0, 0.8); delay += 0.5
+			if fresh: got[id] = 2
 
 # historial (T-09): las últimas intervenciones, con el nombre y el color de quien habló
 func _j_history() -> void:
@@ -1326,6 +1384,9 @@ class OptCard extends PanelContainer:
 		mouse_filter = Control.MOUSE_FILTER_STOP; mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		if o.has("swatch"):
 			custom_minimum_size = Vector2(54, 54); add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+		elif o.has("circle"):
+			# un tamaño de círculo (C7-02): se dibuja; el punteado es el tamaño de referencia
+			custom_minimum_size = Vector2(104, 104); add_theme_stylebox_override("panel", ui._card(Color("fffaf0"), 6, 6, 2, 0))
 		else:
 			var sb := ui._card(Color("fffaf0"), 14, 6, 2, 0)
 			add_theme_stylebox_override("panel", sb)
@@ -1343,7 +1404,15 @@ class OptCard extends PanelContainer:
 			draw_circle(size / 2.0, 22, Color(o.swatch))
 			draw_arc(size / 2.0, 22, 0, TAU, 40, App.INK, 2.0, true)
 			if on: draw_arc(size / 2.0, 26, 0, TAU, 40, App.ACC, 2.0, true)
-		elif on: draw_rect(Rect2(Vector2.ZERO, size), App.ACC, false, 3.0)
+			return
+		if o.has("circle"):
+			var c := size / 2.0 - Vector2(0, 4); var R := 38.0
+			for k in 24:
+				if k % 2 == 0: draw_arc(c, R, TAU * k / 24.0, TAU * (k + 1) / 24.0, 4, Color(App.INK, 0.45), 1.2, true)
+			var r: float = maxf(1.5, R * float(o.circle))
+			draw_circle(c, r, Color(App.ACC, 0.18)); draw_arc(c, r, 0, TAU, 40, App.ACC, 2.0, true)
+			draw_string(_ui.caps, Vector2(size.x / 2.0 - 4, size.y - 4), str(o.get("sub", "")), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, App.SOFT)
+		if on: draw_rect(Rect2(Vector2.ZERO, size), App.ACC, false, 3.0)
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and Rect2(Vector2.ZERO, size).has_point(ev.position):
 			accept_event(); chosen.emit()
@@ -1375,6 +1444,32 @@ class Bar extends Control:
 			draw_line(Vector2(x, y - h), Vector2(x, y + h), App.INK, 1.2)
 		var x := size.x * (0.5 + v * 0.1)
 		draw_colored_polygon(PackedVector2Array([Vector2(x, y - 9), Vector2(x + 8, y), Vector2(x, y + 9), Vector2(x - 8, y)]), App.ACC)
+
+# casillas animadas de la tabla de analogías: lo que ve quien llega de arriba
+class LedgerAnim extends Control:
+	var kind := "?"
+	func _process(_dt: float) -> void: queue_redraw()
+	func _draw() -> void:
+		var t := Time.get_ticks_msec() / 1000.0
+		var c := size / 2.0; var w := size.x
+		var ink := App.INK; var acc := App.ACC
+		match kind:
+			"lineland_point":
+				# una recta; un tramo aparece en ella, crece, mengua y desaparece
+				draw_line(Vector2(4, c.y), Vector2(w - 4, c.y), Color(ink, 0.6), 1.5)
+				var u := fmod(t / 3.0, 1.0); var L := sin(u * PI) * w * 0.32
+				if L > 0.5: draw_line(Vector2(c.x - L / 2.0, c.y), Vector2(c.x + L / 2.0, c.y), acc, 5.0)
+			"circle_grow":
+				var u := fmod(t / 3.0, 1.0); var r := sin(u * PI) * minf(size.y, w) * 0.42
+				if r > 0.5: draw_arc(c, r, 0, TAU, 40, acc, 2.5, true)
+				draw_circle(c, 1.5, Color(ink, 0.4))
+			"voice_inside":
+				for i in 3:
+					var u := fmod(t / 2.0 + i / 3.0, 1.0)
+					draw_arc(c, 3.0 + u * size.y * 0.45, 0, TAU, 32, Color(acc, 1.0 - u), 1.5, true)
+				draw_circle(c, 2.5, ink)
+			_:
+				draw_string(App.ui.caps, c + Vector2(-6, 8), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color(ink, 0.6))
 
 # filete doble con rombo: adorno de rótulo
 class Rule extends Control:

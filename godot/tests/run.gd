@@ -19,6 +19,9 @@ func _ready() -> void:
 	print("== test_keys"); test_keys()
 	print("== test_cine"); test_cine()
 	print("== test_refs"); test_refs()
+	print("== test_geom3"); test_geom3()
+	print("== test_sketch"); test_sketch()
+	print("== test_lens"); test_lens()
 	print("%d comprobaciones, %d fallos" % [count, fails])
 	get_tree().quit(1 if fails > 0 else 0)
 
@@ -148,3 +151,47 @@ func test_refs() -> void:
 	re.compile("g\\.achieve\\('([A-Z_]+)'")
 	for m in re.search_all(code): ok(book.achievements.has(m.get_string(1)), "logro con nombre: " + m.get_string(1))
 	for m in book.margins: ok(m.has("title") and m.has("text") and m.has("ch"), "nota completa: " + m.id)
+
+# S-12 (parte 2D): la sección de un polígono por la Recta y la de una esfera por el Plano
+func test_geom3() -> void:
+	var r := 0.78
+	var sq := func(rot: float, cy: float) -> Array:
+		var out := []
+		for i in 4: out.append(Vector2(r * cos(rot + TAU * i / 4.0), cy + r * sin(rot + TAU * i / 4.0)))
+		return out
+	ok(absf(Geom3.line_len(sq.call(PI / 2, 0.0)) - 2.0 * r) < 1e-4, "diagonal sobre la Recta: 2r")
+	ok(absf(Geom3.line_len(sq.call(PI / 4, 0.0)) - 2.0 * r * sin(PI / 4)) < 1e-4, "un lado paralelo: el lado")
+	ok(absf(Geom3.line_len(sq.call(PI / 2, -(r - 0.125))) - 0.25) < 1e-4, "por un vértice: 0,25")
+	ok(Geom3.line_len(sq.call(0.3, 2.0)) == 0.0, "lejos de la Recta: nada")
+	var s := Geom3.line_section([Vector2(0, 1), Vector2(1, 0), Vector2(0, -1), Vector2(-1, 0)])
+	ok(s.is_equal_approx(Vector2(-1, 1)), "rombo: de -1 a 1 (%s)" % s)
+	ok(absf(Geom3.sphere_section(1.0, 0.5) - sqrt(0.75)) < 1e-6, "esfera a media altura: raíz de tres cuartos")
+	ok(Geom3.sphere_section(1.0, 1.2) == 0.0, "esfera por encima: no corta")
+	ok(Geom3.sphere_section(2.0, 0.0) == 2.0, "esfera centrada: su radio")
+
+# S-11: lo que reconoce la pizarra
+func test_sketch() -> void:
+	var cyc := func(vs: Array) -> Array:
+		var out := []
+		for i in vs.size(): out.append(Vector2i(vs[i], vs[(i + 1) % vs.size()]))
+		return out
+	var cube: Array = cyc.call([0, 1, 2, 3]) + cyc.call([4, 5, 6, 7]) + [Vector2i(0, 4), Vector2i(1, 5), Vector2i(2, 6), Vector2i(3, 7)]
+	ok(Sketch.classify(cube) == "cube_shadow", "sombra de un cubo")
+	var cube2: Array = cyc.call([10, 3, 8, 1]) + cyc.call([2, 9, 4, 7]) + [Vector2i(10, 2), Vector2i(3, 9), Vector2i(8, 4), Vector2i(1, 7)]
+	cube2.append(Vector2i(4, 8))   # un trazo repetido al revés no cuenta
+	ok(Sketch.classify(cube2) == "cube_shadow", "sombra de un cubo en otra perspectiva")
+	ok(Sketch.classify(cyc.call([0, 1, 2, 3, 4, 5])) == "hexagon", "hexágono")
+	ok(Sketch.classify(cyc.call([5, 6, 9, 8])) == "square", "cuadrado")
+	ok(Sketch.classify(cyc.call([5, 6, 9, 8]) + [Vector2i(5, 9)]) == "other", "cuadrado con una diagonal")
+	ok(Sketch.classify([]) == "empty", "pizarra vacía")
+
+# S-06: el botón de vista recorre las lentes del mundo
+func test_lens() -> void:
+	var e := Eye.new()
+	e.set_lens("point", true)
+	ok(e.squeeze == 1.0 and e.grow == 0.0, "punto: la línea encogida del todo")
+	e.set_lens("flood", true)
+	ok(e.grow == 1.0, "inundación: el punto crecido")
+	e.set_lens("line", true)
+	ok(e.squeeze == 0.0 and e.grow == 0.0, "línea")
+	e.view.free(); e.free()

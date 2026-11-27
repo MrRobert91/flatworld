@@ -47,7 +47,10 @@ const MOODS := {
 const CHORD := {M = [0, 4, 7], m = [0, 3, 7], M7 = [0, 4, 7, 11], m7 = [0, 3, 7, 10], m9 = [0, 3, 7, 10, 14], add9 = [0, 4, 7, 14],
 	sus2 = [0, 2, 7], sus4 = [0, 5, 7], dim = [0, 3, 6]}
 # antiguo sintetizador: tonos sueltos que piden los capítulos (con deslizamiento)
-const FALLBACK := {chalk = [[2000, 0.03, "triangle", 0.02]]}
+const FALLBACK := {chalk = [[2000, 0.03, "triangle", 0.02]],
+	chalk_break = [[2600, 0.22, "sawtooth", 0.03, 1.4], [1900, 0.18, "square", 0.02, 0.6, 0.04], [3100, 0.08, "sawtooth", 0.02, 0.8, 0.16]]}
+# Leitmotivs (S-07): [paso, semitonos sobre la tónica del ánimo]. El paso es una corchea del compás.
+const MOTIFS := {esfera = [[0, 0], [1, 7], [3, 12], [4, 7]], hermano = [[0, 3], [2, 0]], nieto = [[0, 0], [1, 4], [2, 7], [3, 11]]}
 
 var muted := false
 var _cache := {}
@@ -113,6 +116,13 @@ func _make_buses() -> void:
 		var rv := AudioEffectReverb.new(); rv.room_size = 0.45; rv.damping = 0.6; rv.wet = 0.14; rv.dry = 1.0
 		AudioServer.add_bus_effect(_bus_s, rv)
 	_bus_s = AudioServer.get_bus_index("Sfx")
+	# mono (C6-05): en Linealandia todo suena por un solo canal
+	var has_st := false
+	for i in AudioServer.get_bus_effect_count(0):
+		if AudioServer.get_bus_effect(0, i) is AudioEffectStereoEnhance: has_st = true
+	if not has_st:
+		var st := AudioEffectStereoEnhance.new(); st.pan_pullout = 1.0
+		AudioServer.add_bus_effect(0, st, 0); AudioServer.set_bus_effect_enabled(0, 0, false)
 	_rain_p = AudioStreamPlayer.new(); _rain_p.bus = "Sfx"; _rain_p.volume_db = -80; add_child(_rain_p)
 
 # lluvia: un rumor continuo que sube y baja con la intensidad del aguacero
@@ -300,6 +310,33 @@ func _pos_step(dt: float) -> void:
 		var a: AudioStreamPlayer3D = _pos[_pos_i]; _pos_i = (_pos_i + 1) % POS_N
 		a.stream = q[1]; a.position = q[2]; a.volume_db = q[3] + 4.0; a.pitch_scale = 1.0; a.play()
 	_queue_pos = keep
+
+# mono: el panorama se colapsa a un canal (v = 1) o en parte (0 < v < 1)
+var mono_v := 0.0
+func mono(on: bool) -> void:
+	mono_mix(1.0 if on else 0.0)
+
+func mono_mix(v: float) -> void:
+	mono_v = clampf(v, 0.0, 1.0)
+	for i in AudioServer.get_bus_effect_count(0):
+		var e := AudioServer.get_bus_effect(0, i)
+		if e is AudioEffectStereoEnhance:
+			(e as AudioEffectStereoEnhance).pan_pullout = 1.0 - mono_v
+			AudioServer.set_bus_effect_enabled(0, i, mono_v > 0.001)
+
+# un leitmotiv (S-07), en la tónica del ánimo que suena y cuadrado con su pulso. invert: las
+# notas bajan en lugar de subir (la Esfera, vista desde abajo); detune en semitonos
+func motif(name: String, inst := "", invert := false, detune := 0.0, db := 0.0) -> void:
+	var notes: Array = MOTIFS.get(name, [])
+	if notes.is_empty(): return
+	var M: Dictionary = MOODS.get(_mood, MOODS.home)
+	var root: float = float(M.root) + 12.0 + detune
+	var step := 30.0 / float(M.bpm)
+	var wait := maxf(0.0, step - _acc) if _mood != "none" else 0.0
+	var ins := inst if inst != "" else ("glass" if name == "esfera" else ("celesta" if name == "nieto" else "harp"))
+	for q in notes:
+		var iv: float = -float(q[1]) if invert else float(q[1])
+		note(ins, root + iv, db - 2.0, wait + float(q[0]) * step, false)
 
 # un acorde de una vez, que la música no ha tocado nunca (el primer color, C4-02)
 func chord_once(root := 60, kind := [0, 4, 7, 11, 14]) -> void:

@@ -49,6 +49,8 @@ var script_policy := ""  # --script=heretic|orthodox: política de elección del
 var pull := Vector2.ZERO # deriva por segundo mientras se anda (el tirón del Sur, C3-05)
 var no_guides := false   # sin brújula, flecha ni rumbo del objetivo (orientarse a ciegas)
 var force_world := false # el mundo se dibuja aunque el ojo ocupe la pantalla (plano partido)
+var lenses := ["top", "eye"]   # lo que recorre el botón de vista en este mundo (S-06); "king" = el ojo del Rey
+var eye_src = null       # otra figura desde cuyo ojo se mira (el Rey); null = el Cuadrado
 
 static func fresh() -> Dictionary:
 	return Profile.fresh_state()
@@ -161,6 +163,12 @@ func achieve(id: String) -> void:
 	Profile.data.ach[id] = 1; Profile.touch(0.0)
 	ui.toast("frag", tr("Logro"), tr(book.get("achievements", {}).get(id, id)))
 
+# tabla de analogías (S-05): marca la casilla (1 = nueva, sin leer; 2 = ya vista en el inventario)
+func ledger(cell: String) -> void:
+	if not state.has("ledger"): state.ledger = {}
+	if state.ledger.has(cell): return
+	state.ledger[cell] = 1; ui.new_pages = true; save()
+
 # dificultad de las deducciones: relaxed | normal | expert (T-11)
 func difficulty() -> String:
 	return String(App.cfg.get("difficulty", "normal"))
@@ -238,10 +246,20 @@ func press_act() -> void:
 
 func toggle_view() -> void:
 	if view_lock or player == null or world.cam_mode != "follow" or busy: return
-	set_view("eye" if view == "top" else "top"); Snd.sfx("whoosh")
+	var i := lenses.find(lens_name())
+	set_view(lenses[(i + 1) % lenses.size()]); Snd.sfx("whoosh")
+
+# la lente actual: top, eye, king o flood
+func lens_name() -> String:
+	if view == "top": return "top"
+	return {point = "king", flood = "flood"}.get(eye.lens, "eye")
 
 func set_view(v: String) -> void:
-	view = v
+	match v:
+		"king": view = "eye"; eye.set_lens("point")
+		"flood": view = "eye"; eye.set_lens("flood")
+		"eye": view = "eye"; eye.set_lens("line")
+		_: view = v; eye.set_lens("line")
 
 # dirección de movimiento (y = Norte) con magnitud 0..1: teclado, mando o palanca táctil
 func axis() -> Vector2:
@@ -337,6 +355,8 @@ func _check_pricks(p: Ent, hits: Array) -> void:
 
 func set_map(map: Dictionary) -> void:
 	actors.clear(); talk_ent = null
+	lenses = ["top", "eye"]; eye_src = null; eye.set_lens("line", true)
+	if Snd.mono_v > 0.0: Snd.mono(false)
 	handlers.clear(); world.load_map(map); near = null; ui.prompt(null); vel = Vector2.ZERO
 
 func spawn_player(x: float, y: float, rot := PI / 2, extra := {}) -> Ent:
@@ -530,8 +550,11 @@ func _process(delta: float) -> void:
 	var eye_on := p != null and (strip or e > 0.0) and not free
 	eye.set_active(eye_on)
 	if eye_on:
-		var fx: float = p.local[0].x * 0.9
-		eye.cast(W, p, p.x + cos(p.rot) * fx, p.y + sin(p.rot) * fx, p.rot, W.fog)
+		# el ojo del Rey mira desde el Rey, por su Recta; el resto, desde el vértice delantero del Cuadrado
+		var src: Ent = eye_src if eye_src != null and is_instance_valid(eye_src) and eye.lens == "point" else p
+		var fx: float = src.local[0].x * 0.9 * src.sc
+		eye.cast(W, src, src.x + cos(src.rot) * fx, src.y + sin(src.rot) * fx, src.rot, W.fog)
+		eye.step(dt)
 		eye.layout(e, ui.size, W.time, strip, ui.strip_rect)
 	hud(p, e, strip, free)
 

@@ -257,17 +257,6 @@ func ch1() -> void:
 	await _rain_north()
 	await outro()
 
-# la llave de la alacena y otras acciones que se mantienen
-func _hold(title: String, text: String, label: String, sec: float) -> void:
-	if g.auto: return
-	ui.panel_info(title, text); g.need_act = label
-	var st := {t = 0.0}
-	await g.tick_until(func(dt) -> bool:
-		if g.bot: st.t = sec
-		if g.act_held(): st.t += dt
-		return st.t >= sec)
-	g.need_act = ''; ui.panel_info(null)
-
 # C1-03 · el juego de los ángulos: tres juguetes, a ciegas y sin riesgo. Devuelve los aciertos.
 func _angle_game() -> int:
 	if g.auto: return 2

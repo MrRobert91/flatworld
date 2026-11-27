@@ -434,6 +434,7 @@ func ch5() -> void:
 
 # C5-01 · tu hermano: cálido, irónico y prudente
 func _brother() -> void:
+	Snd.motif('hermano')
 	await say('hermano', '¡Hermano! Te he guardado sitio. Aquí, entre un Pentágono que ronca y otro que reza, que es lo mismo pero más alto.')
 	await say('hermano', 'Tú y yo, cuatro lados cada uno, y sin embargo a ti te llaman a la Puerta y a mí me dejan copiando actas del Consejo.')
 	var c = await choose([{t = 'Me llamaron. Y ojalá no lo hubieran hecho.', id = 'p'}, {t = 'Alguien tiene que copiar las actas.', id = 'b'}])

@@ -9,6 +9,9 @@ uniform float u_trace = 0.0; uniform float u_time = 0.0; uniform float u_strip =
 uniform float u_flip = 0.0; uniform float u_dark = 0.0; uniform float fov_tan = 1.2; uniform float u_px = 1.0;
 uniform float u_patterns = 1.0;   // rayado por tono en la línea (C4-07)
 uniform float u_desat = 0.0;      // la línea en gris (C4-03: lo que se ganó con el Color)
+// lentes (S-06): la línea se encoge hacia el centro (u_squeeze 0→1) hasta ser un punto (el ojo del Rey);
+// el punto crece (u_grow 0→1) hasta llenar la pantalla con el color medio (el ojo del Punto)
+uniform float u_squeeze = 0.0; uniform float u_grow = 0.0; uniform vec2 u_size = vec2(1280.0, 720.0);
 uniform vec3 bg_col = vec3(0.925, 0.894, 0.812);
 uniform vec3 ink_col = vec3(0.09, 0.13, 0.17);
 uniform vec3 acc_col = vec3(0.66, 0.22, 0.16);
@@ -16,14 +19,17 @@ vec3 info_at(float x, float ry) { return texture(t_data, vec2(x, ry)).rgb; }
 void fragment() {
 	vec2 uv = vec2(UV.x, 1.0 - UV.y);
 	float rc = mix(0.25, 0.75, u_flip); float ri = 1.0 - rc;
-	vec3 col = texture(t_data, vec2(uv.x, rc)).rgb;
+	float sx = max(1.0 - u_squeeze, 0.004);
+	float inside = step(abs(uv.x - 0.5), sx * 0.5) * (1.0 - smoothstep(0.85, 1.0, u_squeeze));
+	float ux = 0.5 + (uv.x - 0.5) / sx;
+	vec3 col = texture(t_data, vec2(ux, rc)).rgb;
 	float sat0 = pat_sat(col);
 	int pk = pat_index(pat_hue(col));
 	col = mix(col, vec3(dot(col, vec3(0.3, 0.59, 0.11))), u_desat);
-	vec3 inf = info_at(uv.x, ri);
+	vec3 inf = info_at(ux, ri);
 	float tx = 1.0 / 1024.0;
-	vec3 a = info_at(uv.x - tx * 1.6, ri); vec3 b = info_at(uv.x + tx * 1.6, ri);
-	float I = inf.r;
+	vec3 a = info_at(ux - tx * 1.6, ri); vec3 b = info_at(ux + tx * 1.6, ri);
+	float I = inf.r * inside;
 	float hit = step(0.004, max(a.r, b.r));
 	float id_jump = step(0.004, abs(a.g - b.g));
 	float dz = abs(a.b - b.b);
@@ -45,12 +51,12 @@ void fragment() {
 	c = mix(c, c * 0.45, pm * 0.6 * ink * core);
 	// la línea del horizonte, apenas un trazo de lápiz
 	float hl = 1.0 - smoothstep(0.0, fwidth(uv.y) * 1.2, abs(uv.y - 0.5));
-	c = mix(c, ink_col, hl * 0.16 * (1.0 - ink * core));
+	c = mix(c, ink_col, hl * 0.16 * (1.0 - ink * core) * (1.0 - u_squeeze));
 	// marca de vértice: asoma un poco fuera de la línea
 	float tick = crease * (1.0 - smoothstep(1.45, 1.55, d)) * (1.0 - core) * (1.0 - u_strip);
 	c = mix(c, ink_col, tick * 0.42);
 	// regla graduada (cada 5°, más larga cada 15°)
-	float full = 1.0 - u_strip;
+	float full = (1.0 - u_strip) * (1.0 - u_squeeze);
 	float ang = degrees(atan((1.0 - 2.0 * uv.x) * fov_tan));
 	float w5 = fwidth(ang);
 	float t5 = 1.0 - smoothstep(0.0, w5 * 1.2, abs(fract(ang / 5.0 + 0.5) - 0.5) * 5.0);
@@ -73,5 +79,29 @@ void fragment() {
 	c = mix(c, acc_col, fill * 0.16 * tr);
 	c = mix(c, ink_col, base * 0.5 * tr);
 	c = mix(c, acc_col, tl * 0.9 * tr * step(0.003, I));
-	COLOR = vec4(c, mix(u_bg, 1.0, clamp(ink * core * 2.0, 0.0, 1.0)) * u_alpha);
+	float alpha = mix(u_bg, 1.0, clamp(ink * core * 2.0, 0.0, 1.0));
+	// el punto: el brillo de lo que queda justo delante; al crecer, el color medio de toda la línea
+	if (u_squeeze > 0.5) {
+		vec3 c0 = texture(t_data, vec2(0.5, rc)).rgb; float I0 = texture(t_data, vec2(0.5, ri)).r;
+		vec3 avg = vec3(0.0); float ai = 0.0;
+		for (int k = 0; k < 32; k++) {
+			float x = (float(k) + 0.5) / 32.0;
+			float ik = texture(t_data, vec2(x, ri)).r;
+			avg += texture(t_data, vec2(x, rc)).rgb * ik; ai += ik;
+		}
+		avg = ai > 0.001 ? avg / ai : bg_col; ai /= 32.0;
+		vec3 pc = mix(c0, avg, u_grow); float pi = mix(I0, ai * 1.6, u_grow);
+		float pink = pi > 0.003 ? 0.18 + 0.82 * pow(min(pi, 1.0), 0.8) : 0.0;
+		vec2 px = (UV - 0.5) * u_size;
+		float R = mix(7.0 * u_px, length(u_size) * 0.6, u_grow * u_grow);
+		float disk = 1.0 - smoothstep(R - 1.2, R + 1.2, length(px));
+		float ring = (1.0 - smoothstep(0.0, 1.4, abs(length(px) - R - 5.0 * u_px))) * (1.0 - u_grow);
+		float beat = 1.0 + 0.06 * sin(u_time * 0.8 * 6.2832) * u_grow;
+		vec3 dc = mix(bg_col, pc, pink) * beat;
+		float on = smoothstep(0.5, 0.9, u_squeeze);
+		c = mix(c, dc, disk * on);
+		c = mix(c, ink_col, ring * 0.14 * on);
+		alpha = mix(alpha, 1.0, max(disk, ring * 0.14) * on);
+	}
+	COLOR = vec4(c, alpha * u_alpha);
 }

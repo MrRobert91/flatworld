@@ -526,6 +526,42 @@
    "ch": 5,
    "title": "La fila de las mujeres",
    "text": "Las mujeres asisten al oficio en una fila lateral, de pie. Desde aquí arriba se ve lo que nadie ve desde dentro: todas menean la espalda al mismo compás, como un coro mudo."
+  },
+  {
+   "id": "m_c6_corto",
+   "ch": 6,
+   "title": "El súbdito más corto",
+   "text": "El varón más corto de la Línea está en su extremo oriental. Nunca ha visto a su vecino de delante: sólo a una mujer, que es un punto, y detrás de ella nada. Para él, el mundo acaba en una voz."
+  },
+  {
+   "id": "m_c6_leguas",
+   "ch": 6,
+   "title": "Mil leguas",
+   "text": "«Aunque los esposos disten mil leguas», dice el Rey. Desde la lámina se ve lo que significa: sus esposas están en los dos extremos de su reino, y él en medio, y nunca se han tocado."
+  },
+  {
+   "id": "m_c6_sombra",
+   "ch": 6,
+   "title": "Antes de entrar",
+   "text": "Aquí, a un paso de la Recta, el Cuadrado ya está a medio palmo del Rey. Y para el Rey no hay nada. Ni sombra, ni voz, ni rastro: lo que no corta su Línea no existe."
+  },
+  {
+   "id": "m_c7_reloj",
+   "ch": 7,
+   "title": "Los últimos granos",
+   "text": "El reloj de arena del salón. Lo vuelvo cada noche desde hace cuarenta años; esta noche deja caer los últimos granos del milenio. No sé por qué lo miro tanto."
+  },
+  {
+   "id": "m_c7_pisos",
+   "ch": 7,
+   "title": "3³ en tres pisos",
+   "text": "En la tablilla del nieto, a escondidas, un 3³ dibujado como tres cuadrados de tres por tres, uno encima de otro. «Pisos», ha escrito al lado. No ha podido dibujar el encima; ha puesto uno al lado del otro."
+  },
+  {
+   "id": "m_c7_puerta",
+   "ch": 7,
+   "title": "El vano del estudio",
+   "text": "Para llegar a la alacena hay que cruzar este vano, subir al estudio y girar la llave. El Forastero no hizo ni lo uno ni lo otro: la llave sigue en mi bolsillo."
   }
  ],
  "achievements": {
@@ -536,6 +572,103 @@
   "ACH_GATE_P": "Ojo de Colegio",
   "ACH_HOME": "A casa por la lluvia",
   "ACH_TRIBUNAL": "Tribunal del Colegio",
-  "ACH_HYMN": "Una sola voz"
+  "ACH_HYMN": "Una sola voz",
+  "ACH_KING": "Línea de Líneas",
+  "ACH_WED": "Las tres voces",
+  "ACH_SPHERE": "La raíz de tres cuartos"
+ },
+ "ledger": {
+  "cols": [
+   {
+    "id": "0d",
+    "name": "Puntolandia",
+    "sub": "0D"
+   },
+   {
+    "id": "1d",
+    "name": "Linealandia",
+    "sub": "1D"
+   },
+   {
+    "id": "2d",
+    "name": "Planilandia",
+    "sub": "2D"
+   },
+   {
+    "id": "3d",
+    "name": "Espaciolandia",
+    "sub": "3D"
+   },
+   {
+    "id": "4d",
+    "name": "¿?",
+    "sub": "4D"
+   }
+  ],
+  "rows": [
+   {
+    "id": "habitante",
+    "name": "Habitante"
+   },
+   {
+    "id": "ve",
+    "name": "Cómo ve"
+   },
+   {
+    "id": "limites",
+    "name": "Límites"
+   },
+   {
+    "id": "no_concibe",
+    "name": "Lo que no puede concebir"
+   },
+   {
+    "id": "rechazo",
+    "name": "Su frase de rechazo"
+   },
+   {
+    "id": "desde_arriba",
+    "name": "Qué ve quien llega de arriba"
+   }
+  ],
+  "cells": {
+   "0d.habitante": "el Punto",
+   "0d.ve": "nada fuera de sí",
+   "0d.limites": "0",
+   "0d.no_concibe": "el Dos",
+   "0d.rechazo": "«Ello inventa palabras sin objeto»",
+   "0d.desde_arriba": {
+    "anim": "voice_inside"
+   },
+   "1d.habitante": "el Rey",
+   "1d.ve": "un punto",
+   "1d.limites": "2 puntos",
+   "1d.no_concibe": "el costado",
+   "1d.rechazo": "«Eso es un truco de mago»",
+   "1d.desde_arriba": {
+    "anim": "lineland_point"
+   },
+   "2d.habitante": "el Cuadrado",
+   "2d.ve": "una línea",
+   "2d.limites": "4 lados",
+   "2d.no_concibe": "el Arriba",
+   "2d.rechazo": "«¿Cómo va a moverse algo hacia Arriba y no hacia el Norte?»",
+   "2d.desde_arriba": {
+    "anim": "circle_grow"
+   },
+   "3d.habitante": "la Esfera",
+   "3d.ve": "una superficie con luz y sombra",
+   "3d.limites": "6 caras",
+   "3d.no_concibe": "la Cuarta",
+   "3d.rechazo": "«Visiones del cerebro»",
+   "3d.desde_arriba": {
+    "anim": "?"
+   },
+   "4d.habitante": "?",
+   "4d.ve": "?",
+   "4d.limites": "8 cubos",
+   "4d.no_concibe": "?",
+   "4d.rechazo": "?"
+  }
  }
 }

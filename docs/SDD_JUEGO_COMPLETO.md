@@ -635,7 +635,7 @@ Rama `diseno-juego-completo`. Lo hecho, y en qué se aparta de lo especificado a
 | S-01 Entrada y mando | Hecho | Acciones en `sys/keys.gd` (no en `project.godot`); A/B también en `ui_accept`/`ui_cancel`. Menús, pausa, inventario y ajustes navegables con foco; las respuestas (`choose`) y los paneles (`panel`) con cruceta o stick y A. Glifos **de texto** (`ui/glyphs.gd`: «A», «Cruz», «RB»…); la fuente de iconos queda para M6. `Ch.tx(kb, touch, pad)` devuelve la plantilla con `{act}`, `{view}`, `{move}`… y la interfaz la rellena. Reasignación de teclas (no de mando) en Ajustes. `App.rumble`. Stick derecho: mirada libre y giro en el ojo. |
 | S-02 Estado v2, perfil, huecos | Hecho | Autoload `Profile` (`sys/profile.gd`). Escritura atómica (temporal + renombrar; en web, directa). Menú: Continuar, Nueva partida (elige hueco; los ocupados piden confirmación), Cargar partida, Capítulos (por perfil). `stats.play_s` cuenta el tiempo. `--auto` no lee ni escribe partidas (`--save` lo fuerza). |
 | S-03 Expediente y relaciones | Hecho | `g.note/record_top/record_text/rel/rel_of`; sin avisos en `rep()`/`her()`. Anotaciones enganchadas en III, IV y V; `hospital_miracle` y `estilete_en_poder` tienen texto pero esperan a `C8-04` y al X. La pestaña «Posición» pasa a ser **«Personas»** (siete relaciones con frase, `book.people`). |
-| S-07 Audio posicional | Hecho (solo posicional) | `AudioListener3D` en el ojo del Cuadrado; `Snd.sfx_at` con 8 reproductores 3D; subtítulos de sonido con dirección. El Grito de Paz ya es posicional donde suena hoy; el bucle por figura (`Ent.cry`) se añade con `C2-02` (M1). Leitmotivs y mono, en M3. |
+| S-07 Audio posicional | Hecho (solo posicional) | `AudioListener3D` en el ojo del Cuadrado; `Snd.sfx_at` con 8 reproductores 3D; subtítulos de sonido con dirección. El Grito de Paz ya es posicional donde suena hoy; el bucle por figura (`Ent.cry`) se añade con `C2-02` (M1). Leitmotivs y mono, en M3 (hechos, §9.6). |
 | S-08 Raíles y franjas | Hecho | `Cine.play` (llaves de foco/zoom o de cámara libre), `Cine.orbit` (para `P-03`), `ui/letterbox.gd` con «mantén para saltar». Reducir movimiento. Aún no lo usa ningún capítulo (prueba: `--cinetest`). |
 | S-09 Lectura | Hecho | Historial (pestaña, H/R3, pausa), velocidad de texto, avance automático, saltar lo leído (Ctrl/B), punto de tinta en las respuestas ya elegidas. La clave de una elección es el capítulo más un hash de sus textos. |
 | S-10 Localización | Infraestructura | `I18n.t()` dentro de `say/narrate/choose/note/panel/panel_info/objective/title/toast/chapter_tag` y en los nombres de quien habla. `book.json` → `book.es.json` (y `book.<lang>.json` opcional). `tools/extract_strings.py` (910 textos) y `--check`. `en.po` sin traducir (M6); `--lang=en` informa de cuántos textos faltan. |
@@ -673,7 +673,7 @@ Prólogo y capítulos I–III con las mejoras del diseño. Lo hecho y en qué se
 | C3-05 A casa sin lámina | Hecho | `minigames/orient.gd`, paleta `flat_night`, tirón del Sur (`g.pull`), lluvia a mitad de camino, la esposa grita en la puerta del Este, el criado llama a los 90 s. `ACH_HOME`. |
 | C3-06 Cena tarde | Hecho | Elección contar/callar; `rel nieto +1`. |
 | S-04 Marginalia | Hecho | 14 notas en Prólogo–III (`book.margins`): brillo de tinta a menos de 6 u, chispa en la línea del ojo, pluma (`s_quill`). Se leen en el Manuscrito, «Notas al margen». |
-| S-06 Lluvia en el ojo | Hecho | Hasta 64 gotas como dos trazos cortos (en la caída y de través). Las lentes `point` y `flood`, en M3. |
+| S-06 Lluvia en el ojo | Hecho | Hasta 64 gotas como dos trazos cortos (en la caída y de través). Las lentes `point` y `flood`, en M3 (hechas, §9.6). |
 | Logros | Local | `g.achieve` guarda en el perfil y avisa; la subida a Steam llega con `Platform` (M6). |
 
 Efectos nuevos (`tools/make_audio.py --extra`, en WAV porque no requiere ffmpeg): `lock`, `quill`, `compress`, `chime`, `hum`. Pruebas: `-- --test` (130 comprobaciones, incluida la de que todo id de nota, anotación y logro tenga texto), las cuatro pasadas `--auto` y el autómata. Parámetros nuevos para probar: `--until=N` (para después del capítulo N), `--botdt=s` (autómata más lento, para capturas) y `--noframe`.
@@ -692,7 +692,7 @@ Capítulos IV y V con las mejoras del diseño:
 | C4-06 Tres planos | Hecho | Sin `Cine.play`: el foco va a los artesanos, a las mujeres (que giran de punta hacia los soldados) y, según la elección, a ellas o a los presos. |
 | C4-07 Patrones | Hecho | `shaders/pattern.gdshaderinc`: 8 rayados, elegidos por el **tono** del color (no hace falta etiquetar nada). En la lámina, `Ent.build` añade una banda rayada junto a cada lado pintado; en la línea del ojo, el rayado se superpone a la tinta. Ajuste «Colores con patrón» (activado por defecto). |
 | C4-08 Silencio | Hecho | 12 s sin música con lluvia; luego el color se va lado a lado. |
-| C5-01 Hermano | Hecho | En la fila de los Profesionales; conversación antes del oficio; si susurras, te pisa el lado («Aquí no, hermano») y `rel hermano −1`. El leitmotiv queda para M3. |
+| C5-01 Hermano | Hecho | En la fila de los Profesionales; conversación antes del oficio; si susurras, te pisa el lado («Aquí no, hermano») y `rel hermano −1`. El leitmotiv llega en M3. |
 | C5-02 Cántico | Hecho | `minigames/hymn.gd` (M-06). 0 aciertos → `temple_silent`; 3–4 → el coro; 4 → `ACH_HYMN`. Sustituye a «(Mover la boca sin voz)». |
 | C5-03 Medición | Hecho | El arco de 60° se dibuja en el vértice del niño (1,5 s). |
 | C5-04 La excusa | Hecho, con cambio | Al **empezar** el capítulo (por la mañana, en casa), para que el novicio pueda referirse a lo que hiciste (`flags.excusa`). La tercera opción es un minijuego: girar la mitad suelta hasta que encaje (6°), 15 s como máximo. |
@@ -700,6 +700,32 @@ Capítulos IV y V con las mejoras del diseño:
 | C5-06 Puente | Hecho | El Cuadrado dibuja una Línea en su tablilla y el fundido va al papel lila del sueño; el fundido vuelve solo al papel de siempre al desaparecer. |
 
 Notas al margen: 7 más (pasquín, vitrina, poema, examen, ujier, tablas de lados, fila de las mujeres). `--try=` admite `exam`, `woman`, `hymn` y `mend`.
+
+### 9.6 Estado: M3 implementado
+
+Capítulos VI y VII, con los sistemas que necesitan:
+
+| Id | Estado | Notas |
+|---|---|---|
+| S-05 Tabla de analogías | Hecho (adelantado) | No estaba asignado a ningún hito y el VI y el VII lo llaman. `g.ledger(celda)` y pestaña «Analogías» del inventario: 6 filas × 5 mundos (29 casillas, textos en `book.ledger`). Las nuevas se escriben con pluma al abrir la pestaña; la fila «desde arriba» son dibujos en bucle (`LedgerAnim`, con `_draw()`, sin `SubViewport`). |
+| S-06 Lentes | Hecho | `Eye.lens` (`line`, `point`, `flood`) → `u_squeeze` y `u_grow` en `eye_view.gdshader`: la línea se encoge al centro en 1,2 s; el punto crece hasta la pantalla con el color medio de 32 muestras y un latido. `Game.lenses` (por mundo; `set_map` lo restablece) y `Game.eye_src`: la lente `king` mira **desde el Rey**, por su Recta. `flood` queda lista para el IX. |
+| S-07 Mono y leitmotivs | Hecho | `AudioEffectStereoEnhance` en `Master` (`pan_pullout = 1 − v`): `Snd.mono(on)`, `Snd.mono_mix(v)`. `Snd.motif(nombre, inst, invert, detune)` cuadrado con el pulso del ánimo; suenan el del nieto (VII), el de la Esfera (VII, invertido al reaparecer) y el del hermano (V). Pendiente de comprobar con auriculares que el mono es real en el ejecutable de escritorio. |
+| S-11 Pizarra de dibujo | Hecho | `ui/draw_board.gd` (`DrawBoard`, hereda de `SlateBoard`), con ratón, dedo o stick + imán; `ui.draw_board(show, cap)`. `sys/sketch.gd → Sketch.classify` (cubo, hexágono, cuadrado, vacío, otro) con 6 pruebas; lo usará el X. |
+| S-12 (2D) | Hecho | `sys/geom3.gd`: `line_section`, `line_len`, `sphere_section`, con pruebas. Lo 3D, en M4. |
+| C6-01 Ojo del Rey | Hecho | 7 s forzados, después la línea y la frase del «alivio»; la lente queda en el botón de vista durante el capítulo. Como en la Recta todo se ve de punta (y un segmento de punta no ocupa nada en la línea), con la lente `point` `Eye.cast` añade el extremo más cercano de cada habitante como un trazo mínimo. Casillas `1d.ve` y `2d.ve`. |
+| C6-02 Oído | Hecho, con cambio | `minigames/voice_length.gd` (M-08). Va en la pregunta «¿Cómo veis?», donde el Rey habla de las voces, y no antes del matrimonio. Se elige el más corto y, de los otros dos, el más largo (en vez de arrastrar), con «Otra vez». Con subtítulos de sonido, el intervalo se ve como «♪ ··· ♪». |
+| C6-03 Tu sección | Hecho | `minigames/line_section.gd` (M-07): regla cada 0,25 u, dos muescas rojas, mantener 0,6 s; 45 s por reto y pista de la Lógica a los 15 s. Para que los largos tengan referencia en la Línea, m3 mide ahora la diagonal (r 0,78) y m4 el lado (r 0,55). `ACH_KING`, `flags.king_sections`, `1d.desde_arriba`. |
+| C6-04 Armonía | Hecho | `minigames/harmony.gd` (M-09). Tolerancia de **12** centésimas (25 en relajado) en vez de 8, que con el stick resultaba imposible; la pizarra muestra tres cuerdas que tiemblan según la aspereza. Al casar: acorde y tres puntos nuevos. `ACH_WED`. |
+| C6-05 Mono | Hecho | Todo el capítulo en mono; al salir de la Línea, el panorama vuelve a medias durante 2 s. |
+| C6-06 Huida | Hecho, con cambio | Para que la huida tenga sentido, el Cuadrado vuelve a entrar en la Línea antes de «¡Guerra al intruso!». Los súbditos corren hacia los extremos de la sección; el primero que la toca pincha (`hurt 0,25`). Se escapa con `|y| > 2`. |
+| C7-01 Pizarra | Hecho | El jugador traza el 3×3 en una rejilla de 4×4 (vale cualquier trazo que cubra las 24 aristas unidad); 90 s y, si no, la animación de siempre. En 3³, modo `reject`: termina tras dos intentos rechazados o 25 s. |
+| C7-02 Sección de la Esfera | Hecho | `minigames/sphere_predict.gd` (M-10), con círculos dibujados (`OptCard.circle`) y el tamaño actual punteado. Distractores: `1 − h` y `1 − h²` (con h = 0,5, `h` y `1 − h` coincidían). `ACH_SPHERE`, `2d.desde_arriba`, y la línea de `asombro` si `king_sections ≥ 2`. |
+| C7-03 Tabla | Hecho | Cuatro casillas (Cuadrado y Cubo, puntos y lados) que se rellenan con fichas numéricas; la del Cubo se ilumina. Tras dos fallos, la Esfera da el número. Casillas `1d/2d/3d.limites`. |
+| C7-04 Alacena | Hecho | `go_to` a la alacena, llave mantenida (`Ch._hold`, que pasa de `ChA` a `Ch`), dos cofres y una tablilla; la Lógica sólo dice «…» con un trazo de tiza roto. Después, vuelta al salón. |
+| C7-05 Toque | Hecho | 3 s, entrañas visibles, seis chispas *dentro* del Cuadrado, vibración. |
+| C7-06 Ritmo | Hecho | Dos «Gírate hacia la voz» (`eye.sees('esfera')`) tras las reapariciones de la Esfera. |
+
+Notas al margen: 6 más (el súbdito más corto, mil leguas, antes de entrar, el reloj de arena, 3³ en tres pisos, el vano del estudio). `--try=` admite `kingview`, `section`, `ear`, `harmony`, `square`, `cube`, `sphere`, `table` y `cupboard`.
 
 ---
 
