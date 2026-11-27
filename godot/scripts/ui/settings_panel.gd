@@ -53,6 +53,11 @@ func _main() -> void:
 	_add(ui.T("Avance automático: ") + _yn(C.auto_adv), _toggle("auto_adv"))
 	_add(ui.T("Subtítulos de sonido: ") + _yn(C.get("sound_captions", true)), func(_b): C.sound_captions = not bool(C.get("sound_captions", true)); App.save_cfg(); _main())
 	_add(ui.T("Reducir movimiento: ") + _yn(C.reduce_motion), _toggle("reduce_motion"))
+	_add(ui.T("Colores con patrón: ") + _yn(C.get("patterns", true)), func(_b):
+		C.patterns = not bool(C.get("patterns", true)); App.save_cfg()
+		if App.g != null:
+			for e in App.g.world.ents.values(): e.build()
+		_main())
 	var di := DIFF.find(String(C.get("difficulty", "normal")))
 	_add(ui.T("Deducciones: ") + ui.T(DIFF_NAME[maxi(di, 1)]), func(_b): C.difficulty = DIFF[(maxi(di, 1) + 1) % 3]; App.save_cfg(); _main())
 	var si := SENS.find(float(C.get("look_sens", 1.0)))

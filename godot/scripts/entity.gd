@@ -115,6 +115,13 @@ func build() -> void:
 		mb.quad(Vector2(-0.07, 0), Vector2(0.07, 0), 0.02, 0.016, Color(edge_col, 0.55))
 		mb.quad(Vector2(0, -0.07), Vector2(0, 0.07), 0.02, 0.016, Color(edge_col, 0.55))
 	mb.ring(pts, 0.06 if woman else 0.07, 0.02, sides, edge_col, 1.0)
+	# colores con patrón (C4-07): junto a cada lado pintado, una banda con el rayado de su tono
+	if sides != null and not woman and bool(App.cfg.get("patterns", true)):
+		var np2 := pts.size()
+		for i in np2:
+			var a: Vector2 = pts[i]; var b: Vector2 = pts[(i + 1) % np2]
+			var k := 0.58 if np2 < 20 else 0.8
+			mb.fan([a, b, b * k, a * k], 0.016, sides[i % sides.size()], Vector2(-1.0, 7.0))
 	if woman:
 		mb.disc(Vector2(pts[0].x, 0), 0.085, 0.03, edge_col)
 		mb.disc(Vector2(-pts[0].x, 0), 0.05, 0.03, edge_col)

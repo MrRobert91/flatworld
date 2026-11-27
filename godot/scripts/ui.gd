@@ -517,6 +517,8 @@ func _process(dt: float) -> void:
 	if fade_r.color.a != _fade_to:
 		fade_r.color.a = move_toward(fade_r.color.a, _fade_to, dt * _fade_sp)
 	fade_r.visible = fade_r.color.a > 0.001
+	# un fundido de otro color (el papel de calco del sueño, C5-06) vuelve al papel de siempre al desaparecer
+	if not fade_r.visible and fade_r.color.r8 != 230: fade_r.color = Color(Color("e6dec8"), 0.0)
 	if size.x < 640:
 		# fila 1: capítulo y objetivo; fila 2: la tira del ojo
 		hud_card.reset_size()

@@ -12,6 +12,7 @@ var img: Image
 var tex: ImageTexture
 var fov := 1.75
 var trace := 0.0
+var desat := 0.0         # la línea en gris (C4-03)
 var _cpu := []           # segmentos relativos al ojo, para consultas puntuales: [ax, ay, bx, by, id]
 var _facing := 0.0
 
@@ -112,6 +113,8 @@ func cast(W: World, exclude, ox: float, oy: float, facing: float, fog: float) ->
 	view_mat.set_shader_parameter("ink_col", World._v3(W.pal.edge))
 	view_mat.set_shader_parameter("acc_col", World._v3(W.pal.acc))
 	view_mat.set_shader_parameter("u_dark", 1.0 if dark else 0.0)
+	view_mat.set_shader_parameter("u_desat", desat)
+	view_mat.set_shader_parameter("u_patterns", 1.0 if bool(App.cfg.get("patterns", true)) else 0.0)
 
 func _put(k: int, ax: float, ay: float, bx: float, by: float, c: Color, lum: float, near: float, fig: float) -> void:
 	var o := k * 4; var row := N * 4; var row2 := N * 8

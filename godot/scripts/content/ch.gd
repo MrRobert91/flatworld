@@ -101,9 +101,11 @@ func town(open := {}) -> Dictionary:
 #      arc (llega en curva), next (clase de la figura que espera en la cola), trace (forzar/quitar la traza),
 #      ok (Callable ans -> bool), split (s de plano partido antes de responder, C3-03)
 const BOW := {id = 'bow', label = 'Inclinarse', sub = 'ante un Círculo'}
+const YIELD := {id = 'yield', label = 'Ceder el paso', sub = 'a una Mujer'}
 
 func _sight_def(kind: String, o := {}) -> Dictionary:
 	var big := {r = 1.45}
+	if kind.begins_with('poli'): return F_poli('_s', 0, 0, int(kind.substr(4)), {r = 1.45, name = 'un Polígono'})
 	match kind:
 		'mujer': return F_mujer('_s', 0, 0, {r = 1.5})
 		'iso': return F_iso('_s', 0, 0, o.get('deg', 12.0), big)
@@ -128,7 +130,7 @@ func sight_round(kind: String, o := {}):
 	d.id = '_s' if o.get('keep', false) else '_s%d' % _sn
 	var sid: String = d.id
 	if o.get('cloak', false): d.noEye = true; d.lum = 0.55
-	var far := 15.0; var near: float = o.get('near', 3.4)
+	var far: float = o.get('far', 15.0); var near: float = o.get('near', 3.4)
 	var side := dir + PI / 2
 	var sx := (cos(side) * 5.0 if o.get('arc', false) else 0.0); var sy := (sin(side) * 5.0 if o.get('arc', false) else 0.0)
 	d.x = p.x + cos(dir) * far + sx; d.y = p.y + sin(dir) * far + sy; d.rot = dir + PI + o.get('turn', 0.0)

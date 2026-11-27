@@ -115,7 +115,8 @@ func _try(name: String) -> void:
 	ui.hide_menu(); ui.fade_r.color.a = 0.0; ui._fade_to = 0.0
 	g.running = true
 	g.on_menu = func(): ui.toggle_pause(func(): get_tree().quit())
-	await (get_meta("keep")[0] as ChA).try_mini(name)
+	if name in ["exam", "woman", "hymn", "mend", "bridge"]: await (get_meta("keep")[1] as ChB).try_mini(name)
+	else: await (get_meta("keep")[0] as ChA).try_mini(name)
 	print("TRY OK ", name)
 	if App.args.has("quit"): get_tree().quit()
 

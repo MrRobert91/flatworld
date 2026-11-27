@@ -678,6 +678,29 @@ Prólogo y capítulos I–III con las mejoras del diseño. Lo hecho y en qué se
 
 Efectos nuevos (`tools/make_audio.py --extra`, en WAV porque no requiere ffmpeg): `lock`, `quill`, `compress`, `chime`, `hum`. Pruebas: `-- --test` (130 comprobaciones, incluida la de que todo id de nota, anotación y logro tenga texto), las cuatro pasadas `--auto` y el autómata. Parámetros nuevos para probar: `--until=N` (para después del capítulo N), `--botdt=s` (autómata más lento, para capturas) y `--noframe`.
 
+### 9.5 Estado: M2 implementado
+
+Capítulos IV y V con las mejoras del diseño:
+
+| Id | Estado | Notas |
+|---|---|---|
+| C4-01 Examen | Hecho | Mesa del tribunal en el Colegio (opcional): tres `sight_round` con `poli10/11/12` (nuevo), `far = 8.5`, en arco y girando. `ACH_TRIBUNAL` y nota «Tres años para esto». |
+| C4-02 Primer color | Hecho | Primer plano de 1,8 s y `Snd.chord_once` (Maj9 con arpa, cuerdas y campana). |
+| C4-03 Gris y color | Hecho | `Eye.desat` → `u_desat` en `eye_view.gdshader`; 6 s alternando dos veces. |
+| C4-04 ¿Mujer o Sacerdote? | Hecho | Tres figuras mitad rojas, mitad verdes, de canto; opciones `BOW` y `YIELD` (nueva). |
+| C4-05 Fraude | Hecho | La doncella se aparta si calas al Isósceles, y el narrador se corrige. |
+| C4-06 Tres planos | Hecho | Sin `Cine.play`: el foco va a los artesanos, a las mujeres (que giran de punta hacia los soldados) y, según la elección, a ellas o a los presos. |
+| C4-07 Patrones | Hecho | `shaders/pattern.gdshaderinc`: 8 rayados, elegidos por el **tono** del color (no hace falta etiquetar nada). En la lámina, `Ent.build` añade una banda rayada junto a cada lado pintado; en la línea del ojo, el rayado se superpone a la tinta. Ajuste «Colores con patrón» (activado por defecto). |
+| C4-08 Silencio | Hecho | 12 s sin música con lluvia; luego el color se va lado a lado. |
+| C5-01 Hermano | Hecho | En la fila de los Profesionales; conversación antes del oficio; si susurras, te pisa el lado («Aquí no, hermano») y `rel hermano −1`. El leitmotiv queda para M3. |
+| C5-02 Cántico | Hecho | `minigames/hymn.gd` (M-06). 0 aciertos → `temple_silent`; 3–4 → el coro; 4 → `ACH_HYMN`. Sustituye a «(Mover la boca sin voz)». |
+| C5-03 Medición | Hecho | El arco de 60° se dibuja en el vértice del niño (1,5 s). |
+| C5-04 La excusa | Hecho, con cambio | Al **empezar** el capítulo (por la mañana, en casa), para que el novicio pueda referirse a lo que hiciste (`flags.excusa`). La tercera opción es un minijuego: girar la mitad suelta hasta que encaje (6°), 15 s como máximo. |
+| C5-05 Gimnasio | Hecho | Rótulo del Gimnasio y pausa del novicio ante él si le preguntaste por sus lados. |
+| C5-06 Puente | Hecho | El Cuadrado dibuja una Línea en su tablilla y el fundido va al papel lila del sueño; el fundido vuelve solo al papel de siempre al desaparecer. |
+
+Notas al margen: 7 más (pasquín, vitrina, poema, examen, ujier, tablas de lados, fila de las mujeres). `--try=` admite `exam`, `woman`, `hymn` y `mend`.
+
 ---
 
 ## 10. Riesgos

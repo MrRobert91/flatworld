@@ -301,6 +301,13 @@ func _pos_step(dt: float) -> void:
 		a.stream = q[1]; a.position = q[2]; a.volume_db = q[3] + 4.0; a.pitch_scale = 1.0; a.play()
 	_queue_pos = keep
 
+# un acorde de una vez, que la música no ha tocado nunca (el primer color, C4-02)
+func chord_once(root := 60, kind := [0, 4, 7, 11, 14]) -> void:
+	for k in kind.size():
+		note("harp", root + kind[k], 2.0, k * 0.07, false)
+		note("strings", root - 12 + kind[k], -2.0, 0.0, false)
+	note("bell", root + 24, -4.0, 0.4, false)
+
 # zumbido continuo (la lámpara de la mesa del lector)
 var _hum_p: AudioStreamPlayer
 func hum(on: bool) -> void:

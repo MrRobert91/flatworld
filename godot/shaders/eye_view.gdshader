@@ -2,10 +2,13 @@
 // Más tinta = más cerca. Los vértices dejan una marca leve; los muros llevan un rayado fino;
 // debajo, una regla graduada en grados y, cuando se ha aprendido, el perfil de claridad.
 shader_type canvas_item;
+#include "res://shaders/pattern.gdshaderinc"
 uniform sampler2D t_data : filter_linear, repeat_disable;
 uniform float u_half = 0.03; uniform float u_bg = 1.0; uniform float u_alpha = 1.0;
 uniform float u_trace = 0.0; uniform float u_time = 0.0; uniform float u_strip = 0.0;
 uniform float u_flip = 0.0; uniform float u_dark = 0.0; uniform float fov_tan = 1.2; uniform float u_px = 1.0;
+uniform float u_patterns = 1.0;   // rayado por tono en la línea (C4-07)
+uniform float u_desat = 0.0;      // la línea en gris (C4-03: lo que se ganó con el Color)
 uniform vec3 bg_col = vec3(0.925, 0.894, 0.812);
 uniform vec3 ink_col = vec3(0.09, 0.13, 0.17);
 uniform vec3 acc_col = vec3(0.66, 0.22, 0.16);
@@ -14,6 +17,9 @@ void fragment() {
 	vec2 uv = vec2(UV.x, 1.0 - UV.y);
 	float rc = mix(0.25, 0.75, u_flip); float ri = 1.0 - rc;
 	vec3 col = texture(t_data, vec2(uv.x, rc)).rgb;
+	float sat0 = pat_sat(col);
+	int pk = pat_index(pat_hue(col));
+	col = mix(col, vec3(dot(col, vec3(0.3, 0.59, 0.11))), u_desat);
 	vec3 inf = info_at(uv.x, ri);
 	float tx = 1.0 / 1024.0;
 	vec3 a = info_at(uv.x - tx * 1.6, ri); vec3 b = info_at(uv.x + tx * 1.6, ri);
@@ -34,6 +40,9 @@ void fragment() {
 	ink = mix(ink, min(1.0, ink * 1.25 + 0.16), crease * 0.8);
 	ink *= 1.0 - sil * 0.85;
 	vec3 c = mix(bg_col, col, ink * core);
+	// cada tono, con su rayado: el color nunca es la única pista
+	float pm = pat_mask(FRAGCOORD.xy / (4.0 * u_px), pk) * step(0.3, sat0) * (1.0 - u_desat) * u_patterns;
+	c = mix(c, c * 0.45, pm * 0.6 * ink * core);
 	// la línea del horizonte, apenas un trazo de lápiz
 	float hl = 1.0 - smoothstep(0.0, fwidth(uv.y) * 1.2, abs(uv.y - 0.5));
 	c = mix(c, ink_col, hl * 0.16 * (1.0 - ink * core));

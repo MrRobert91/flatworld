@@ -20,6 +20,18 @@ msgstr ""
 msgid "ante un Círculo"
 msgstr ""
 
+#: scripts/content/ch.gd:104
+msgid "Ceder el paso"
+msgstr ""
+
+#: scripts/content/ch.gd:104
+msgid "a una Mujer"
+msgstr ""
+
+#: scripts/content/ch.gd:108
+msgid "un Polígono"
+msgstr ""
+
 #: scripts/content/ch.gd:11
 msgid "Obrero Isósceles"
 msgstr ""
@@ -28,7 +40,7 @@ msgstr ""
 msgid "Médico Pentágono"
 msgstr ""
 
-#: scripts/content/ch.gd:115 scripts/content/ch_a.gd:604
+#: scripts/content/ch.gd:117 scripts/content/ch_a.gd:604
 msgid "Irregular"
 msgstr ""
 
@@ -48,7 +60,7 @@ msgstr ""
 msgid "Estudiante"
 msgstr ""
 
-#: scripts/content/ch.gd:14 scripts/content/ch_b.gd:65
+#: scripts/content/ch.gd:14 scripts/content/ch_b.gd:69
 msgid "Cromatistes"
 msgstr ""
 
@@ -72,7 +84,7 @@ msgstr ""
 msgid "Círculo joven"
 msgstr ""
 
-#: scripts/content/ch.gd:160 scripts/content/ch_a.gd:386
+#: scripts/content/ch.gd:162 scripts/content/ch_a.gd:386
 msgid "Grito de Paz"
 msgstr ""
 
@@ -84,20 +96,16 @@ msgstr ""
 msgid "El padre Isósceles"
 msgstr ""
 
-#: scripts/content/ch.gd:172 scripts/content/ch.gd:178 scripts/content/ch_a.gd:603
+#: scripts/content/ch.gd:174 scripts/content/ch.gd:180 scripts/content/ch_a.gd:603
 msgid "Reconocimiento por la vista"
 msgstr ""
 
-#: scripts/content/ch.gd:172
+#: scripts/content/ch.gd:174
 msgid "¿Qué figura se acerca? Observa cómo se apagan sus extremos en la niebla."
 msgstr ""
 
-#: scripts/content/ch.gd:176
-msgid "Mira otra vez cómo caen los extremos: deprisa, ángulo agudo; despacio, muchos lados. Y si no cae nada, inclínate."
-msgstr ""
-
 #: scripts/content/ch.gd:178
-msgid "¿Qué figura se acerca?"
+msgid "Mira otra vez cómo caen los extremos: deprisa, ángulo agudo; despacio, muchos lados. Y si no cae nada, inclínate."
 msgstr ""
 
 #: scripts/content/ch.gd:18
@@ -108,20 +116,8 @@ msgstr ""
 msgid "El Forastero"
 msgstr ""
 
-#: scripts/content/ch.gd:188
-msgid "Cierto: %s. *La lámina te lo confirma.*"
-msgstr ""
-
-#: scripts/content/ch.gd:189
-msgid "No: era %s %s. *Mírala desde arriba y compara con la línea.*"
-msgstr ""
-
-#: scripts/content/ch.gd:189
-msgid "una"
-msgstr ""
-
-#: scripts/content/ch.gd:189
-msgid "un"
+#: scripts/content/ch.gd:180
+msgid "¿Qué figura se acerca?"
 msgstr ""
 
 #: scripts/content/ch.gd:19
@@ -130,6 +126,22 @@ msgstr ""
 
 #: scripts/content/ch.gd:19
 msgid "El Presidente del Consejo"
+msgstr ""
+
+#: scripts/content/ch.gd:190
+msgid "Cierto: %s. *La lámina te lo confirma.*"
+msgstr ""
+
+#: scripts/content/ch.gd:191
+msgid "No: era %s %s. *Mírala desde arriba y compara con la línea.*"
+msgstr ""
+
+#: scripts/content/ch.gd:191
+msgid "una"
+msgstr ""
+
+#: scripts/content/ch.gd:191
+msgid "un"
 msgstr ""
 
 #: scripts/content/ch.gd:20
@@ -280,7 +292,7 @@ msgstr ""
 msgid "tu hija"
 msgstr ""
 
-#: scripts/content/ch_a.gd:125 scripts/content/ch_a.gd:693 scripts/content/ch_c.gd:120 scripts/content/ch_d.gd:244
+#: scripts/content/ch_a.gd:125 scripts/content/ch_a.gd:693 scripts/content/ch_b.gd:286 scripts/content/ch_b.gd:616 …
 msgid "tu nieto menor"
 msgstr ""
 
@@ -1164,7 +1176,7 @@ msgstr ""
 msgid "Las clases bajas tienen la garganta más hábil que nosotros. El oído, solo, no es de fiar."
 msgstr ""
 
-#: scripts/content/ch_a.gd:525 scripts/content/ch_b.gd:108 scripts/content/ch_b.gd:145 scripts/content/ch_c.gd:199
+#: scripts/content/ch_a.gd:525 scripts/content/ch_b.gd:126 scripts/content/ch_b.gd:171 scripts/content/ch_c.gd:199
 msgid "Escuchar"
 msgstr ""
 
@@ -1556,7 +1568,7 @@ msgstr ""
 msgid "línea"
 msgstr ""
 
-#: scripts/content/ch_a.gd:714
+#: scripts/content/ch_a.gd:714 scripts/content/ch_b.gd:599
 msgid "Prueba · "
 msgstr ""
 
@@ -1588,144 +1600,144 @@ msgstr ""
 msgid "Escribir"
 msgstr ""
 
-#: scripts/content/ch_b.gd:106
-msgid "el tribuno"
+#: scripts/content/ch_b.gd:104
+msgid "Nadie tropezaba contigo. Nadie tenía que palparte ni calcular tus ángulos: te *veían*. En dos generaciones no quedaba figura sin pintar, salvo las Mujeres y los Sacerdotes, que no tienen lados."
 msgstr ""
 
 #: scripts/content/ch_b.gd:107
-msgid "un Sacerdote"
+msgid "Míralo con el ojo de un planilandés. Ya no es una raya gris: cada cual lleva su clase a la vista. Fue la infancia del Arte. Inmoral, anárquica… y bellísima."
 msgstr ""
 
-#: scripts/content/ch_b.gd:108
-msgid "Años después. Escucha al tribuno, junto a la Tribuna"
-msgstr ""
-
-#: scripts/content/ch_b.gd:109
-msgid "¡Ciudadanos de todos los ángulos! ¿Quién sigue sin color en Planilandia? ¡Ellos! Los Círculos, que nos gobiernan. Y ellas, que no tienen voto ni lados."
-msgstr ""
-
-#: scripts/content/ch_b.gd:110
-msgid "Proyecto de Ley del Color Universal: ¡que todos se pinten! Y como ni mujeres ni sacerdotes tienen lados, sea roja la mitad de cada cual que lleva el ojo y la boca, y verde la otra mitad."
-msgstr ""
-
-#: scripts/content/ch_b.gd:114
-msgid "Piensa lo que eso significa visto *de canto*. Una mujer: línea mitad roja, mitad verde. Un sacerdote: línea mitad roja, mitad verde."
-msgstr ""
-
-#: scripts/content/ch_b.gd:115
-msgid "¡Cualquier mujer podrá ser tomada por un Círculo, y tratada como tal! ¡Y cualquier Círculo, por una mujer! ¿Quién se opondrá? ¿Vuestras esposas?"
-msgstr ""
-
-#: scripts/content/ch_b.gd:116
-msgid "Era diabólico, y era brillante. Lo ideó un Círculo Irregular, a quien una indulgencia insensata perdonó la vida de niño. Las mujeres apoyaron la Ley en masa. Tres años estuvo el Estado al borde del abismo."
+#: scripts/content/ch_b.gd:112
+msgid "Ahora lo ves todo a la primera. Tú, que tardaste años en el Colegio."
 msgstr ""
 
 #: scripts/content/ch_b.gd:117
-msgid "(Gritar con la multitud.) ¡Color para todos!"
-msgstr ""
-
-#: scripts/content/ch_b.gd:117
-msgid "(Callar.) Esto acabará en sangre."
-msgstr ""
-
-#: scripts/content/ch_b.gd:117
-msgid "(Abuchear.) ¡Demagogo irregular!"
-msgstr ""
-
-#: scripts/content/ch_b.gd:118
-msgid "¡Color! ¡Color! ¡Color!"
-msgstr ""
-
-#: scripts/content/ch_b.gd:119
-msgid "(Te empujan. Aquí eres minoría.)"
+msgid "Pero si un soldado se pinta como un noble, ¿en qué se distinguen? El Reconocimiento por la Vista dejó de estudiarse. Y los de abajo empezaron a decir, cada vez con más razón, que eran iguales a los de arriba."
 msgstr ""
 
 #: scripts/content/ch_b.gd:124
-msgid "Un ejército de Isósceles había vencido ya a los Polígonos. Entonces ocurrió, aquí mismo, en el mercado, un incidente pequeño. Míralo tú. Con el ojo."
+msgid "el tribuno"
+msgstr ""
+
+#: scripts/content/ch_b.gd:125
+msgid "un Sacerdote"
+msgstr ""
+
+#: scripts/content/ch_b.gd:126
+msgid "Años después. Escucha al tribuno, junto a la Tribuna"
+msgstr ""
+
+#: scripts/content/ch_b.gd:127
+msgid "¡Ciudadanos de todos los ángulos! ¿Quién sigue sin color en Planilandia? ¡Ellos! Los Círculos, que nos gobiernan. Y ellas, que no tienen voto ni lados."
+msgstr ""
+
+#: scripts/content/ch_b.gd:128
+msgid "Proyecto de Ley del Color Universal: ¡que todos se pinten! Y como ni mujeres ni sacerdotes tienen lados, sea roja la mitad de cada cual que lleva el ojo y la boca, y verde la otra mitad."
 msgstr ""
 
 #: scripts/content/ch_b.gd:132
-msgid "En el mercado"
-msgstr ""
-
-#: scripts/content/ch_b.gd:132
-msgid "Se te acerca alguien con doce colores y la voz redonda de un gran señor. ¿Qué es?"
+msgid "Piensa lo que eso significa visto *de canto*. Una mujer: línea mitad roja, mitad verde. Un sacerdote: línea mitad roja, mitad verde."
 msgstr ""
 
 #: scripts/content/ch_b.gd:133
-msgid "Dodecágono"
-msgstr ""
-
-#: scripts/content/ch_b.gd:133
-msgid "doce colores"
-msgstr ""
-
-#: scripts/content/ch_b.gd:133
-msgid "una cuña"
-msgstr ""
-
-#: scripts/content/ch_b.gd:133
-msgid "un noble menor"
+msgid "¡Cualquier mujer podrá ser tomada por un Círculo, y tratada como tal! ¡Y cualquier Círculo, por una mujer! ¿Quién se opondrá? ¿Vuestras esposas?"
 msgstr ""
 
 #: scripts/content/ch_b.gd:134
-msgid "Lo has calado: un Isósceles de cuatro grados, pintado con los doce colores de un Dodecágono."
+msgid "Era diabólico, y era brillante. Lo ideó un Círculo Irregular, a quien una indulgencia insensata perdonó la vida de niño. Las mujeres apoyaron la Ley en masa. Tres años estuvo el Estado al borde del abismo."
 msgstr ""
 
-#: scripts/content/ch_b.gd:134
-msgid "Era un Isósceles de cuatro grados, pintado con los doce colores de un Dodecágono. *El color miente mejor que la voz.*"
+#: scripts/content/ch_b.gd:135
+msgid "(Gritar con la multitud.) ¡Color para todos!"
+msgstr ""
+
+#: scripts/content/ch_b.gd:135
+msgid "(Callar.) Esto acabará en sangre."
+msgstr ""
+
+#: scripts/content/ch_b.gd:135
+msgid "(Abuchear.) ¡Demagogo irregular!"
 msgstr ""
 
 #: scripts/content/ch_b.gd:136
-msgid "Así engañó a una doncella, huérfana de un noble Polígono. Hubo boda. Cuando ella descubrió el fraude, se quitó la vida. La noticia corrió de casa en casa, y las mujeres empezaron a mirar la Ley con otros ojos."
+msgid "¡Color! ¡Color! ¡Color!"
 msgstr ""
 
-#: scripts/content/ch_b.gd:140
-msgid "Pantociclo"
+#: scripts/content/ch_b.gd:137
+msgid "(Te empujan. Aquí eres minoría.)"
 msgstr ""
 
 #: scripts/content/ch_b.gd:143
-msgid "un preso armado"
-msgstr ""
-
-#: scripts/content/ch_b.gd:145
-msgid "Asamblea extraordinaria. Acude ante el Círculo Supremo"
-msgstr ""
-
-#: scripts/content/ch_b.gd:147
-msgid "Ciudadanos. Los Círculos hemos decidido ceder. Aceptamos la Ley del Color. Sólo os pido, antes de votar, que me escuchéis una última vez."
-msgstr ""
-
-#: scripts/content/ch_b.gd:148
-msgid "Habló casi un día entero. Nadie supo después repetir sus frases, sólo lo que hicieron."
-msgstr ""
-
-#: scripts/content/ch_b.gd:149
-msgid "Artesanos: hoy vuestros hijos pueden nacer Equiláteros y subir. Cuando nada distinga a un noble de un obrero, ¿a qué subirán? Lo que ganáis en pintura lo perdéis en hijos."
-msgstr ""
-
-#: scripts/content/ch_b.gd:150
-msgid "Mujeres: recordad a la doncella del mercado. Con el Color, ningún honor de esposa está a salvo de un impostor de cuatro grados."
+msgid "Un ejército de Isósceles había vencido ya a los Polígonos. Entonces ocurrió, aquí mismo, en el mercado, un incidente pequeño. Míralo tú. Con el ojo."
 msgstr ""
 
 #: scripts/content/ch_b.gd:151
-msgid "(Mirar a las mujeres. Están girando.)"
-msgstr ""
-
-#: scripts/content/ch_b.gd:151
-msgid "(Mirar a los presos armados junto a la Tribuna.)"
-msgstr ""
-
-#: scripts/content/ch_b.gd:151
-msgid "(Gritar.) ¡Es una trampa!"
+msgid "una doncella"
 msgstr ""
 
 #: scripts/content/ch_b.gd:152
-msgid "Nadie te oye. Un día entero de discurso lo ha preparado todo; tu grito llega con un día de retraso."
+msgid "En el mercado"
+msgstr ""
+
+#: scripts/content/ch_b.gd:152
+msgid "Se te acerca alguien con doce colores y la voz redonda de un gran señor. ¿Qué es?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:153 scripts/content/ch_b.gd:552 scripts/content/ch_b.gd:553
+msgid "Dodecágono"
 msgstr ""
 
 #: scripts/content/ch_b.gd:153
-msgid "¡Antes la muerte que el Color!"
+msgid "doce colores"
+msgstr ""
+
+#: scripts/content/ch_b.gd:153
+msgid "una cuña"
+msgstr ""
+
+#: scripts/content/ch_b.gd:153
+msgid "un noble menor"
+msgstr ""
+
+#: scripts/content/ch_b.gd:154
+msgid "Lo has calado: un Isósceles de cuatro grados, pintado con los doce colores de un Dodecágono."
+msgstr ""
+
+#: scripts/content/ch_b.gd:154
+msgid "Era un Isósceles de cuatro grados, pintado con los doce colores de un Dodecágono. *El color miente mejor que la voz.*"
+msgstr ""
+
+#: scripts/content/ch_b.gd:160
+msgid "(En voz alta.) Señora: ése es un Isósceles de cuatro grados, pintado."
+msgstr ""
+
+#: scripts/content/ch_b.gd:161
+msgid "Ese día, en el teatro, la salvé. En la historia, no la salvó nadie."
+msgstr ""
+
+#: scripts/content/ch_b.gd:162
+msgid "Así engañó a una doncella, huérfana de un noble Polígono. Hubo boda. Cuando ella descubrió el fraude, se quitó la vida. La noticia corrió de casa en casa, y las mujeres empezaron a mirar la Ley con otros ojos."
+msgstr ""
+
+#: scripts/content/ch_b.gd:166
+msgid "Pantociclo"
+msgstr ""
+
+#: scripts/content/ch_b.gd:169
+msgid "un preso armado"
+msgstr ""
+
+#: scripts/content/ch_b.gd:171
+msgid "Asamblea extraordinaria. Acude ante el Círculo Supremo"
+msgstr ""
+
+#: scripts/content/ch_b.gd:173
+msgid "Ciudadanos. Los Círculos hemos decidido ceder. Aceptamos la Ley del Color. Sólo os pido, antes de votar, que me escuchéis una última vez."
+msgstr ""
+
+#: scripts/content/ch_b.gd:174
+msgid "Habló casi un día entero. Nadie supo después repetir sus frases, sólo lo que hicieron."
 msgstr ""
 
 #: scripts/content/ch_b.gd:18
@@ -1740,328 +1752,440 @@ msgstr ""
 msgid "teatro de la memoria · hace muchos siglos"
 msgstr ""
 
-#: scripts/content/ch_b.gd:180
-msgid "A una señal, las mujeres retrocedieron de punta sobre los soldados. Los artesanos las imitaron. Los presos tomaron las salidas. Los Isósceles, creyéndose traicionados, se revolvieron unos contra otros."
-msgstr ""
-
-#: scripts/content/ch_b.gd:181
-msgid "En media hora no quedaba ninguno. Ciento cuarenta mil, muertos por los ángulos de sus compañeros."
-msgstr ""
-
-#: scripts/content/ch_b.gd:187
-msgid "Después vinieron las purgas: todo Triángulo sospechoso, destruido sin medición. Y el Color quedó abolido. Hoy sólo un viviente conoce el secreto de fabricarlo: el Círculo Supremo."
-msgstr ""
-
-#: scripts/content/ch_b.gd:195
-msgid "Capítulo IV · El tiempo de los colores"
-msgstr ""
-
-#: scripts/content/ch_b.gd:196
-msgid "Abre el ojo. Habla con el archivero"
-msgstr ""
-
-#: scripts/content/ch_b.gd:197
-msgid "Ya está. Vuelve usted a ser una raya gris entre rayas grises. ¿Qué le ha parecido?"
+#: scripts/content/ch_b.gd:185
+msgid "Artesanos: hoy vuestros hijos pueden nacer Equiláteros y subir. Cuando nada distinga a un noble de un obrero, ¿a qué subirán? Lo que ganáis en pintura lo perdéis en hijos."
 msgstr ""
 
 #: scripts/content/ch_b.gd:198
-msgid "Que era hermoso. Y que nos lo quitaron."
-msgstr ""
-
-#: scripts/content/ch_b.gd:198
-msgid "Que el Color era una mentira peligrosa. Hicieron bien."
-msgstr ""
-
-#: scripts/content/ch_b.gd:198
-msgid "Que Pantociclo no convenció a nadie: los enfrentó."
-msgstr ""
-
-#: scripts/content/ch_b.gd:198
-msgid "requiere conocer las clases"
+msgid "Mujeres: recordad a la doncella del mercado. Con el Color, ningún honor de esposa está a salvo de un impostor de cuatro grados."
 msgstr ""
 
 #: scripts/content/ch_b.gd:199
-msgid "Baje la voz. …Sí. Yo también lo pienso, los días de lluvia."
+msgid "(Mirar a las mujeres. Están girando.)"
 msgstr ""
 
-#: scripts/content/ch_b.gd:200
-msgid "Eso dice el manual. Tiene usted buena memoria para los manuales."
+#: scripts/content/ch_b.gd:199
+msgid "(Mirar a los presos armados junto a la Tribuna.)"
 msgstr ""
 
-#: scripts/content/ch_b.gd:201
-msgid "Ah. Un Cuadrado que mira la mano y no la boca. Tenga cuidado con ese ojo, perito: aquí se premia ver ángulos, no ver *eso*."
+#: scripts/content/ch_b.gd:199
+msgid "(Gritar.) ¡Es una trampa!"
 msgstr ""
 
 #: scripts/content/ch_b.gd:202
-msgid "Mañana hay ceremonia en el Templo. Vaya. Conviene que lo vean a usted allí, después de lo de la Puerta."
+msgid "Todas de punta. Todas hacia un soldado. Nadie se lo ha mandado en voz alta."
 msgstr ""
 
-#: scripts/content/ch_b.gd:209
-msgid "Círculos"
+#: scripts/content/ch_b.gd:205
+msgid "Cuatro presos, armados, junto a las salidas. Alguien les ha abierto la celda esta mañana."
 msgstr ""
 
-#: scripts/content/ch_b.gd:209
-msgid "Nobleza"
+#: scripts/content/ch_b.gd:206
+msgid "Nadie te oye. Un día entero de discurso lo ha preparado todo; tu grito llega con un día de retraso."
 msgstr ""
 
-#: scripts/content/ch_b.gd:209
-msgid "Profesionales"
-msgstr ""
-
-#: scripts/content/ch_b.gd:209
-msgid "Equiláteros"
-msgstr ""
-
-#: scripts/content/ch_b.gd:214
-msgid "el Círculo oficiante"
-msgstr ""
-
-#: scripts/content/ch_b.gd:228
-msgid "Capítulo V"
-msgstr ""
-
-#: scripts/content/ch_b.gd:228
-msgid "Atiende a tu Configuración"
-msgstr ""
-
-#: scripts/content/ch_b.gd:228
-msgid "Donde los Círculos explican por qué nadie tiene la culpa, y a quién se castiga de todos modos."
-msgstr ""
-
-#: scripts/content/ch_b.gd:229
-msgid "El Templo de los Círculos. Tantos lados que desde dentro la pared parece no tener ninguno."
-msgstr ""
-
-#: scripts/content/ch_b.gd:230
-msgid "Entra en el Templo"
-msgstr ""
-
-#: scripts/content/ch_b.gd:231
-msgid "Cada clase tiene su fila; más cerca del altar cuantos más lados. Busca la tuya."
+#: scripts/content/ch_b.gd:208
+msgid "¡Antes la muerte que el Color!"
 msgstr ""
 
 #: scripts/content/ch_b.gd:235
-msgid "*Un ujier te cierra el paso con un ángulo muy educado.* «La fila de los Profesionales está detrás, caballero.»"
+msgid "A una señal, las mujeres retrocedieron de punta sobre los soldados. Los artesanos las imitaron. Los presos tomaron las salidas. Los Isósceles, creyéndose traicionados, se revolvieron unos contra otros."
 msgstr ""
 
 #: scripts/content/ch_b.gd:236
-msgid "Ocupa tu sitio en la fila de los Profesionales"
-msgstr ""
-
-#: scripts/content/ch_b.gd:240
-msgid "Hijos del Plano. Hay una sola ley, y cabe en cuatro palabras. Decidlas conmigo."
-msgstr ""
-
-#: scripts/content/ch_b.gd:241
-msgid "«Atiende a tu Configuración.»"
-msgstr ""
-
-#: scripts/content/ch_b.gd:241
-msgid "(Mover la boca sin voz.)"
-msgstr ""
-
-#: scripts/content/ch_b.gd:241
-msgid "(Susurrar.) ¿Y quién atiende a la del calderero?"
-msgstr ""
-
-#: scripts/content/ch_b.gd:242
-msgid "«ATIENDE A TU CONFIGURACIÓN.»"
-msgstr ""
-
-#: scripts/content/ch_b.gd:244
-msgid "El Pentágono de tu izquierda se ha apartado medio paso. Te ha oído."
-msgstr ""
-
-#: scripts/content/ch_b.gd:245
-msgid "Lo que sois, lo sois por vuestros ángulos. El ladrón Isósceles no elige robar: su vértice roba por él. No lo culpamos. No culpamos a nadie."
-msgstr ""
-
-#: scripts/content/ch_b.gd:246
-msgid "Y como él no puede evitar ser un daño para sus vecinos, el Magistrado no puede evitar hacerlo consumir. Así, sin culpa y sin rencor, todo queda en orden."
-msgstr ""
-
-#: scripts/content/ch_b.gd:247
-msgid "Sigue el razonamiento: si nadie es culpable, nadie merece castigo. Y sin embargo castigan. El silogismo cojea de un lado. Irregular, diríase."
-msgstr ""
-
-#: scripts/content/ch_b.gd:248
-msgid "Los llamamos Círculos, pero ninguno lo es. Son Polígonos de lados tan numerosos y pequeños que no se distinguen. Del Círculo Supremo se dice, por cortesía, que tiene diez mil. Palparlo para comprobarlo sería impensable."
-msgstr ""
-
-#: scripts/content/ch_b.gd:251
-msgid "el padre"
-msgstr ""
-
-#: scripts/content/ch_b.gd:251
-msgid "la madre"
-msgstr ""
-
-#: scripts/content/ch_b.gd:251
-msgid "el niño"
-msgstr ""
-
-#: scripts/content/ch_b.gd:253
-msgid "Hoy hay júbilo. A un obrero de cincuenta y nueve grados y medio le ha nacido un hijo. Que lo traigan."
-msgstr ""
-
-#: scripts/content/ch_b.gd:256
-msgid "La Junta Sanitaria y Social ha medido. Sesenta grados. Sesenta. Sesenta. Lo declaramos Regular: un Equilátero."
-msgstr ""
-
-#: scripts/content/ch_b.gd:257
-msgid "(Un murmullo de fila en fila. En la de los Isósceles, algo parecido a un sollozo de orgullo.)"
+msgid "En media hora no quedaba ninguno. Ciento cuarenta mil, muertos por los ángulos de sus compañeros."
 msgstr ""
 
 #: scripts/content/ch_b.gd:258
-msgid "Gracias, Reverencia. Gracias. Cien generaciones, y me ha tocado a mí verlo."
+msgid "Después vinieron las purgas: todo Triángulo sospechoso, destruido sin medición. Y el Color quedó abolido. Hoy sólo un viviente conoce el secreto de fabricarlo: el Círculo Supremo."
 msgstr ""
 
-#: scripts/content/ch_b.gd:260
-msgid "Un Regular no puede criarse entre puntas. Será adoptado por este Equilátero sin hijos. Padre: jura no volver a verlo."
+#: scripts/content/ch_b.gd:266
+msgid "Capítulo IV · El tiempo de los colores"
 msgstr ""
 
-#: scripts/content/ch_b.gd:261
-msgid "…Lo juro."
+#: scripts/content/ch_b.gd:267
+msgid "Abre el ojo. Habla con el archivero"
 msgstr ""
 
-#: scripts/content/ch_b.gd:262
-msgid "¿Adónde lo llevan? Esposo, ¿adónde llevan al niño?"
-msgstr ""
-
-#: scripts/content/ch_b.gd:263
-msgid "(Aplaudir con la asamblea.)"
-msgstr ""
-
-#: scripts/content/ch_b.gd:263
-msgid "(Bajar el ojo.)"
-msgstr ""
-
-#: scripts/content/ch_b.gd:263
-msgid "(En voz alta.) ¡Dejad al menos que la madre lo visite!"
+#: scripts/content/ch_b.gd:268
+msgid "Ya está. Vuelve usted a ser una raya gris entre rayas grises. ¿Qué le ha parecido?"
 msgstr ""
 
 #: scripts/content/ch_b.gd:269
-msgid "Aplaudí. Era un día de fiesta, y yo un ciudadano que sabía cuándo se aplaude."
+msgid "Que era hermoso. Y que nos lo quitaron."
+msgstr ""
+
+#: scripts/content/ch_b.gd:269
+msgid "Que el Color era una mentira peligrosa. Hicieron bien."
+msgstr ""
+
+#: scripts/content/ch_b.gd:269
+msgid "Que Pantociclo no convenció a nadie: los enfrentó."
+msgstr ""
+
+#: scripts/content/ch_b.gd:269
+msgid "requiere conocer las clases"
 msgstr ""
 
 #: scripts/content/ch_b.gd:270
-msgid "Miré al suelo, que en mi mundo es mirar a ninguna parte."
+msgid "Baje la voz. …Sí. Yo también lo pienso, los días de lluvia."
+msgstr ""
+
+#: scripts/content/ch_b.gd:271
+msgid "Eso dice el manual. Tiene usted buena memoria para los manuales."
 msgstr ""
 
 #: scripts/content/ch_b.gd:272
-msgid "El caballero de cuatro lados confunde la piedad con la Geometría. La madre lo habrá olvidado antes de la cena: su Configuración no retiene. ¿No es una misericordia?"
+msgid "Ah. Un Cuadrado que mira la mano y no la boca. Tenga cuidado con ese ojo, perito: aquí se premia ver ángulos, no ver *eso*."
 msgstr ""
 
 #: scripts/content/ch_b.gd:273
-msgid "¿Qué niño?"
-msgstr ""
-
-#: scripts/content/ch_b.gd:274
-msgid "No. Ha dicho «¿qué niño?» porque tres ujieres la están mirando."
-msgstr ""
-
-#: scripts/content/ch_b.gd:275
-msgid "Esa es la esperanza que sostiene a los de abajo: que un día les nazca un hijo que les quiten. Los Círculos la llaman válvula de seguridad."
-msgstr ""
-
-#: scripts/content/ch_b.gd:277
-msgid "Id en orden. Atended a vuestra Configuración."
+msgid "Mañana hay ceremonia en el Templo. Vaya. Conviene que lo vean a usted allí, después de lo de la Puerta."
 msgstr ""
 
 #: scripts/content/ch_b.gd:280
-msgid "un Círculo joven"
+msgid "Círculos"
 msgstr ""
 
-#: scripts/content/ch_b.gd:281
-msgid "Un Círculo joven te hace una seña junto a la salida"
+#: scripts/content/ch_b.gd:280
+msgid "Nobleza"
 msgstr ""
 
-#: scripts/content/ch_b.gd:282
-msgid "Lo he observado durante el oficio, Cuadrado. Tiene usted el perímetro inquieto. Pregunte: prefiero una duda dicha que una pensada."
+#: scripts/content/ch_b.gd:280
+msgid "Profesionales"
 msgstr ""
 
-#: scripts/content/ch_b.gd:286
-msgid "Si la falta es de la Configuración, ¿por qué reprendo a mi nieto?"
+#: scripts/content/ch_b.gd:280
+msgid "Equiláteros"
 msgstr ""
 
-#: scripts/content/ch_b.gd:287
-msgid "¿Por qué no se enseña a leer a las mujeres?"
+#: scripts/content/ch_b.gd:283
+msgid "Gimnasio Neoterapéutico"
 msgstr ""
 
 #: scripts/content/ch_b.gd:288
-msgid "¿Cuántos lados tiene usted, en verdad?"
+msgid "el Círculo oficiante"
 msgstr ""
 
-#: scripts/content/ch_b.gd:289
-msgid "Nada más, Reverencia."
+#: scripts/content/ch_b.gd:303 scripts/content/ch_d.gd:26 scripts/content/ch_d.gd:405
+msgid "tu hermano"
 msgstr ""
 
-#: scripts/content/ch_b.gd:294
-msgid "El pequeño Hexágono alegó que un cambio de temperatura fue demasiado para su perímetro. Que la culpa no era suya sino de su Configuración."
+#: scripts/content/ch_b.gd:305
+msgid "Capítulo V"
 msgstr ""
 
-#: scripts/content/ch_b.gd:295
-msgid "¿Y qué le respondió usted?"
+#: scripts/content/ch_b.gd:305
+msgid "Atiende a tu Configuración"
 msgstr ""
 
-#: scripts/content/ch_b.gd:296
-msgid "Que, en ese caso, una buena reprimenda le fortalecería la Configuración."
-msgstr ""
-
-#: scripts/content/ch_b.gd:297
-msgid "Je. Heterodoxo, pero práctico. Así gobernamos también nosotros, sólo que sin reírnos."
-msgstr ""
-
-#: scripts/content/ch_b.gd:299
-msgid "Hace trescientos años, el Círculo Supremo decretó que, siendo ellas pobres en Razón y ricas en Emoción, educarlas era malgastar la tablilla. Desde entonces no leen ni cuentan."
-msgstr ""
-
-#: scripts/content/ch_b.gd:300
-msgid "Y desde entonces tú hablas dos lenguas. Con ella: «amor», «deber», «piedad». Con ellos: «anticipación de beneficios», «necesidad». Dos idiomas, casi dos mentes."
-msgstr ""
-
-#: scripts/content/ch_b.gd:301
-msgid "Temo que esa doble carga sea excesiva para los jóvenes. Humildemente, pido que se reconsidere."
-msgstr ""
-
-#: scripts/content/ch_b.gd:301
-msgid "Una disposición sabia."
-msgstr ""
-
-#: scripts/content/ch_b.gd:302
-msgid "Humildemente anotado. No lo repita ante el oficiante: él no distingue una apelación de una sedición, y a veces tiene razón."
-msgstr ""
-
-#: scripts/content/ch_b.gd:303
-msgid "Eso decimos."
-msgstr ""
-
-#: scripts/content/ch_b.gd:306
-msgid "Qué pregunta tan de palpador. Unos cuatrocientos. Mi padre tenía trescientos cincuenta; entre nosotros no rige eso de un lado por generación."
+#: scripts/content/ch_b.gd:305
+msgid "Donde los Círculos explican por qué nadie tiene la culpa, y a quién se castiga de todos modos."
 msgstr ""
 
 #: scripts/content/ch_b.gd:307
-msgid "A mi hermano mayor lo llevaron de niño al Gimnasio Neoterapéutico, a que le fracturasen el marco para ganar lados. Sobrevive uno de cada diez. Él no fue ése."
+msgid "Después fui al Templo, como me había aconsejado el archivero. El Templo de los Círculos: tantos lados que desde dentro la pared parece no tener ninguno."
 msgstr ""
 
 #: scripts/content/ch_b.gd:308
-msgid "Lo dice con la misma voz con que antes dijo «misericordia»."
+msgid "Ve al Templo, al sur de la Calle Mayor, y entra"
 msgstr ""
 
 #: scripts/content/ch_b.gd:309
-msgid "Vaya a casa. Faltan dos noches para el milenio; dicen que en esas fechas la gente ve cosas. Usted no vea nada."
+msgid "Cada clase tiene su fila; más cerca del altar cuantos más lados. Busca la tuya."
 msgstr ""
 
-#: scripts/content/ch_b.gd:312
-msgid "Volví a casa bajo una niebla espesa. Era el penúltimo día del año 1999. Me entretuve hasta tarde con mi vicio de siempre, la Geometría, y me dormí sobre las tablillas."
+#: scripts/content/ch_b.gd:313
+msgid "*Un ujier te cierra el paso con un ángulo muy educado.* «La fila de los Profesionales está detrás, caballero.»"
 msgstr ""
 
-#: scripts/content/ch_b.gd:41 scripts/content/ch_b.gd:194
+#: scripts/content/ch_b.gd:314
+msgid "Tu hermano te guarda sitio en la fila de los Profesionales"
+msgstr ""
+
+#: scripts/content/ch_b.gd:321
+msgid "Hijos del Plano. Hay una sola ley, y cabe en cuatro palabras. Decidlas conmigo."
+msgstr ""
+
+#: scripts/content/ch_b.gd:322
+msgid "(Cantar con la asamblea.)"
+msgstr ""
+
+#: scripts/content/ch_b.gd:322
+msgid "(Susurrar.) ¿Y quién atiende a la del calderero?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:328 scripts/content/ch_b.gd:338
+msgid "«ATIENDE A TU CONFIGURACIÓN.»"
+msgstr ""
+
+#: scripts/content/ch_b.gd:330
+msgid "Tu silencio se ha oído. En un Templo, callar a destiempo también es una voz."
+msgstr ""
+
+#: scripts/content/ch_b.gd:333
+msgid "Te has fundido con el coro. Nadie podría distinguir tu voz de la de los demás. De eso se trata."
+msgstr ""
+
+#: scripts/content/ch_b.gd:336
+msgid "Un poco a destiempo, pero entre tantas voces nadie lo nota. Casi nadie."
+msgstr ""
+
+#: scripts/content/ch_b.gd:344
+msgid "(Te pisa el lado, sin mirarte.) Aquí no, hermano."
+msgstr ""
+
+#: scripts/content/ch_b.gd:345
+msgid "El Pentágono de tu izquierda se ha apartado medio paso. Te ha oído."
+msgstr ""
+
+#: scripts/content/ch_b.gd:347
+msgid "Lo que sois, lo sois por vuestros ángulos. El ladrón Isósceles no elige robar: su vértice roba por él. No lo culpamos. No culpamos a nadie."
+msgstr ""
+
+#: scripts/content/ch_b.gd:348
+msgid "Y como él no puede evitar ser un daño para sus vecinos, el Magistrado no puede evitar hacerlo consumir. Así, sin culpa y sin rencor, todo queda en orden."
+msgstr ""
+
+#: scripts/content/ch_b.gd:349
+msgid "Sigue el razonamiento: si nadie es culpable, nadie merece castigo. Y sin embargo castigan. El silogismo cojea de un lado. Irregular, diríase."
+msgstr ""
+
+#: scripts/content/ch_b.gd:350
+msgid "Los llamamos Círculos, pero ninguno lo es. Son Polígonos de lados tan numerosos y pequeños que no se distinguen. Del Círculo Supremo se dice, por cortesía, que tiene diez mil. Palparlo para comprobarlo sería impensable."
+msgstr ""
+
+#: scripts/content/ch_b.gd:353
+msgid "el padre"
+msgstr ""
+
+#: scripts/content/ch_b.gd:353
+msgid "la madre"
+msgstr ""
+
+#: scripts/content/ch_b.gd:353
+msgid "el niño"
+msgstr ""
+
+#: scripts/content/ch_b.gd:355
+msgid "Hoy hay júbilo. A un obrero de cincuenta y nueve grados y medio le ha nacido un hijo. Que lo traigan."
+msgstr ""
+
+#: scripts/content/ch_b.gd:359
+msgid "La Junta Sanitaria y Social ha medido. Sesenta grados. Sesenta. Sesenta. Lo declaramos Regular: un Equilátero."
+msgstr ""
+
+#: scripts/content/ch_b.gd:360
+msgid "Lo mismo que hiciste tú con el comerciante. Un ángulo palpado. Hoy decide la vida de una familia."
+msgstr ""
+
+#: scripts/content/ch_b.gd:361
+msgid "(Un murmullo de fila en fila. En la de los Isósceles, algo parecido a un sollozo de orgullo.)"
+msgstr ""
+
+#: scripts/content/ch_b.gd:362
+msgid "Gracias, Reverencia. Gracias. Cien generaciones, y me ha tocado a mí verlo."
+msgstr ""
+
+#: scripts/content/ch_b.gd:364
+msgid "Un Regular no puede criarse entre puntas. Será adoptado por este Equilátero sin hijos. Padre: jura no volver a verlo."
+msgstr ""
+
+#: scripts/content/ch_b.gd:365
+msgid "…Lo juro."
+msgstr ""
+
+#: scripts/content/ch_b.gd:366
+msgid "¿Adónde lo llevan? Esposo, ¿adónde llevan al niño?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:367
+msgid "(Aplaudir con la asamblea.)"
+msgstr ""
+
+#: scripts/content/ch_b.gd:367
+msgid "(Bajar el ojo.)"
+msgstr ""
+
+#: scripts/content/ch_b.gd:367
+msgid "(En voz alta.) ¡Dejad al menos que la madre lo visite!"
+msgstr ""
+
+#: scripts/content/ch_b.gd:373
+msgid "Aplaudí. Era un día de fiesta, y yo un ciudadano que sabía cuándo se aplaude."
+msgstr ""
+
+#: scripts/content/ch_b.gd:374
+msgid "Miré al suelo, que en mi mundo es mirar a ninguna parte."
+msgstr ""
+
+#: scripts/content/ch_b.gd:376
+msgid "El caballero de cuatro lados confunde la piedad con la Geometría. La madre lo habrá olvidado antes de la cena: su Configuración no retiene. ¿No es una misericordia?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:377
+msgid "¿Qué niño?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:378
+msgid "No. Ha dicho «¿qué niño?» porque tres ujieres la están mirando."
+msgstr ""
+
+#: scripts/content/ch_b.gd:379
+msgid "Esa es la esperanza que sostiene a los de abajo: que un día les nazca un hijo que les quiten. Los Círculos la llaman válvula de seguridad."
+msgstr ""
+
+#: scripts/content/ch_b.gd:381
+msgid "Id en orden. Atended a vuestra Configuración."
+msgstr ""
+
+#: scripts/content/ch_b.gd:384
+msgid "un Círculo joven"
+msgstr ""
+
+#: scripts/content/ch_b.gd:385
+msgid "Un Círculo joven te hace una seña junto a la salida"
+msgstr ""
+
+#: scripts/content/ch_b.gd:386
+msgid "Lo he observado durante el oficio, Cuadrado. Tiene usted el perímetro inquieto. Pregunte: prefiero una duda dicha que una pensada."
+msgstr ""
+
+#: scripts/content/ch_b.gd:390
+msgid "Si la falta es de la Configuración, ¿por qué reprendo a mi nieto?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:391
+msgid "¿Por qué no se enseña a leer a las mujeres?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:392
+msgid "¿Cuántos lados tiene usted, en verdad?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:393
+msgid "Nada más, Reverencia."
+msgstr ""
+
+#: scripts/content/ch_b.gd:398
+msgid "Esta mañana mi nieto rompió una tablilla. Alegó que un cambio de temperatura fue demasiado para su perímetro: que la culpa era de su Configuración."
+msgstr ""
+
+#: scripts/content/ch_b.gd:399
+msgid "¿Y qué le respondió usted?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:401
+msgid "Que, en ese caso, una buena reprimenda le fortalecería la Configuración."
+msgstr ""
+
+#: scripts/content/ch_b.gd:402
+msgid "Je. Heterodoxo, pero práctico. Así gobernamos también nosotros, sólo que sin reírnos."
+msgstr ""
+
+#: scripts/content/ch_b.gd:404
+msgid "Que tenía razón: que nadie tiene la culpa. Y me ha prometido romper otra."
+msgstr ""
+
+#: scripts/content/ch_b.gd:405
+msgid "Ha llevado usted la doctrina hasta el final, y el final se le ha reído en la cara. Por eso nosotros nunca llegamos hasta el final."
+msgstr ""
+
+#: scripts/content/ch_b.gd:407
+msgid "Nada. La arreglamos juntos."
+msgstr ""
+
+#: scripts/content/ch_b.gd:408
+msgid "…Eso no está en ningún manual. Y por eso no tiene respuesta. Qué incómodo."
+msgstr ""
+
+#: scripts/content/ch_b.gd:41 scripts/content/ch_b.gd:265 scripts/content/ch_b.gd:603
 msgid "el viejo archivero"
+msgstr ""
+
+#: scripts/content/ch_b.gd:410
+msgid "Hace trescientos años, el Círculo Supremo decretó que, siendo ellas pobres en Razón y ricas en Emoción, educarlas era malgastar la tablilla. Desde entonces no leen ni cuentan."
+msgstr ""
+
+#: scripts/content/ch_b.gd:411
+msgid "Y desde entonces tú hablas dos lenguas. Con ella: «amor», «deber», «piedad». Con ellos: «anticipación de beneficios», «necesidad». Dos idiomas, casi dos mentes."
+msgstr ""
+
+#: scripts/content/ch_b.gd:412
+msgid "Temo que esa doble carga sea excesiva para los jóvenes. Humildemente, pido que se reconsidere."
+msgstr ""
+
+#: scripts/content/ch_b.gd:412
+msgid "Una disposición sabia."
+msgstr ""
+
+#: scripts/content/ch_b.gd:413
+msgid "Humildemente anotado. No lo repita ante el oficiante: él no distingue una apelación de una sedición, y a veces tiene razón."
+msgstr ""
+
+#: scripts/content/ch_b.gd:414
+msgid "Eso decimos."
+msgstr ""
+
+#: scripts/content/ch_b.gd:417
+msgid "Qué pregunta tan de palpador. Unos cuatrocientos. Mi padre tenía trescientos cincuenta; entre nosotros no rige eso de un lado por generación."
+msgstr ""
+
+#: scripts/content/ch_b.gd:418
+msgid "A mi hermano mayor lo llevaron de niño al Gimnasio Neoterapéutico, a que le fracturasen el marco para ganar lados. Sobrevive uno de cada diez. Él no fue ése."
+msgstr ""
+
+#: scripts/content/ch_b.gd:419
+msgid "Lo dice con la misma voz con que antes dijo «misericordia»."
+msgstr ""
+
+#: scripts/content/ch_b.gd:420
+msgid "Vaya a casa. Faltan dos noches para el milenio; dicen que en esas fechas la gente ve cosas. Usted no vea nada."
 msgstr ""
 
 #: scripts/content/ch_b.gd:43
 msgid "un estudiante"
+msgstr ""
+
+#: scripts/content/ch_b.gd:432
+msgid "Volví a casa bajo una niebla espesa. Era el penúltimo día del año 1999. Me entretuve hasta tarde con mi vicio de siempre, la Geometría, y me dormí sobre las tablillas."
+msgstr ""
+
+#: scripts/content/ch_b.gd:437
+msgid "¡Hermano! Te he guardado sitio. Aquí, entre un Pentágono que ronca y otro que reza, que es lo mismo pero más alto."
+msgstr ""
+
+#: scripts/content/ch_b.gd:438
+msgid "Tú y yo, cuatro lados cada uno, y sin embargo a ti te llaman a la Puerta y a mí me dejan copiando actas del Consejo."
+msgstr ""
+
+#: scripts/content/ch_b.gd:439
+msgid "Me llamaron. Y ojalá no lo hubieran hecho."
+msgstr ""
+
+#: scripts/content/ch_b.gd:439
+msgid "Alguien tiene que copiar las actas."
+msgstr ""
+
+#: scripts/content/ch_b.gd:441
+msgid "Ya me lo han contado. El calderero. …No digas nada aquí. Aquí las paredes tienen tantos lados que todas oyen."
+msgstr ""
+
+#: scripts/content/ch_b.gd:443
+msgid "Eso me digo yo cada mañana, mientras afilo el punzón. Y cada mañana me lo creo un poco menos."
+msgstr ""
+
+#: scripts/content/ch_b.gd:444
+msgid "Ven mañana, el primer día del año 2000, a casa, después de la sesión del Consejo. Habrá sopa y ninguna geometría."
+msgstr ""
+
+#: scripts/content/ch_b.gd:445
+msgid "Dicen que con el milenio saldrán los iluminados a contar visiones. El Consejo ya tiene la sala preparada. Nosotros, a la sopa."
+msgstr ""
+
+#: scripts/content/ch_b.gd:446
+msgid "Lo ha dicho riendo."
 msgstr ""
 
 #: scripts/content/ch_b.gd:46
@@ -2070,6 +2194,10 @@ msgstr ""
 
 #: scripts/content/ch_b.gd:47
 msgid "Tres años para distinguir un Decágono de un Dodecágono en movimiento. Mi padre dice que es lo único que nos separa de los que palpan."
+msgstr ""
+
+#: scripts/content/ch_b.gd:478 scripts/content/ch_b.gd:479
+msgid "media tablilla"
 msgstr ""
 
 #: scripts/content/ch_b.gd:48
@@ -2084,8 +2212,68 @@ msgstr ""
 msgid "Donde un viejo recuerda que el mundo no siempre fue una línea gris."
 msgstr ""
 
+#: scripts/content/ch_b.gd:480
+msgid "Por la mañana. Tu nieto te espera en el salón, con cara de culpa"
+msgstr ""
+
+#: scripts/content/ch_b.gd:482
+msgid "Abuelo… se ha roto la tablilla de mi hermano. Pero no fue culpa mía: un cambio brusco de temperatura fue demasiado para mi perímetro. La culpa es de mi Configuración."
+msgstr ""
+
+#: scripts/content/ch_b.gd:483
+msgid "Lo ha aprendido en el Templo. Palabra por palabra."
+msgstr ""
+
+#: scripts/content/ch_b.gd:485
+msgid "Entonces una buena reprimenda te fortalecerá la Configuración."
+msgstr ""
+
+#: scripts/content/ch_b.gd:486
+msgid "Tienes razón: nadie tiene la culpa."
+msgstr ""
+
+#: scripts/content/ch_b.gd:487
+msgid "Lo que importa no es de quién es la culpa, sino que se arregle."
+msgstr ""
+
+#: scripts/content/ch_b.gd:490
+msgid "¿Una reprimenda… para la Configuración? Abuelo, eso es trampa. …Vale. Lo siento."
+msgstr ""
+
+#: scripts/content/ch_b.gd:492
+msgid "¡Entonces tampoco me castigarás si rompo otra!"
+msgstr ""
+
+#: scripts/content/ch_b.gd:493
+msgid "Y salió corriendo, encantado con la teología. Me quedé con las dos mitades en la mano."
+msgstr ""
+
+#: scripts/content/ch_b.gd:495
+msgid "¿Arreglarla? ¿Se puede? A ver… tú gira esa mitad y yo la sujeto."
+msgstr ""
+
+#: scripts/content/ch_b.gd:498
+msgid "¡Encaja! Abuelo, se ve la raya, pero encaja. Como cuando palpas: hay que ir despacio."
+msgstr ""
+
 #: scripts/content/ch_b.gd:50
 msgid "No dormí bien. A la mañana siguiente fui al Colegio de Vista, con el pretexto de consultar un tratado. En realidad quería que alguien me dijera que mirar y callar era lo correcto."
+msgstr ""
+
+#: scripts/content/ch_b.gd:509
+msgid "La tablilla"
+msgstr ""
+
+#: scripts/content/ch_b.gd:509
+msgid "Gira la mitad suelta con {move_left} / {move_right} hasta que encaje."
+msgstr ""
+
+#: scripts/content/ch_b.gd:509
+msgid "Gira la mitad suelta con la palanca hasta que encaje."
+msgstr ""
+
+#: scripts/content/ch_b.gd:509
+msgid "Gira la mitad suelta con el stick izquierdo hasta que encaje."
 msgstr ""
 
 #: scripts/content/ch_b.gd:51
@@ -2100,72 +2288,168 @@ msgstr ""
 msgid "Ve al Colegio de Vista, al este por la Calle Mayor"
 msgstr ""
 
-#: scripts/content/ch_b.gd:55
-msgid "Habla con el viejo archivero"
+#: scripts/content/ch_b.gd:531
+msgid "mi tablilla, de madrugada"
+msgstr ""
+
+#: scripts/content/ch_b.gd:545
+msgid "(Un examinando, temblando.) …¿Decágono? No, no: ¡Dodecágono! …¿Puedo volver a mirar?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:546
+msgid "(Desde su mesa.) El tribunal admite oyentes, perito. Pruebe usted. Tres figuras. Sin palpar."
+msgstr ""
+
+#: scripts/content/ch_b.gd:552 scripts/content/ch_b.gd:553
+msgid "Decágono"
+msgstr ""
+
+#: scripts/content/ch_b.gd:552
+msgid "diez lados"
+msgstr ""
+
+#: scripts/content/ch_b.gd:552 scripts/content/ch_b.gd:553
+msgid "Endecágono"
+msgstr ""
+
+#: scripts/content/ch_b.gd:552
+msgid "once lados"
+msgstr ""
+
+#: scripts/content/ch_b.gd:552
+msgid "doce lados"
+msgstr ""
+
+#: scripts/content/ch_b.gd:556
+msgid "Examen final de Vista"
+msgstr ""
+
+#: scripts/content/ch_b.gd:557
+msgid "¿Cuántos lados? La traza apenas cae: con tantos lados, todo es casi un Círculo."
+msgstr ""
+
+#: scripts/content/ch_b.gd:558
+msgid "Cierto: "
+msgstr ""
+
+#: scripts/content/ch_b.gd:558
+msgid "No: era un "
 msgstr ""
 
 #: scripts/content/ch_b.gd:56
-msgid "El perito de la Puerta. Ya se sabe por aquí lo del calderero. ¿Viene a por absolución? No la doy: soy archivero."
+msgid "el tribunal de Vista"
+msgstr ""
+
+#: scripts/content/ch_b.gd:562
+msgid "Tres de tres. Le darían el título, si no lo tuviera ya. Ahora entiende usted por qué el Color fue un alivio."
+msgstr ""
+
+#: scripts/content/ch_b.gd:565
+msgid "%s de tres. No se apure: tres años de Colegio para esto. En color lo habría acertado un niño."
+msgstr ""
+
+#: scripts/content/ch_b.gd:565
+msgid "Ninguno"
+msgstr ""
+
+#: scripts/content/ch_b.gd:565
+msgid "Uno"
+msgstr ""
+
+#: scripts/content/ch_b.gd:565
+msgid "Dos"
 msgstr ""
 
 #: scripts/content/ch_b.gd:57
-msgid "Doy otra cosa. ¿Sabe usted que hubo un tiempo en que no hacía falta mirar con tanto esfuerzo, ni palpar a nadie? Un tiempo en que cada cual llevaba escrito por fuera lo que era… o lo que quería ser."
+msgid "Presentarse de oyente"
 msgstr ""
 
-#: scripts/content/ch_b.gd:58
-msgid "El Color. Sé que está prohibido nombrarlo."
+#: scripts/content/ch_b.gd:573
+msgid "Imagínalo un momento: la Ley aprobada. Estás en el mercado, con el ojo de siempre. Vienen tres figuras, de canto, mitad rojas y mitad verdes."
 msgstr ""
 
-#: scripts/content/ch_b.gd:58
-msgid "Cuentos de viejos."
+#: scripts/content/ch_b.gd:586
+msgid "¿Mujer o Sacerdote?"
+msgstr ""
+
+#: scripts/content/ch_b.gd:587
+msgid "Mitad roja, mitad verde, de canto. ¿Te inclinas ante un Sacerdote o cedes el paso a una Mujer?"
 msgstr ""
 
 #: scripts/content/ch_b.gd:59
-msgid "Aquí dentro, entre tablillas, se puede nombrar. Flojito."
+msgid "Habla con el viejo archivero"
 msgstr ""
 
-#: scripts/content/ch_b.gd:59
-msgid "Cuentos, sí. Con ciento cuarenta mil muertos al final. Siéntese."
+#: scripts/content/ch_b.gd:590
+msgid "Era una Mujer."
+msgstr ""
+
+#: scripts/content/ch_b.gd:590
+msgid " *Se ríe de tu reverencia.*"
+msgstr ""
+
+#: scripts/content/ch_b.gd:591
+msgid "Era un Sacerdote."
+msgstr ""
+
+#: scripts/content/ch_b.gd:591
+msgid " *«¿Me cede el paso? ¡De rodillas!»*"
+msgstr ""
+
+#: scripts/content/ch_b.gd:594
+msgid "No es que no sepas. Es que *no se puede saber*. Eso era la Ley: borrar la diferencia."
 msgstr ""
 
 #: scripts/content/ch_b.gd:60
+msgid "El perito de la Puerta. Ya se sabe por aquí lo del calderero. ¿Viene a por absolución? No la doy: soy archivero."
+msgstr ""
+
+#: scripts/content/ch_b.gd:61
+msgid "Doy otra cosa. ¿Sabe usted que hubo un tiempo en que no hacía falta mirar con tanto esfuerzo, ni palpar a nadie? Un tiempo en que cada cual llevaba escrito por fuera lo que era… o lo que quería ser."
+msgstr ""
+
+#: scripts/content/ch_b.gd:62
+msgid "El Color. Sé que está prohibido nombrarlo."
+msgstr ""
+
+#: scripts/content/ch_b.gd:62
+msgid "Cuentos de viejos."
+msgstr ""
+
+#: scripts/content/ch_b.gd:63
+msgid "Aquí dentro, entre tablillas, se puede nombrar. Flojito."
+msgstr ""
+
+#: scripts/content/ch_b.gd:63
+msgid "Cuentos, sí. Con ciento cuarenta mil muertos al final. Siéntese."
+msgstr ""
+
+#: scripts/content/ch_b.gd:64
 msgid "Cierre el ojo. Los del Colegio lo llamamos el Teatro de la Memoria. Durante un rato será usted otro: un Pentágono al que la historia llama Cromatistes."
 msgstr ""
 
-#: scripts/content/ch_b.gd:67
+#: scripts/content/ch_b.gd:72
 msgid "Teatro de la memoria · Cromatistes"
 msgstr ""
 
-#: scripts/content/ch_b.gd:68
+#: scripts/content/ch_b.gd:73
 msgid "Mira: el mismo mundo, siglos atrás. Todo líneas pálidas, como hoy. Y tú, un Pentágono cualquiera que una tarde, revolviendo tierras y óxidos en su taller, da con algo que no tiene nombre."
 msgstr ""
 
-#: scripts/content/ch_b.gd:74
+#: scripts/content/ch_b.gd:79
 msgid "Elige un color para tu lado %s."
 msgstr ""
 
-#: scripts/content/ch_b.gd:74
+#: scripts/content/ch_b.gd:79
 msgid "Los pigmentos"
 msgstr ""
 
-#: scripts/content/ch_b.gd:80
+#: scripts/content/ch_b.gd:92
 msgid "Primero pintaste tu casa. Luego a tus esclavos, a tu padre, a tus hijos, a tus nietos. Por último, a ti. Y saliste al mercado."
 msgstr ""
 
-#: scripts/content/ch_b.gd:82
+#: scripts/content/ch_b.gd:94
 msgid "Pasea por el mercado. Que te vean."
-msgstr ""
-
-#: scripts/content/ch_b.gd:92
-msgid "Nadie tropezaba contigo. Nadie tenía que palparte ni calcular tus ángulos: te *veían*. En dos generaciones no quedaba figura sin pintar, salvo las Mujeres y los Sacerdotes, que no tienen lados."
-msgstr ""
-
-#: scripts/content/ch_b.gd:95
-msgid "Míralo con el ojo de un planilandés. Ya no es una raya gris: cada cual lleva su clase a la vista. Fue la infancia del Arte. Inmoral, anárquica… y bellísima."
-msgstr ""
-
-#: scripts/content/ch_b.gd:99
-msgid "Pero si un soldado se pinta como un noble, ¿en qué se distinguen? El Reconocimiento por la Vista dejó de estudiarse. Y los de abajo empezaron a decir, cada vez con más razón, que eran iguales a los de arriba."
 msgstr ""
 
 #: scripts/content/ch_c.gd:108
@@ -2912,10 +3196,6 @@ msgstr ""
 msgid "¡Esposo! Anoche desapareciste. Te busqué por toda la casa. ¿Dónde estabas?"
 msgstr ""
 
-#: scripts/content/ch_d.gd:26 scripts/content/ch_d.gd:405
-msgid "tu hermano"
-msgstr ""
-
 #: scripts/content/ch_d.gd:260
 msgid "Fuera del Plano, querida. Arriba. He visto nuestra casa por dentro, toda a la vez."
 msgstr ""
@@ -3540,51 +3820,51 @@ msgstr ""
 msgid "¿BORRAR LA PARTIDA %d Y EMPEZAR? PULSA OTRA VEZ"
 msgstr ""
 
-#: scripts/main.gd:106 scripts/ui/settings_panel.gd:61 scripts/ui/settings_panel.gd:70
+#: scripts/main.gd:106 scripts/ui/settings_panel.gd:66 scripts/ui/settings_panel.gd:75
 msgid "Volver"
 msgstr ""
 
-#: scripts/main.gd:184 scripts/content/ch_a.gd:169 scripts/content/ch_a.gd:220 scripts/content/ch_b.gd:117 …
+#: scripts/main.gd:185 scripts/content/ch_a.gd:169 scripts/content/ch_a.gd:220 scripts/content/ch_b.gd:135 …
 msgid "Herejía"
 msgstr ""
 
-#: scripts/main.gd:184 scripts/content/ch_a.gd:626 scripts/content/ch_b.gd:151 scripts/content/ch_b.gd:263
+#: scripts/main.gd:185 scripts/content/ch_a.gd:626 scripts/content/ch_b.gd:199 scripts/content/ch_b.gd:367
 msgid "Cuestionar"
 msgstr ""
 
-#: scripts/main.gd:184 scripts/content/ch_b.gd:288
+#: scripts/main.gd:185 scripts/content/ch_b.gd:392
 msgid "Osadía"
 msgstr ""
 
-#: scripts/main.gd:184 scripts/content/ch_d.gd:233
+#: scripts/main.gd:185 scripts/content/ch_d.gd:233
 msgid "Atreverse"
 msgstr ""
 
-#: scripts/main.gd:184 scripts/content/ch_a.gd:330 scripts/content/ch_a.gd:699 scripts/content/ch_d.gd:260
+#: scripts/main.gd:185 scripts/content/ch_a.gd:330 scripts/content/ch_a.gd:699 scripts/content/ch_d.gd:260
 msgid "La verdad"
 msgstr ""
 
-#: scripts/main.gd:184 scripts/content/ch_b.gd:301
+#: scripts/main.gd:185 scripts/content/ch_b.gd:412
 msgid "Apelar"
 msgstr ""
 
-#: scripts/main.gd:185 scripts/content/ch_a.gd:627
+#: scripts/main.gd:186 scripts/content/ch_a.gd:627
 msgid "Obedecer"
 msgstr ""
 
-#: scripts/main.gd:185 scripts/content/ch_b.gd:198
+#: scripts/main.gd:186 scripts/content/ch_b.gd:269 scripts/content/ch_b.gd:486
 msgid "Ortodoxia"
 msgstr ""
 
-#: scripts/main.gd:185 scripts/content/ch_a.gd:330 scripts/content/ch_d.gd:260
+#: scripts/main.gd:186 scripts/content/ch_a.gd:330 scripts/content/ch_d.gd:260
 msgid "La mentira"
 msgstr ""
 
-#: scripts/main.gd:185 scripts/content/ch_a.gd:628 scripts/content/ch_a.gd:699
+#: scripts/main.gd:186 scripts/content/ch_a.gd:628 scripts/content/ch_a.gd:699
 msgid "Callar"
 msgstr ""
 
-#: scripts/main.gd:185 scripts/content/ch_c.gd:89
+#: scripts/main.gd:186 scripts/content/ch_c.gd:89
 msgid "Humildad"
 msgstr ""
 
@@ -3660,7 +3940,7 @@ msgstr ""
 msgid "%s  ·  %d min"
 msgstr ""
 
-#: scripts/minigames/cross_street.gd:35 scripts/content/ch_b.gd:107
+#: scripts/minigames/cross_street.gd:35 scripts/content/ch_b.gd:125
 msgid "una mujer"
 msgstr ""
 
@@ -3722,6 +4002,38 @@ msgstr ""
 
 #: scripts/minigames/feel.gd:67
 msgid "Piensa en cuántos lados caben en una vuelta: cuantos más lados, más abierto el ángulo. Otra vez."
+msgstr ""
+
+#: scripts/minigames/hymn.gd:26
+msgid "El cántico"
+msgstr ""
+
+#: scripts/minigames/hymn.gd:26
+msgid "Pulsa {act} en cada sílaba, a la vez que la asamblea."
+msgstr ""
+
+#: scripts/minigames/hymn.gd:26
+msgid "Toca el botón de acción en cada sílaba, a la vez que la asamblea."
+msgstr ""
+
+#: scripts/minigames/hymn.gd:27
+msgid "Cantar"
+msgstr ""
+
+#: scripts/minigames/hymn.gd:8
+msgid "A-TIEN-de"
+msgstr ""
+
+#: scripts/minigames/hymn.gd:8
+msgid "a tu"
+msgstr ""
+
+#: scripts/minigames/hymn.gd:8
+msgid "Con-fi-gu-"
+msgstr ""
+
+#: scripts/minigames/hymn.gd:8
+msgid "RA-ción"
 msgstr ""
 
 #: scripts/minigames/orient.gd:21 scripts/content/ch_a.gd:122 scripts/content/ch_a.gd:692 scripts/content/ch_a.gd:733 …
@@ -3880,119 +4192,119 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
-#: scripts/ui.gd:1133
+#: scripts/ui.gd:1135
 msgid "Parte I · Este mundo"
 msgstr ""
 
-#: scripts/ui.gd:1133
+#: scripts/ui.gd:1135
 msgid "Parte II · Otros mundos"
 msgstr ""
 
-#: scripts/ui.gd:1135
+#: scripts/ui.gd:1137
 msgid "Esta sección aún no ha sido escrita. "
 msgstr ""
 
-#: scripts/ui.gd:1136
+#: scripts/ui.gd:1138
 msgid "%d de 22 secciones recuperadas"
 msgstr ""
 
-#: scripts/ui.gd:1138
+#: scripts/ui.gd:1140
 msgid "Parte I — Este mundo"
 msgstr ""
 
-#: scripts/ui.gd:1139
+#: scripts/ui.gd:1141
 msgid "Parte II — Otros mundos"
 msgstr ""
 
-#: scripts/ui.gd:1145
+#: scripts/ui.gd:1147
 msgid "Notas al margen"
 msgstr ""
 
-#: scripts/ui.gd:1146
+#: scripts/ui.gd:1148
 msgid "Nota al margen"
 msgstr ""
 
-#: scripts/ui.gd:1154 scripts/ui.gd:1155
+#: scripts/ui.gd:1156 scripts/ui.gd:1157
 msgid "Saber"
 msgstr ""
 
-#: scripts/ui.gd:1155
+#: scripts/ui.gd:1157
 msgid "Aún ignoras esto."
 msgstr ""
 
-#: scripts/ui.gd:1156
+#: scripts/ui.gd:1158
 msgid "Lo que sabes del mundo"
 msgstr ""
 
-#: scripts/ui.gd:1170
+#: scripts/ui.gd:1172
 msgid "Tu figura"
 msgstr ""
 
-#: scripts/ui.gd:1172
+#: scripts/ui.gd:1174
 msgid "Un [b]Cuadrado[/b]: cuatro lados iguales, cuatro ángulos rectos. Clase profesional. Tus hijos son Pentágonos; tus nietos, Hexágonos."
 msgstr ""
 
-#: scripts/ui.gd:1172
+#: scripts/ui.gd:1174
 msgid "Mujeres (líneas) · Isósceles · Equiláteros · "
 msgstr ""
 
-#: scripts/ui.gd:1172
+#: scripts/ui.gd:1174
 msgid "Cuadrados"
 msgstr ""
 
-#: scripts/ui.gd:1172
+#: scripts/ui.gd:1174
 msgid "Pentágonos · Hexágonos… · Círculos"
 msgstr ""
 
-#: scripts/ui.gd:1176
+#: scripts/ui.gd:1178
 msgid "Lo que llevas"
 msgstr ""
 
-#: scripts/ui.gd:1177 scripts/content/ch_a.gd:668
+#: scripts/ui.gd:1179 scripts/content/ch_a.gd:668
 msgid "El estilete del calderero"
 msgstr ""
 
-#: scripts/ui.gd:1180
+#: scripts/ui.gd:1182
 msgid "PERSONAS"
 msgstr ""
 
-#: scripts/ui.gd:1181
+#: scripts/ui.gd:1183
 msgid "Quién te recuerda, y cómo"
 msgstr ""
 
-#: scripts/ui.gd:1190
+#: scripts/ui.gd:1192
 msgid "Lo último que se dijo"
 msgstr ""
 
-#: scripts/ui.gd:1191
+#: scripts/ui.gd:1193
 msgid "%d intervenciones"
 msgstr ""
 
-#: scripts/ui.gd:1192
+#: scripts/ui.gd:1194
 msgid "HISTORIAL"
 msgstr ""
 
-#: scripts/ui.gd:1194
+#: scripts/ui.gd:1196
 msgid "Aún no ha hablado nadie."
 msgstr ""
 
-#: scripts/ui.gd:1240
+#: scripts/ui.gd:1242
 msgid "Arrastra a la izquierda para moverte · toca para continuar"
 msgstr ""
 
-#: scripts/ui.gd:1241
+#: scripts/ui.gd:1243
 msgid "stick izquierdo · {act} interactuar y continuar · {view} vista · {journal} inventario"
 msgstr ""
 
-#: scripts/ui.gd:1242
+#: scripts/ui.gd:1244
 msgid "{move} / flechas · {act} interactuar · {advance} continuar · {view} vista · {journal} inventario"
 msgstr ""
 
-#: scripts/ui.gd:1243
+#: scripts/ui.gd:1245
 msgid "Una aventura narrativa. Se recomienda sonido."
 msgstr ""
 
-#: scripts/ui.gd:1267
+#: scripts/ui.gd:1269
 msgid "¿SEGURO? SE GUARDA POR CAPÍTULOS"
 msgstr ""
 
@@ -4064,23 +4376,23 @@ msgstr ""
 msgid "Ajustes"
 msgstr ""
 
-#: scripts/ui.gd:587
+#: scripts/ui.gd:589
 msgid "PERITO"
 msgstr ""
 
-#: scripts/ui.gd:826
+#: scripts/ui.gd:828
 msgid "toca para continuar  ›"
 msgstr ""
 
-#: scripts/ui.gd:826
+#: scripts/ui.gd:828
 msgid "continuar"
 msgstr ""
 
-#: scripts/ui.gd:827 scripts/ui/letterbox.gd:31
+#: scripts/ui.gd:829 scripts/ui/letterbox.gd:31
 msgid "mantén"
 msgstr ""
 
-#: scripts/ui.gd:827
+#: scripts/ui.gd:829
 msgid "saltar"
 msgstr ""
 
@@ -4176,26 +4488,30 @@ msgstr ""
 msgid "Reducir movimiento: "
 msgstr ""
 
-#: scripts/ui/settings_panel.gd:57
+#: scripts/ui/settings_panel.gd:56
+msgid "Colores con patrón: "
+msgstr ""
+
+#: scripts/ui/settings_panel.gd:62
 msgid "Deducciones: "
 msgstr ""
 
-#: scripts/ui/settings_panel.gd:59
+#: scripts/ui/settings_panel.gd:64
 msgid "Mirada con el stick: "
 msgstr ""
 
-#: scripts/ui/settings_panel.gd:60
+#: scripts/ui/settings_panel.gd:65
 msgid "Teclas"
 msgstr ""
 
-#: scripts/ui/settings_panel.gd:65
+#: scripts/ui/settings_panel.gd:70
 msgid "TECLAS"
 msgstr ""
 
-#: scripts/ui/settings_panel.gd:69
+#: scripts/ui/settings_panel.gd:74
 msgid "Restablecer las teclas"
 msgstr ""
 
-#: scripts/ui/settings_panel.gd:75
+#: scripts/ui/settings_panel.gd:80
 msgid "pulsa una tecla…  (Esc cancela)"
 msgstr ""

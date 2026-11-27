@@ -322,6 +322,10 @@
   "mala_presentacion": {
    "who": "medico",
    "text": "Calle Mayor. El Cuadrado incumple el orden de una presentación ante un facultativo del Hospital de Reconfiguración."
+  },
+  "temple_silent": {
+   "who": "circulo",
+   "text": "Templo. Durante el cántico de la Configuración, el Cuadrado mueve la boca sin voz. Se oye su silencio."
   }
  },
  "people": {
@@ -480,6 +484,48 @@
    "ch": 3,
    "title": "La piedra miliar",
    "text": "La piedra miliar del camino de las aldeas. Marca una distancia, no una dirección: para eso está la lluvia."
+  },
+  {
+   "id": "m_c4_pasquin",
+   "ch": 4,
+   "title": "El pasquín",
+   "text": "En el tablón del Colegio, entre avisos de exámenes, un pasquín de hace siglos, enmarcado como un trofeo: «Proyecto de Ley del Color Universal». Debajo, a lápiz, alguien ha escrito «ojalá»."
+  },
+  {
+   "id": "m_c4_vitrina",
+   "ch": 4,
+   "title": "La vitrina vacía",
+   "text": "Una vitrina con un rótulo: «Tarro de pigmento sellado. Propiedad del Círculo Supremo». Está vacía. El archivero dice que siempre lo ha estado, y que por eso la vigilan tanto."
+  },
+  {
+   "id": "m_c4_poema",
+   "ch": 4,
+   "title": "Un poema del Color",
+   "text": "Un fragmento de un poema de la época del Color. Los versos no riman en sonidos sino en tonos: un verso rojo llama a otro rojo. Hoy nadie sabe leerlo en voz alta."
+  },
+  {
+   "id": "m_c4_examen",
+   "ch": 4,
+   "title": "Tres años para esto",
+   "text": "Tres años de Colegio para distinguir un Decágono de un Dodecágono en movimiento. En la época del Color lo habría distinguido un niño de pecho. Por eso el Color no se perdonó."
+  },
+  {
+   "id": "m_c5_ujier",
+   "ch": 5,
+   "title": "El ujier",
+   "text": "El ujier del Templo cierra el paso con un ángulo «muy educado»: el suyo es de doce grados, pero lo inclina de tal manera que parece de treinta. Es todo un arte."
+  },
+  {
+   "id": "m_c5_lados",
+   "ch": 5,
+   "title": "Las tablas de lados",
+   "text": "Junto al altar, las tablas de lados de los Círculos, del menor al Supremo. La última dice «diez mil», y debajo, en letra pequeña: «por cortesía»."
+  },
+  {
+   "id": "m_c5_mujeres",
+   "ch": 5,
+   "title": "La fila de las mujeres",
+   "text": "Las mujeres asisten al oficio en una fila lateral, de pie. Desde aquí arriba se ve lo que nadie ve desde dentro: todas menean la espalda al mismo compás, como un coro mudo."
   }
  ],
  "achievements": {
@@ -488,6 +534,8 @@
   "ACH_STREET": "Cruzar sin un rasguño",
   "ACH_EAR": "Buen oído",
   "ACH_GATE_P": "Ojo de Colegio",
-  "ACH_HOME": "A casa por la lluvia"
+  "ACH_HOME": "A casa por la lluvia",
+  "ACH_TRIBUNAL": "Tribunal del Colegio",
+  "ACH_HYMN": "Una sola voz"
  }
 }
