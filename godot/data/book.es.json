@@ -276,6 +276,14 @@
   "punto": {
    "title": "Puntolandia",
    "text": "El Punto es su propio universo. Todo lo que oye, cree haberlo pensado él. Estar satisfecho de uno mismo es ser vil e ignorante."
+  },
+  "secciones": {
+   "title": "Las secciones",
+   "text": "Un Sólido que atraviesa el Plano se ve, desde dentro, como una sucesión de figuras planas: sus secciones. Un Cubo de cara deja un Cuadrado que no cambia; de arista, un rectángulo que se ensancha y se estrecha; de vértice, un triángulo que se hace hexágono y vuelve a triángulo. Quien sólo ve las secciones puede, con paciencia, adivinar el Sólido."
+  },
+  "sombras": {
+   "title": "Las sombras",
+   "text": "Lo único que un planilandés podría ver de un Cubo que no lo atraviesa es su sombra: dos cuadrados desplazados y cuatro rayas que los cosen. Una figura plana que guarda el dibujo de algo que no es plano."
   }
  },
  "record": {
@@ -562,6 +570,24 @@
    "ch": 7,
    "title": "El vano del estudio",
    "text": "Para llegar a la alacena hay que cruzar este vano, subir al estudio y girar la llave. El Forastero no hizo ni lo uno ni lo otro: la llave sigue en mi bolsillo."
+  },
+  {
+   "id": "m_c8_embarazada",
+   "ch": 8,
+   "title": "Otra manera de latir",
+   "text": "En una casa del Este, una mujer dormida. Dentro de su línea late algo que no es ella, a otro compás. Nadie en Planilandia lo ha visto nunca; ella tampoco."
+  },
+  {
+   "id": "m_c8_circulo",
+   "ch": 8,
+   "title": "Por cortesía",
+   "text": "Un Círculo, a solas en su casa, se mide los lados con un compás. Son catorce. Por la mañana, en el Templo, será «un Círculo perfecto». Por cortesía, decían."
+  },
+  {
+   "id": "m_c8_sala",
+   "ch": 8,
+   "title": "Mil años en el suelo",
+   "text": "El suelo de la Sala del Consejo, visto desde arriba: marcas en el papel, unas sobre otras, de mil en mil años. En el mismo sitio. Siempre ha vuelto a ocurrir."
   }
  ],
  "achievements": {
@@ -575,7 +601,11 @@
   "ACH_HYMN": "Una sola voz",
   "ACH_KING": "Línea de Líneas",
   "ACH_WED": "Las tres voces",
-  "ACH_SPHERE": "La raíz de tres cuartos"
+  "ACH_SPHERE": "La raíz de tres cuartos",
+  "ACH_CUPBOARD": "La alacena, por Arriba",
+  "ACH_TINKER": "Tres lados bien",
+  "ACH_TESS": "Ocho cubos",
+  "ACH_SECTIONS": "Lo que ven allá abajo"
  },
  "ledger": {
   "cols": [

@@ -1384,6 +1384,12 @@ class OptCard extends PanelContainer:
 		mouse_filter = Control.MOUSE_FILTER_STOP; mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		if o.has("swatch"):
 			custom_minimum_size = Vector2(54, 54); add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+		elif o.has("sil"):
+			# una silueta o una sucesión de secciones (C8-05), con su rótulo debajo
+			custom_minimum_size = Vector2(150, 104); add_theme_stylebox_override("panel", ui._card(Color("fffaf0"), 6, 6, 2, 0))
+			var l := ui._lbl(ui.T(str(o.label)), ui.serif_it, 14, App.INK); l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; l.custom_minimum_size.x = 138; l.size_flags_vertical = Control.SIZE_SHRINK_END
+			l.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(l)
 		elif o.has("circle"):
 			# un tamaño de círculo (C7-02): se dibuja; el punteado es el tamaño de referencia
 			custom_minimum_size = Vector2(104, 104); add_theme_stylebox_override("panel", ui._card(Color("fffaf0"), 6, 6, 2, 0))
@@ -1405,6 +1411,8 @@ class OptCard extends PanelContainer:
 			draw_arc(size / 2.0, 22, 0, TAU, 40, App.INK, 2.0, true)
 			if on: draw_arc(size / 2.0, 26, 0, TAU, 40, App.ACC, 2.0, true)
 			return
+		if o.has("sil"):
+			_sil(String(o.sil))
 		if o.has("circle"):
 			var c := size / 2.0 - Vector2(0, 4); var R := 38.0
 			for k in 24:
@@ -1416,6 +1424,48 @@ class OptCard extends PanelContainer:
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and Rect2(Vector2.ZERO, size).has_point(ev.position):
 			accept_event(); chosen.emit()
+	# tres viñetas (lo que se ve al pasar) o un sólido de perfil
+	func _sil(kind: String) -> void:
+		var ink := App.INK; var acc := App.ACC; var w := 1.8
+		var poly := func(pts: Array, c: Vector2, s: float):
+			var arr := PackedVector2Array()
+			for q in pts: arr.append(c + (q as Vector2) * s)
+			arr.append(arr[0]); draw_colored_polygon(arr, Color(acc, 0.15)); draw_polyline(arr, acc, w, true)
+		var ngon := func(n: int, r: float, a0 := 0.0) -> Array:
+			var out := []
+			for i in n: out.append(Vector2(cos(a0 + TAU * i / n), sin(a0 + TAU * i / n)) * r)
+			return out
+		var cs := [Vector2(30, 34), Vector2(75, 34), Vector2(120, 34)]
+		match kind:
+			"square":
+				for c in cs: poly.call(ngon.call(4, 14, PI / 4), c, 1.0)
+			"rect":
+				var ws := [5.0, 16.0, 5.0]
+				for i in 3: poly.call([Vector2(-ws[i], -12), Vector2(ws[i], -12), Vector2(ws[i], 12), Vector2(-ws[i], 12)], cs[i], 1.0)
+			"tri_hex":
+				poly.call(ngon.call(3, 9, -PI / 2), cs[0], 1.0); poly.call(ngon.call(6, 16), cs[1], 1.0); poly.call(ngon.call(3, 9, PI / 2), cs[2], 1.0)
+			"circle":
+				var rs := [6.0, 16.0, 6.0]
+				for i in 3: poly.call(ngon.call(28, rs[i]), cs[i], 1.0)
+			"pyramid":
+				var c := Vector2(75, 36)
+				draw_polyline(PackedVector2Array([c + Vector2(-26, 18), c + Vector2(0, -24), c + Vector2(26, 18), c + Vector2(-26, 18)]), ink, w, true)
+				draw_polyline(PackedVector2Array([c + Vector2(0, -24), c + Vector2(8, 10), c + Vector2(26, 18)]), Color(ink, 0.5), 1.2, true)
+				draw_line(c + Vector2(-26, 18), c + Vector2(8, 10), Color(ink, 0.5), 1.2, true)
+			"cone":
+				var c := Vector2(75, 36)
+				draw_line(c + Vector2(-22, 16), c + Vector2(0, -24), ink, w, true); draw_line(c + Vector2(22, 16), c + Vector2(0, -24), ink, w, true)
+				draw_set_transform(c + Vector2(0, 16), 0.0, Vector2(1.0, 0.3)); draw_arc(Vector2.ZERO, 22, 0, TAU, 32, ink, w / 0.6, true); draw_set_transform(Vector2.ZERO)
+			"cylinder":
+				var c := Vector2(75, 36)
+				draw_line(c + Vector2(-28, -12), c + Vector2(28, -12), ink, w, true); draw_line(c + Vector2(-28, 12), c + Vector2(28, 12), ink, w, true)
+				for x in [-28.0, 28.0]:
+					draw_set_transform(c + Vector2(x, 0), 0.0, Vector2(0.35, 1.0)); draw_arc(Vector2.ZERO, 12, 0, TAU, 28, ink, w / 0.6, true); draw_set_transform(Vector2.ZERO)
+			"cube":
+				var c := Vector2(70, 40); var d := Vector2(10, -8)
+				draw_rect(Rect2(c - Vector2(16, 16), Vector2(32, 32)), ink, false, w)
+				draw_rect(Rect2(c - Vector2(16, 16) + d, Vector2(32, 32)), Color(ink, 0.5), false, 1.2)
+				for q in [Vector2(-16, -16), Vector2(16, -16), Vector2(16, 16), Vector2(-16, 16)]: draw_line(c + q, c + q + d, Color(ink, 0.5), 1.2, true)
 
 # icono de clase: 0 = punto, 2 = línea, 1 = isósceles, n = polígono
 class PolyIcon extends Control:

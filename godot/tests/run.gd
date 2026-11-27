@@ -168,6 +168,24 @@ func test_geom3() -> void:
 	ok(absf(Geom3.sphere_section(1.0, 0.5) - sqrt(0.75)) < 1e-6, "esfera a media altura: raíz de tres cuartos")
 	ok(Geom3.sphere_section(1.0, 1.2) == 0.0, "esfera por encima: no corta")
 	ok(Geom3.sphere_section(2.0, 0.0) == 2.0, "esfera centrada: su radio")
+	# S-12 (3D): secciones del cubo
+	var C := Geom3.cube(2.0)
+	var face := Geom3.section(C, Transform3D(Basis(), Vector3(0, 0.3, 0)))
+	ok(face.size() == 4 and absf(Geom3.area(face) - 4.0) < 1e-3, "cubo de cara: un cuadrado de área l² (%d, %.3f)" % [face.size(), Geom3.area(face)])
+	var up := Vector3(1, 1, 1).normalized()
+	var vb := Basis(up.cross(Vector3.UP).normalized(), up.angle_to(Vector3.UP))   # la diagonal, vertical
+	var hexa := Geom3.section(C, Transform3D(vb, Vector3.ZERO))
+	var sides := []
+	for i in hexa.size(): sides.append(hexa[i].distance_to(hexa[(i + 1) % hexa.size()]))
+	ok(hexa.size() == 6 and sides.max() - sides.min() < 1e-3, "cubo de vértice, a media altura: hexágono regular")
+	var dg := 2.0 * sqrt(3.0)
+	var tri := Geom3.section(C, Transform3D(vb, Vector3(0, dg / 2.0 - dg / 6.0, 0)))
+	var ts := []
+	for i in tri.size(): ts.append(tri[i].distance_to(tri[(i + 1) % tri.size()]))
+	ok(tri.size() == 3 and ts.max() - ts.min() < 1e-3, "cubo de vértice, a 1/6 de la diagonal: triángulo equilátero")
+	ok(Geom3.section(C, Transform3D(Basis(), Vector3(0, 5, 0))).is_empty(), "por encima del Plano: no corta")
+	var sh := Geom3.shadow(C, Transform3D(Basis(), Vector3(0, 3, 0)), Vector4(0, 10, 0, 1))
+	ok(sh.size() == 12, "la sombra de un cubo: doce rayas")
 
 # S-11: lo que reconoce la pizarra
 func test_sketch() -> void:

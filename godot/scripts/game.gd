@@ -51,6 +51,8 @@ var no_guides := false   # sin brújula, flecha ni rumbo del objetivo (orientars
 var force_world := false # el mundo se dibuja aunque el ojo ocupe la pantalla (plano partido)
 var lenses := ["top", "eye"]   # lo que recorre el botón de vista en este mundo (S-06); "king" = el ojo del Rey
 var eye_src = null       # otra figura desde cuyo ojo se mira (el Rey); null = el Cuadrado
+var eye_src_all := false # eye_src manda también con la lente de línea (un planilandés que mira, VIII)
+var strip_in_space := false # la tira del ojo se muestra también en el vuelo (lo que ve un planilandés)
 
 static func fresh() -> Dictionary:
 	return Profile.fresh_state()
@@ -355,7 +357,7 @@ func _check_pricks(p: Ent, hits: Array) -> void:
 
 func set_map(map: Dictionary) -> void:
 	actors.clear(); talk_ent = null
-	lenses = ["top", "eye"]; eye_src = null; eye.set_lens("line", true)
+	lenses = ["top", "eye"]; eye_src = null; eye_src_all = false; strip_in_space = false; eye.set_lens("line", true)
 	if Snd.mono_v > 0.0: Snd.mono(false)
 	handlers.clear(); world.load_map(map); near = null; ui.prompt(null); vel = Vector2.ZERO
 
@@ -456,6 +458,14 @@ func go_to(x: float, y: float, r: float, text: String) -> void:
 	else: await until(func(): return Vector2(player.x - x, player.y - y).length() < r)
 	world.remove_spot("_goal"); objective("", null); Snd.sfx("pick")
 
+# variante de go_to para el vuelo (C8-02): basta con pasar por encima, cerca y no muy alto
+func fly_to(x: float, y: float, r: float, alt_max: float, text: String) -> void:
+	world.add_spot({id = "_goal", x = x, y = y}); world.mark("_goal"); objective(text, Vector2(x, y))
+	if auto: player.x = x; player.y = y
+	else: await until(func(): return Vector2(player.x - x, player.y - y).length() < r and player.alt < alt_max,
+		func(): player.x = x; player.y = y; player.alt = minf(player.alt, alt_max - 0.5))
+	world.remove_spot("_goal"); objective("", null); Snd.sfx("pick")
+
 # espera a que el jugador hable con `id`; la escena sigue en línea y termina con talk_end(o)
 func talk_begin(id: String, text: String, label := "Hablar") -> Ent:
 	world.mark(id); objective(text, id)
@@ -546,12 +556,12 @@ func _process(delta: float) -> void:
 	var bg: Color = W.pal.bg
 	RenderingServer.set_default_clear_color(bg)
 	W.visible = e < 0.995 or free or force_world
-	var strip := show_strip and p != null and not free and running
-	var eye_on := p != null and (strip or e > 0.0) and not free
+	var strip := show_strip and p != null and (not free or strip_in_space) and running
+	var eye_on := p != null and (strip or e > 0.0) and (not free or strip_in_space)
 	eye.set_active(eye_on)
 	if eye_on:
 		# el ojo del Rey mira desde el Rey, por su Recta; el resto, desde el vértice delantero del Cuadrado
-		var src: Ent = eye_src if eye_src != null and is_instance_valid(eye_src) and eye.lens == "point" else p
+		var src: Ent = eye_src if eye_src != null and is_instance_valid(eye_src) and (eye.lens == "point" or eye_src_all) else p
 		var fx: float = src.local[0].x * 0.9 * src.sc
 		eye.cast(W, src, src.x + cos(src.rot) * fx, src.y + sin(src.rot) * fx, src.rot, W.fog)
 		eye.step(dt)

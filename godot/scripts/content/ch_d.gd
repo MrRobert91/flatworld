@@ -5,8 +5,15 @@ func _anger(sph: MeshInstance3D, v: float) -> void:
 	(sph.material_override as ShaderMaterial).set_shader_parameter('anger', v)
 
 # ============ CAP. VIII — ESPACIOLANDIA ============
+const ALACENA_RECT := Rect2(-23.2, 21.0, 1.8, 1.6)    # el interior de la alacena (C1-01, C7-04, C8-03)
+const HOSPITAL_RECT := Rect2(53.4, 15.8, 5.2, 3.8)    # la sala cerrada del Hospital (C8-04)
+
+# posición de cámara a cierta distancia de un punto, como la cámara libre (yaw, inclinación, distancia)
+static func _cam_at(tgt: Vector3, yaw: float, pitch: float, dist: float) -> Vector3:
+	return tgt + Vector3(sin(yaw) * cos(pitch) * dist, sin(pitch) * dist, cos(yaw) * cos(pitch) * dist)
+
 func ch8() -> void:
-	var map := town({palace = true}); g.set_map(map)   # la misma lámina de Planilandia, vista desde Arriba
+	var map := town({palace = true, hospital_room = true}); g.set_map(map)   # la misma lámina de Planilandia, vista desde Arriba
 	var W := g.world
 	for b in map.buildings: W.known[b.id] = true
 	W.rebuild()
@@ -17,6 +24,25 @@ func ch8() -> void:
 	for i in 4: g.add(F_penta('hj%d' % i, hj[i][0], hj[i][1], {rot = float(i)}))
 	g.add(F_hexa('n1', -33.6, 8.5, {r = 0.6})); g.add(F_hexa('n2', -32.6, 9.8, {r = 0.66, rot = 1.0}))
 	g.add(F_mujer('hija', -22.4, 8.8, {r = 0.8, sway = 0.0})); g.add(F_iso('cr1', -21, 15.5, 10)); g.add(F_tri('cr2', -21.6, 11.4, {r = 0.6}))
+	# la alacena: dos cofres y una tablilla; la otra, en el suelo del salón, donde la dejó la Esfera (C8-03)
+	var cc := Vector2(-22.3, 21.8)
+	g.add({id = 'cofre1', n = 4, r = 0.3, rot = 0.785, x = cc.x - 0.5, y = cc.y - 0.35, name = 'un cofre', noCollide = true, noGuts = true})
+	g.add({id = 'cofre2', n = 4, r = 0.3, rot = 0.785, x = cc.x + 0.5, y = cc.y - 0.35, name = 'un cofre', noCollide = true, noGuts = true})
+	g.add({id = 'tab1', pts = [[0.32, 0.12], [-0.32, 0.12], [-0.32, -0.12], [0.32, -0.12]], x = cc.x - 0.45, y = cc.y + 0.4, name = 'una tablilla', noCollide = true, noGuts = true, noEye = true})
+	g.add({id = 'tab2', pts = [[0.32, 0.12], [-0.32, 0.12], [-0.32, -0.12], [0.32, -0.12]], x = -30.2, y = 8.6, name = 'tu tablilla', noCollide = true, noGuts = true, noEye = true, carryable = true})
+	# la tablilla del nieto, bajo su almohada
+	g.add({id = 'tabn', pts = [[0.26, 0.1], [-0.26, 0.1], [-0.26, -0.1], [0.26, -0.1]], x = -33.6, y = 7.9, name = 'la tablilla del nieto', noCollide = true, noGuts = true, noEye = true})
+	# el cofre del Prefecto, en el Palacio, con el acta ya escrita
+	g.add({id = 'cofrep', n = 4, r = 0.45, rot = 0.785, x = -6.4, y = -31.0, name = 'el cofre del Prefecto', noCollide = true, noGuts = true})
+	# el Hospital (C8-04): el calderero, según lo que hiciste en la Puerta
+	var protest: bool = g.flag('irregularChoice') == 'd'
+	if protest: g.add({id = 'calderero', pts = [[0.95, 0], [-0.3, 0.8], [-0.62, -0.38]], voice = 'tri', x = 56, y = 17.6, name = 'el calderero', rot = 0.2, noCollide = true})
+	else: W.fx_add('cross', 56, 17.6, 9999.0, 0.5)
+	if g.state.get('inv', {}).has('estilete'):
+		g.add({id = 'estilete', pts = [[0.4, 0], [-0.4, 0.05], [-0.4, -0.05]], x = -27.2, y = 23.6, name = 'el estilete del calderero', noCollide = true, noGuts = true, noEye = true, carryable = true})
+	# dos marginalia de este capítulo tienen figura: una mujer encinta y un Círculo que se mide
+	g.add(F_mujer('vecina', -4, 16.5, {r = 0.8, sway = 0.0}))
+	g.add(F_poli('circsolo', 40, 17, 14, {name = 'un Círculo', r = 1.1}))
 	# el Consejo
 	g.add(F_circ('presidente', -14, -33.5, {r = 1.5, rot = PI / 2}))
 	var cons := []
@@ -32,25 +58,44 @@ func ch8() -> void:
 		street[i].ai = {type = 'wander', home = Vector2(-10 + i * 14, 0), r = 4.0}; street[i].speed = 1.5; g.add(street[i])
 	var sph := Space.make_sphere(); var bd := Space.backdrop(false); W.add_child(sph); W.add_child(bd)
 	g.actors['esfera'] = sph
-	var st := {free = true, time = 0.0}
+	var st := {free = true, time = 0.0, busy_m = false}
 	var stop_space := g.tick(func(dt):
 		st.time += dt
 		var spin: Array = bd.get_meta('spin')
 		for i in spin.size(): spin[i].rotation.x += dt * 0.07 * (1 + i % 3); spin[i].rotation.y += dt * 0.1
 		if st.free:
 			var y: float = W.free.yaw
-			sph.position = sph.position.lerp(Vector3(p.x + cos(y) * 4.5, p.alt + 1.2 + sin(st.time) * 0.3, -p.y - sin(y) * 4.5 - 1), minf(1.0, dt * 3.0)))
-	g.show_strip = false; g.view_lock = true; W.cam_mode = 'free'; W.free = {yaw = 0.0, pitch = 0.5, dist = 26.0}; p.alt = 0.4; p.no_collide = true; g.alt_min = 0.4; g.alt_max = 0.4
-	ui.chapter_tag('Capítulo VIII · Espaciolandia'); Snd.drone('space')
+			sph.position = sph.position.lerp(Vector3(p.x + cos(y) * 4.5, p.alt + 1.2 + sin(st.time) * 0.3, -p.y - sin(y) * 4.5 - 1), minf(1.0, dt * 3.0))
+		# marginalia en vuelo: basta con pasar cerca y bajo (S-04 en el Espacio)
+		if not g.auto and not g.busy and not st.busy_m:
+			for s in W.spots.values():
+				if s.margin and not s.hid and Vector2(p.x - s.x, p.y - s.y).length() < 4.0 and p.alt < 8.0:
+					st.busy_m = true
+					var take := func(id: String):
+						g.begin_scene(); await g.margin(id); g.end_scene(); st.busy_m = false
+					take.call(s.id)
+					break)
+	margins([['m_c8_embarazada', -4, 16.5], ['m_c8_circulo', 40, 17], ['m_c8_sala', -14, -27.5]])
+	g.show_strip = false; g.view_lock = true; W.cam_mode = 'free'; W.free = {yaw = 0.0, pitch = 1.05, dist = 38.0}; p.alt = 0.4; p.no_collide = true; g.alt_min = 0.4; g.alt_max = 0.4
+	ui.chapter_tag('Capítulo VIII · Espaciolandia'); Snd.drone('none')
 	await narr('Un horror indecible. Oscuridad. Luego una sensación mareante de una vista que no era ver: vi una Línea que no era Línea; un Espacio que no era Espacio. Yo era yo y no lo era.', true)
 	await narr('Grité: «¡Esto es la locura, o es el Infierno!»', true)
 	await ui.title('Capítulo VIII', 'Espaciolandia', '«Ni lo uno ni lo otro. Es el Conocimiento; son las Tres Dimensiones. Abre el ojo de nuevo y procura mirar con firmeza.»', 4.0)
 	W.show_guts = true
 	for e in W.ents.values(): e.guts.visible = true
+	# C8-01 · el vértigo: a ras del Plano la ciudad es una raya; la cámara sube y la raya se abre
+	var P0 := Vector3(p.x, 0.0, -p.y)
+	var keys := [
+		{t = 0.0, pos = _cam_at(P0, 0.0, 0.02, 30.0), look = P0, fov = 42.0, ease = 'linear'},
+		{t = 3.0, pos = _cam_at(P0, 0.0, 0.03, 30.0), look = P0, fov = 42.0},
+		{t = 6.0, pos = _cam_at(P0 + Vector3(0, 6, 0), 0.0, 0.4, 30.0), look = P0 + Vector3(0, 6, 0), fov = 42.0},
+		{t = 9.0, pos = _cam_at(P0 + Vector3(0, 13, 0), 0.0, 1.05, 38.0), look = P0 + Vector3(0, 13, 0), fov = 42.0},
+	]
 	ui.fade(false, 2.0)
-	await g.tween(5, func(t):
-		var k := App.ease(t)
-		p.alt = 0.4 + k * 13; W.free.pitch = 0.5 + k * 0.55; W.free.dist = 26 + k * 12; W.free.yaw = 0.0)
+	g.after(3.2, func(): Snd.drone('space'); Snd.sfx('rise'))
+	g.tween(9.0, func(t): p.alt = 0.4 + clampf((t - 0.33) / 0.67, 0.0, 1.0) * 12.6)
+	await Cine.play(W, keys, true)
+	p.alt = 13.0; W._free_intro = 1.0; W.rail = {}
 	g.alt_min = 4; g.alt_max = 20
 	g.begin_scene()
 	await say('esfera', 'Mira. No con el borde de tu ojo: con todo él. Lo que hay debajo de ti es tu mundo. Entero.')
@@ -58,18 +103,60 @@ func ch8() -> void:
 	await say('narr', 'Y vi a la Esfera. No una rebanada: él. Lo que yo había tomado por un Círculo era una cosa con un *dentro* que no se veía y un *fuera* por todas partes. Era hermoso de un modo para el que aún no tengo palabra.')
 	g.end_scene()
 	ui.note(tx('Arrastra el ratón para mirar alrededor · {move} para volar · {rise} / {sink} para subir y bajar · rueda: acercar', 'Palanca para volar · arrastra por la derecha para mirar · botones para subir y bajar · pellizca para acercar', 'Stick derecho para mirar alrededor · stick izquierdo para volar · {rise} / {sink} para subir y bajar'), 14)
-	await g.go_to(-28, 17, 6, 'Vuela sobre tu casa y mírala por dentro')
+	# C8-02 · ver por dentro: tres hallazgos obligatorios (y las marginalia, si se pasa cerca)
+	await _finds({
+		h_alacena = {x = -24.5, y = 18.0, fn = func():
+			await say('yo', 'Mis hijos, dormidos en sus cuartos del Oeste. Mis dos nietos. Mi hija. Los criados. Y… veo dentro de *ellos*. Sus entrañas. Les late algo.')
+			await say('yo', 'Y mi alacena, abierta como un plato: dos cofres y *una* tablilla. La otra sigue en el suelo del salón, donde la dejó él.')
+			await say('esfera', 'Desde Arriba no hay dentro que se esconda. Así vi yo tu alacena. Así te toqué el estómago.')
+			await say('logica', 'Tu esposa recorre el salón de punta a punta. Para ella has desaparecido sin cruzar ninguna puerta. Como el Forastero. Como tú ante el Rey de la Línea.')},
+		h_nieto = {x = -33.6, y = 8.2, fn = func():
+			await say('yo', 'Mi nieto pequeño, dormido. Y bajo su almohada, una tablilla: tres cuadrados de tres por tres, uno al lado del otro, y una palabra: «pisos».')
+			await say('asombro', 'Lo intentó a escondidas. Como tú esta noche. Él tampoco tenía dónde poner el «encima».')},
+		h_acta = {x = -6.4, y = -31.0, fn = func():
+			await say('yo', 'El cofre del Prefecto. Dentro, un acta con la fecha de hoy, ya firmada. «Se resuelve: prisión perpetua para el Escribano.» Y el Consejo aún no se ha reunido.')
+			await say('recelo', 'Mil años repitiendo la misma resolución. Ni siquiera hace falta la sesión.')},
+	}, 'Mira dentro de lo que nunca has visto')
+	# C8-03 · coger desde Arriba
+	var stop_carry := Carry.enable(self, func(e):
+		if e.id == 'estilete' and HOSPITAL_RECT.has_point(Vector2(e.x, e.y)) and not g.flag('estilete_hospital'):
+			g.flag('estilete_hospital', 1); g.state.inv.erase('estilete'); g.note('hospital_miracle', 3)
+			ui.note('*Dentro de la sala cerrada, junto al calderero, cae un estilete que nadie ha traído.*', 5.0))
 	g.begin_scene()
-	await say('yo', 'Mis hijos, dormidos en sus cuartos del Oeste. Mis dos nietos. Mi hija. Los criados. Y… veo dentro de *ellos*. Sus entrañas. Les late algo.')
-	await say('esfera', 'Desde Arriba no hay dentro que se esconda. Así vi yo tu alacena. Así te toqué el estómago.')
-	await say('yo', 'Y mi esposa. Recorre el salón de punta a punta. Me busca.')
-	await say('logica', 'Para ella has desaparecido sin cruzar ninguna puerta. Como el Forastero. Como tú ante el Rey de la Línea.')
+	await say('esfera', 'Ahora hazlo tú. Lo que yo hice con tu alacena. Baja hasta casi tocar tu tablilla, tómala y déjala donde estaba.')
+	g.end_scene()
+	ui.note(tx('Baja con {sink} hasta la tablilla y mantén {act} para tomarla; suéltalo para dejarla caer.', 'Baja hasta la tablilla y mantén el botón de acción para tomarla; suéltalo para dejarla caer.', 'Baja con {sink} hasta la tablilla y mantén {act} para tomarla; suéltalo para dejarla caer.'), 10.0)
+	g.alt_min = 1.5
+	await Carry.run(self, 'tab2', func(e): return ALACENA_RECT.has_point(Vector2(e.x, e.y)), 'Devuelve la tablilla a tu alacena cerrada', ALACENA_RECT.get_center())
+	g.achieve('ACH_CUPBOARD')
+	g.begin_scene()
+	await say('asombro', 'Cerrada por sus cuatro lados. Y dentro, dos tablillas. Mañana la contarás de memoria y no faltará ninguna.')
+	await say('esfera', 'Ya lo ves: no es magia. Es un sitio más.')
+	if g.state.get('inv', {}).has('estilete'): await say('recelo', 'Llevas aún el estilete del calderero, en el estudio. El Hospital está al Este. Nadie vigila el techo de una sala cerrada.')
 	await say('esfera', 'Ven. Hay algo que debes oír. Es la primera hora del primer día del año 2000, y el Alto Consejo de tu país está reunido, como lo estuvo hace mil años, y hace dos mil.')
 	g.end_scene()
-	await g.go_to(-14, -24, 6.5, 'Vuela hacia el sur: la Sala del Consejo, en el Palacio')
+	# C8-04 · el calderero, desde Arriba (opcional: se ve si se pasa por encima del Hospital)
+	var tinker := {seen = false}
+	var stop_tinker := g.tick(func(_dt):
+		if tinker.seen or g.busy or g.auto: return
+		if Vector2(p.x - 56, p.y - 17.6).length() < 5.0 and p.alt < 10.0:
+			tinker.seen = true
+			var see := func():
+				g.begin_scene()
+				if protest:
+					await say('yo', 'El Hospital. En una sala cerrada, en una camilla, el calderero. Lo tienen metido en un marco que le fuerza los ángulos. Está vivo.')
+					await say('asombro', 'Desde aquí se ve que sus tres lados están bien. Sólo son distintos.')
+				else:
+					await say('yo', 'El Hospital. Una sala cerrada, vacía. En el suelo, marcas en el papel, como las de la plaza.')
+					await say('recelo', 'Firmaste como perito. O miraste la niebla.')
+				g.achieve('ACH_TINKER'); g.end_scene()
+			see.call())
+	await g.fly_to(-14, -24, 6.5, 12.0, 'Vuela hacia el sur: la Sala del Consejo, en el Palacio')
+	stop_tinker.call()
 	g.begin_scene()
 	g.tween(2.5, func(t): p.x = lerpf(p.x, -14, t * 0.2); p.y = lerpf(p.y, -20, t * 0.2); p.alt = lerpf(p.alt, 11, t * 0.2); W.free.dist = lerpf(W.free.dist, 30, t * 0.2))
 	await say('yo', '¡Mi hermano! Es el Escribano Mayor del Consejo. Está leyendo.')
+	Snd.motif('hermano', '', false, -12.0)
 	await say('hermano', '«…considerando que cada milenio han turbado a los Estados gentes mal intencionadas que pretenden haber recibido revelaciones de Otro Mundo…»')
 	await say('hermano', '«…se resuelve: que en el primer día de cada milenio los Prefectos busquen a tales extraviados; que se destruya sin examen al que sea Isósceles; se azote y encarcele al Equilátero; se envíe al Manicomio al Cuadrado o Pentágono; y se arreste a cualquiera de rango superior.»')
 	await say('esfera', 'Ya oyes tu destino. Y, sin embargo, voy a decírselo a ellos también. Mira cómo me ven.')
@@ -78,7 +165,7 @@ func ch8() -> void:
 	var from := sph.position
 	var section := func():
 		var h := sph.position.y
-		sec.sc = maxf(0.001, sqrt(1.0 - pow(h / 1.7, 2))) if absf(h) < 1.7 else 0.001
+		sec.sc = maxf(0.001, Geom3.sphere_section(1.0, h / 1.7))
 	await g.tween(3.2, func(t):
 		var k := App.ease(t)
 		sph.position = Vector3(lerpf(from.x, -14, k), lerpf(from.y, 0, k), lerpf(from.z, 25.5, k)); section.call())
@@ -111,6 +198,7 @@ func ch8() -> void:
 	g.frag(18)
 	await say('esfera', 'Sube conmigo. Más alto. Te enseñaré de qué estás hecho, y de qué estoy hecho yo.')
 	g.end_scene()
+	stop_carry.call()
 	g.alt_max = 44; g.objective(tx('Asciende (mantén {rise}) hasta dejar la ciudad muy abajo', 'Asciende (mantén el botón de subir) hasta dejar la ciudad muy abajo'), null)
 	await g.until(func(): return p.alt > 32, func(): p.alt = 34.0)
 	g.objective('', null); g.alt_min = 30
@@ -133,66 +221,123 @@ func ch8() -> void:
 	var base_y := p.alt + 0.5
 	await g.tween(3, func(t): cube.scale = Vector3(L, lerpf(0.08, L, App.ease(t)), L); cube.position.y = base_y + L / 2 * App.ease(t))
 	await say('yo', 'Ocho puntos terminales. Seis lados, y cada uno es… un Cuadrado. Tres pulgadas en todos los sentidos. *Tres al cubo.*')
-	var stop_spin := g.tick(func(dt): cube.rotation.y += dt * 0.5; cube.rotation.x += dt * 0.23)
+	var spin := {on = true}
+	var stop_spin := g.tick(func(dt):
+		if spin.on and is_instance_valid(cube): cube.rotation.y += dt * 0.5; cube.rotation.x += dt * 0.23)
 	await say('logica', 'Fíjate en cómo lo ves: unas caras más claras, otras más oscuras. Luz y sombra. Así se ve la profundidad desde fuera, igual que tú leías los ángulos en la niebla.')
+	g.ledger('3d.ve')
 	g.learn('solidos'); g.learn('altura')
 	await say('narr', 'Lo adoré. No hay otra palabra. Le llamé Maestro, y lo era.')
+	# C8-05 · las secciones del Cubo: bajamos con él hasta la Calle Mayor
+	await say('esfera', 'Ahora mira lo que ven tus compatriotas cuando un Cubo atraviesa su mundo. Bajemos.')
+	spin.on = false
+	var at := Vector2(2.0, 6.0)
+	var obs: Ent = g.add(F_penta('testigo', at.x + 7.0, at.y, {name = 'un Pentágono que pasaba', rot = PI}))
+	g.eye_src = obs; g.eye_src_all = true; g.strip_in_space = true
+	g.alt_min = 3.0
+	await g.tween(2.5, func(t):
+		var k := App.ease(t)
+		p.x = lerpf(p.x, at.x, k * 0.3); p.y = lerpf(p.y, at.y - 6.0, k * 0.3); p.alt = lerpf(p.alt, 7.0, k * 0.3)
+		W.free.yaw = 0.0; W.free.pitch = lerpf(0.35, 0.55, k); W.free.dist = lerpf(24.0, 16.0, k))
+	p.x = at.x; p.y = at.y - 6.0; p.alt = 7.0
+	await say('logica', 'Arriba, la línea de ese Pentágono: lo que él ve. Abajo, el Plano. Lo que cruce el Plano, lo verá él.')
+	ui.close_dlg()
+	var res: Dictionary = await CubeSections.run(self, cube, at, L)
+	g.flag('cube_pred', res.pred); g.flag('hidden_ok', 1 if res.hidden else 0)
+	if res.pred >= 3 and res.hidden: g.achieve('ACH_SECTIONS')
+	g.learn('secciones')
+	await say('asombro', 'Un hexágono, salido de un Cubo. Y tú, en el salón, mirando cómo un Círculo crecía y menguaba. Ahora sabes qué era.')
+	# C8-06 · la sombra del Cubo
+	await say('esfera', 'Hay otra manera de que te vean sin cruzar tu Plano. Mira: enciendo una luz.')
+	ui.close_dlg()
+	await ShadowTurn.run(self, cube, at, L)
+	g.learn('sombras')
+	await say('esfera', 'Esto es lo único que tus compatriotas podrían ver de él: su sombra. Dos cuadrados y cuatro rayas. Recuérdala.')
+	g.eye_src = null; g.eye_src_all = false; g.strip_in_space = false; W.remove('testigo')
+	# de vuelta arriba, para la Cuarta
+	await g.tween(2.5, func(t):
+		var k := App.ease(t)
+		p.alt = lerpf(7.0, 34.0, k); W.free.pitch = lerpf(0.55, 0.35, k); W.free.dist = lerpf(16.0, 24.0, k))
+	g.alt_min = 30
+	cube.transform = Transform3D(Basis().scaled(Vector3.ONE * L), Vector3(p.x, p.alt + 2.5, -p.y - 9))
+	cube.visible = true; spin.on = true
 	# --- la Cuarta ---
 	await say('yo', 'Maestro: me habéis mostrado las entrañas de mis compatriotas desde la tierra de Tres Dimensiones. Llevadme ahora a la de Cuatro.')
 	await say('esfera', '¿Qué dices?')
 	c = await choose([{t = 'Desde allí miraríamos este Espacio y veríamos el interior de todo Sólido. Vuestras propias entrañas.', id = 'a'}, {t = '(Callar. Has visto bastante.)', id = 's'}])
 	if c == 's': await say('narr', 'Pude callar. Había visto más que nadie en mil años. No callé: un Cuadrado que ha contado hasta tres quiere contar hasta cuatro.')
 	await say('esfera', 'No existe tal tierra. La sola idea es inconcebible.')
+	g.ledger('3d.no_concibe')
 	_anger(sph, 0.2)
-	# teseracto imaginado
+	# C8-07 · el teseracto, manejable
 	var tess := Space.make_lines(W.ink(Color('b79cf0'))); W.add_child(tess)
-	var V := []; var E := []
-	for i in 16: V.append([1.0 if i & 1 else -1.0, 1.0 if i & 2 else -1.0, 1.0 if i & 4 else -1.0, 1.0 if i & 8 else -1.0])
-	for i in 16:
-		for b in 4:
-			if not (i & (1 << b)): E.append([i, i | (1 << b)])
-	var ts := {a = 0.0, sc = 0.01}
-	var cpos := cube.position
-	var stop_tess := g.tick(func(dt):
-		ts.a += dt * 0.6
-		var ca := cos(ts.a); var sa := sin(ts.a); var cb := cos(ts.a * 0.6); var sb := sin(ts.a * 0.6)
-		var im: ImmediateMesh = tess.mesh
-		im.clear_surfaces(); im.surface_begin(Mesh.PRIMITIVE_LINES)
-		for e in E:
-			for vi in e:
-				var v: Array = V[vi]
-				var x: float = v[0] * ca - v[3] * sa; var w: float = v[0] * sa + v[3] * ca
-				var y: float = v[1] * cb - v[2] * sb; var z: float = v[1] * sb + v[2] * cb
-				var k: float = 2.6 / (3.2 - w) * ts.sc * 2.6
-				im.surface_add_vertex(cpos + Vector3(x, y, z) * k)
-		im.surface_end())
+	var ts := {sc = 0.01}
 	await say('yo', 'Vuestra propia Analogía, Maestro. Punto, Línea, Cuadrado, Cubo: uno, dos, cuatro, ocho puntos terminales. ¿Qué sigue?')
 	c = await choose([{t = 'Dieciséis.', id = 16}, {t = 'Diez.', id = 10}, {t = 'Doce.', id = 12}])
 	Snd.sfx('her')
+	var stop_tess := Tesseract.start(self, tess, cube.position, ts)
 	var held := {cube = cube}   # el Cubo puede borrarse antes de que acabe esta animación suelta
 	g.tween(4, func(t):
 		ts.sc = App.ease(t)
 		if is_instance_valid(held.cube): cm.set_shader_parameter('dim', 1.0 - t * 0.6); held.cube.scale = Vector3.ONE * L * (1.0 - 0.45 * App.ease(t)))
 	await say('yo', 'Dieciséis. Y sus límites: dos Puntos, cuatro Líneas, seis Cuadrados… *ocho Cubos*. Un Cubo movido en una dirección nueva. ¡Casi lo veo!' if c == 16 else 'No… el doble cada vez: *dieciséis*. Y sus límites: dos Puntos, cuatro Líneas, seis Cuadrados… ocho Cubos. ¡Casi lo veo!')
 	g.learn('cuarta')
-	await say('asombro', 'Eso que gira ahí no está en el Espacio. Está en ti. Es la sombra de una sombra, y es lo más grande que has pensado nunca.')
+	for k in ['habitante', 've', 'limites', 'no_concibe', 'rechazo']: g.ledger('4d.' + k)
+	g.ledger('3d.desde_arriba')
+	await say('asombro', 'Eso que gira ahí no está en el Espacio. Está en ti. Es la sombra de una sombra, igual que la sombra del Cubo en tu Plano. Y es lo más grande que has pensado nunca.')
 	_anger(sph, 0.45)
 	await say('esfera', 'Basta. Son fantasías. Analogías sin objeto.')
 	c = await choose([{t = '¿No es cierto que en vuestro país se han visto Seres entrar en cuartos cerrados, como vos en el mío?', id = 'a'}, {t = '(Ceder.) Perdonad, Maestro.', id = 's'}])
 	if c == 's': await say('narr', 'No cedí. Tú has elegido la prudencia dos veces y yo te he desmentido dos veces: así fue. No sabía parar.')
 	await say('esfera', '…Se cuenta. Visiones. Cosas del cerebro de quien las ve. Nadie las cree.')
+	g.ledger('3d.rechazo')
 	await say('logica', '«Un truco de mago.» «Visiones del cerebro.» El Rey, tú, la Esfera. Cada mundo tiene su frase para lo que le queda por encima.')
 	_anger(sph, 0.75); g.her(1); Snd.tension(0.55)
 	await say('yo', '¡Entonces existe! ¡Y más allá, la Quinta, la Sexta, la Séptima Dimensión! ¡Llevadme! ¡Hacia Arriba de Arriba!')
 	_anger(sph, 1.0); Snd.sfx('gavel'); App.rumble(0.8, 1.0, 0.2)
 	await say('esfera', '¡SILENCIO!')
 	g.frag(19); ui.close_dlg(); stop_tess.call(); stop_spin.call(); tess.queue_free(); cube.queue_free()
-	Snd.sfx('fall'); Snd.tension(0.0); g.alt_min = 0; ui.fade(true, 1.9)
-	await g.tween(2.0, func(t): p.alt = lerpf(34, 0.2, t * t); p.rot += 0.3; W.free.pitch = lerpf(0.35, 1.2, t))
-	g.end_scene()
+	# C8-08 · la caída: la cámara cae girando y la ciudad se cierra otra vez en una raya
+	Snd.sfx('fall'); Snd.tension(0.0); g.alt_min = 0
+	var P1 := Vector3(p.x, 0.0, -p.y)
+	var fall := [
+		{t = 0.0, pos = W.cam.global_position, look = Vector3(p.x, p.alt, -p.y), fov = 42.0, ease = 'in'},
+		{t = 2.0, pos = _cam_at(P1 + Vector3(0, 8, 0), 1.6, 0.5, 30.0), look = P1 + Vector3(0, 4, 0), fov = 42.0, ease = 'linear'},
+		{t = 4.0, pos = _cam_at(P1, 3.1, 0.015, 30.0), look = P1, fov = 42.0, hold = true},
+	]
+	g.tween(4.0, func(t): p.alt = lerpf(34, 0.2, t * t); p.rot += 0.3)
+	g.after(3.0, func(): ui.fade(true, 1.0))
+	await Cine.play(W, fall, false)
+	await ui.fade(true, 0.3)
+	W.rail = {}
 	stop_space.call(); sph.queue_free(); bd.queue_free()
 	W.cam_mode = 'follow'; g.show_strip = true; g.view_lock = false; W.show_guts = false; W.known = {home = true, school = W.known.get('school', false), temple = true}
 	await narr('Un estrépito. Y me hallé de nuevo en mi estudio, en el Plano, oyendo acercarse el Grito de Paz de mi esposa.', true)
+
+# C8-02 · hallazgos en vuelo: se registran al sobrevolarlos de cerca (a menos de 4 u y por debajo de 8 u)
+func _finds(list: Dictionary, text: String) -> void:
+	var W := g.world; var p := g.player
+	for id in list: W.add_spot({id = id, x = list[id].x, y = list[id].y}); W.mark(id)
+	g.objective(text, list.keys()[0])
+	var left := list.keys()
+	while not left.is_empty():
+		var st := {hit = null}   # las claves del diccionario son StringName: no se mezclan con String
+		if g.auto or g.bot:
+			st.hit = left[0]; p.x = list[st.hit].x; p.y = list[st.hit].y
+		else:
+			await g.until(func():
+				for id in left:
+					if Vector2(p.x - list[id].x, p.y - list[id].y).length() < 4.0 and p.alt < 8.0:
+						st.hit = id; return true
+				return false)
+		var hit = st.hit
+		if hit == null or not left.has(hit): break
+		left.erase(hit); W.unmark(hit); W.remove_spot(hit); Snd.sfx('pick')
+		W.target = left[0] if not left.is_empty() else null
+		g.begin_scene()
+		await list[hit].fn.call()
+		g.end_scene()
+	g.objective('', null)
 
 # ============ CAP. IX — PUNTOLANDIA Y EL NIETO ============
 func ch9() -> void:
@@ -439,3 +584,44 @@ func ch10() -> void:
 	var n: int = g.state.frags.size()
 	await ui.title('FIN', 'Planilandia', 'El manuscrito está completo: 22 de 22 secciones. Alguien, en Alguna Dimensión, lo ha leído.' if n >= 22 else tr('Has recuperado %d de 22 secciones del manuscrito. Las que faltan esperan en sus capítulos.') % n, 6.0)
 	await ui.title('Edwin A. Abbott', 'Flatland, 1884', 'Hacia Arriba, no hacia el Norte.', 5.0)
+
+# --try=ascent|sections|shadow|carry|tess: piezas sueltas del VIII
+func try_mini(name: String) -> void:
+	ui.hud.visible = true; ui.chapter_tag('Prueba · ' + name)
+	var map := town({palace = true, hospital_room = true}); g.set_map(map); var W := g.world
+	for b in map.buildings: W.known[b.id] = true
+	W.rebuild()
+	var p := g.spawn_player(-27.6, 12, -PI / 2)
+	g.show_strip = false; g.view_lock = true; W.cam_mode = 'free'; W.free = {yaw = 0.0, pitch = 1.05, dist = 38.0}; p.no_collide = true
+	W.show_guts = true; W._free_intro = 1.0; p.alt = 13.0; g.alt_min = 4; g.alt_max = 20
+	var bd := Space.backdrop(false); W.add_child(bd); Snd.drone('space')
+	match name:
+		'ascent':
+			p.alt = 0.4; W._free_intro = 0.0
+			var P0 := Vector3(p.x, 0.0, -p.y)
+			g.tween(9.0, func(t): p.alt = 0.4 + clampf((t - 0.33) / 0.67, 0.0, 1.0) * 12.6)
+			await Cine.play(W, [{t = 0.0, pos = _cam_at(P0, 0.0, 0.02, 30.0), look = P0, ease = 'linear'}, {t = 3.0, pos = _cam_at(P0, 0.0, 0.03, 30.0), look = P0},
+				{t = 6.0, pos = _cam_at(P0 + Vector3(0, 6, 0), 0.0, 0.4, 30.0), look = P0 + Vector3(0, 6, 0)}, {t = 9.0, pos = _cam_at(P0 + Vector3(0, 13, 0), 0.0, 1.05, 38.0), look = P0 + Vector3(0, 13, 0)}], true)
+			W._free_intro = 1.0; await g.wait(1.0)
+		'sections', 'shadow':
+			var cube := Space.make_cube(); W.add_child(cube)
+			var cm: ShaderMaterial = cube.material_override
+			cm.set_shader_parameter('col', Vector3(0.98, 0.96, 0.89)); cm.set_shader_parameter('edge_col', World._v3(W.pal.edge))
+			var at := Vector2(2.0, 6.0)
+			var obs: Ent = g.add(F_penta('testigo', at.x + 7.0, at.y, {rot = PI}))
+			g.eye_src = obs; g.eye_src_all = true; g.strip_in_space = true; g.show_strip = true
+			p.x = at.x; p.y = at.y - 6.0; p.alt = 7.0; g.alt_min = 3.0; W.free = {yaw = 0.0, pitch = 0.55, dist = 16.0}
+			g.begin_scene()
+			if name == 'sections': print('secciones ', await CubeSections.run(self, cube, at))
+			else: print('sombra ', await ShadowTurn.run(self, cube, at))
+		'carry':
+			g.add({id = 'tab2', pts = [[0.32, 0.12], [-0.32, 0.12], [-0.32, -0.12], [0.32, -0.12]], x = -30.2, y = 8.6, noCollide = true, noGuts = true, noEye = true, carryable = true})
+			var stop := Carry.enable(self)
+			g.alt_min = 1.5; p.alt = 3.0
+			print('alacena ', await Carry.run(self, 'tab2', func(e): return ALACENA_RECT.has_point(Vector2(e.x, e.y)), 'Devuelve la tablilla a tu alacena cerrada', ALACENA_RECT.get_center()))
+			stop.call()
+		'tess':
+			var tess := Space.make_lines(W.ink(Color('b79cf0'))); W.add_child(tess)
+			var stop := Tesseract.start(self, tess, Vector3(p.x, p.alt + 2.0, -p.y - 9), {sc = 1.0})
+			W.free = {yaw = 0.0, pitch = 0.35, dist = 24.0}
+			await g.wait(8.0); stop.call()

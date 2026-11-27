@@ -48,6 +48,8 @@ var phase := 0.0
 var cry := false         # grita «¡Paz!» cada pocos segundos, desde donde está (S-07)
 var cry_range := 14.0
 var cry_t := 0.0
+var carryable := false   # se puede tomar desde Arriba (S-13)
+var lifted := false      # fuera del Plano: sin sombra y fuera de la línea de los planilandeses
 var margin := false      # nota al margen (S-04): un brillo de tinta que sólo se ve de cerca
 
 func setup(w, d: Dictionary) -> Ent:
@@ -57,7 +59,7 @@ func setup(w, d: Dictionary) -> Ent:
 	x = d.get("x", 0.0); y = d.get("y", 0.0); rot = d.get("rot", 0.0); speed = d.get("speed", 2.6)
 	ai = d.get("ai", null); lum = d.get("lum", 1.0); solidity = 1 if d.get("solid", false) else 0
 	sway = d.get("sway", 1.0) if woman else 0.0
-	no_collide = d.get("noCollide", false); fixed_rot = d.get("fixedRot", false)
+	no_collide = d.get("noCollide", false); fixed_rot = d.get("fixedRot", false); carryable = d.get("carryable", false)
 	t = randf() * 10.0; phase = randf() * TAU
 	cry = d.get("cry", false); cry_range = d.get("cryRange", 14.0); cry_t = 0.5 + randf() * 2.5
 	body = MeshInstance3D.new(); add_child(body)
@@ -152,6 +154,18 @@ func build() -> void:
 		guts.mesh = gb.commit(); guts.material_override = world.mat(2)
 	guts.visible = world.show_guts
 
+# cambia la forma sin recrear la figura (las secciones del VIII): puntos del Plano relativos a (x, y)
+func set_shape(pts) -> void:
+	local = []
+	for q in pts: local.append(q)
+	if local.size() < 2: hid = true; return
+	hid = false
+	var m := 0.0
+	for q in local: m = maxf(m, (q as Vector2).length())
+	rad = maxf(m * 0.86, 0.05)
+	def.pts = local
+	build()
+
 func set_colors(arr) -> void:
 	side_colors = arr; build()
 
@@ -195,6 +209,7 @@ func update(dt: float) -> void:
 			rotation.y = 0.0
 			scale = Vector3.ONE * (0.75 + 0.35 * pow(0.5 + 0.5 * sin(world.time * TAU / 2.4 + phase), 3.0))
 		return
+	if shadow != null: shadow.visible = not lifted and alt < 0.3
 	greet_cd = maxf(0.0, greet_cd - dt); talk = maxf(0.0, talk - dt * 2.5); shake = maxf(0.0, shake - dt * 2.6)
 	if dying >= 0.0:
 		# herida mortal: gira sobre sí, se encoge y desaparece

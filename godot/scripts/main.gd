@@ -116,6 +116,7 @@ func _try(name: String) -> void:
 	g.running = true
 	g.on_menu = func(): ui.toggle_pause(func(): get_tree().quit())
 	if name in ["exam", "woman", "hymn", "mend", "bridge"]: await (get_meta("keep")[1] as ChB).try_mini(name)
+	elif name in ["ascent", "sections", "shadow", "carry", "tess"]: await (get_meta("keep")[3] as ChD).try_mini(name)
 	elif name in ["kingview", "section", "ear", "harmony", "square", "cube", "sphere", "table", "cupboard"]: await (get_meta("keep")[2] as ChC).try_mini(name)
 	else: await (get_meta("keep")[0] as ChA).try_mini(name)
 	print("TRY OK ", name)

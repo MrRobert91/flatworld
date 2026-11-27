@@ -12,24 +12,20 @@ msgstr ""
 msgid "Mujer del obrero"
 msgstr ""
 
-#: scripts/content/ch.gd:103
+#: scripts/content/ch.gd:105
 msgid "Inclinarse"
 msgstr ""
 
-#: scripts/content/ch.gd:103
+#: scripts/content/ch.gd:105
 msgid "ante un Círculo"
 msgstr ""
 
-#: scripts/content/ch.gd:104
+#: scripts/content/ch.gd:106
 msgid "Ceder el paso"
 msgstr ""
 
-#: scripts/content/ch.gd:104
+#: scripts/content/ch.gd:106
 msgid "a una Mujer"
-msgstr ""
-
-#: scripts/content/ch.gd:108
-msgid "un Polígono"
 msgstr ""
 
 #: scripts/content/ch.gd:11
@@ -40,7 +36,11 @@ msgstr ""
 msgid "Médico Pentágono"
 msgstr ""
 
-#: scripts/content/ch.gd:117 scripts/content/ch_a.gd:593
+#: scripts/content/ch.gd:110
+msgid "un Polígono"
+msgstr ""
+
+#: scripts/content/ch.gd:119 scripts/content/ch_a.gd:593
 msgid "Irregular"
 msgstr ""
 
@@ -84,7 +84,7 @@ msgstr ""
 msgid "Círculo joven"
 msgstr ""
 
-#: scripts/content/ch.gd:162 scripts/content/ch_a.gd:375
+#: scripts/content/ch.gd:164 scripts/content/ch_a.gd:375
 msgid "Grito de Paz"
 msgstr ""
 
@@ -96,16 +96,12 @@ msgstr ""
 msgid "El padre Isósceles"
 msgstr ""
 
-#: scripts/content/ch.gd:174 scripts/content/ch.gd:180 scripts/content/ch_a.gd:592
+#: scripts/content/ch.gd:176 scripts/content/ch.gd:182 scripts/content/ch_a.gd:592
 msgid "Reconocimiento por la vista"
 msgstr ""
 
-#: scripts/content/ch.gd:174
+#: scripts/content/ch.gd:176
 msgid "¿Qué figura se acerca? Observa cómo se apagan sus extremos en la niebla."
-msgstr ""
-
-#: scripts/content/ch.gd:178
-msgid "Mira otra vez cómo caen los extremos: deprisa, ángulo agudo; despacio, muchos lados. Y si no cae nada, inclínate."
 msgstr ""
 
 #: scripts/content/ch.gd:18
@@ -117,6 +113,10 @@ msgid "El Forastero"
 msgstr ""
 
 #: scripts/content/ch.gd:180
+msgid "Mira otra vez cómo caen los extremos: deprisa, ángulo agudo; despacio, muchos lados. Y si no cae nada, inclínate."
+msgstr ""
+
+#: scripts/content/ch.gd:182
 msgid "¿Qué figura se acerca?"
 msgstr ""
 
@@ -128,19 +128,19 @@ msgstr ""
 msgid "El Presidente del Consejo"
 msgstr ""
 
-#: scripts/content/ch.gd:190
+#: scripts/content/ch.gd:192
 msgid "Cierto: %s. *La lámina te lo confirma.*"
 msgstr ""
 
-#: scripts/content/ch.gd:191
+#: scripts/content/ch.gd:193
 msgid "No: era %s %s. *Mírala desde arriba y compara con la línea.*"
 msgstr ""
 
-#: scripts/content/ch.gd:191
+#: scripts/content/ch.gd:193
 msgid "una"
 msgstr ""
 
-#: scripts/content/ch.gd:191
+#: scripts/content/ch.gd:193
 msgid "un"
 msgstr ""
 
@@ -216,24 +216,20 @@ msgstr ""
 msgid "Hexágono ocioso"
 msgstr ""
 
-#: scripts/content/ch.gd:80
+#: scripts/content/ch.gd:82
 msgid "Tu casa"
 msgstr ""
 
-#: scripts/content/ch.gd:84
+#: scripts/content/ch.gd:86
 msgid "Colegio de Vista"
 msgstr ""
 
-#: scripts/content/ch.gd:85
+#: scripts/content/ch.gd:87
 msgid "Templo de los Círculos"
 msgstr ""
 
-#: scripts/content/ch.gd:86
-msgid "Palacio del Prefecto"
-msgstr ""
-
 #: scripts/content/ch.gd:88
-msgid "Cuartel"
+msgid "Palacio del Prefecto"
 msgstr ""
 
 #: scripts/content/ch.gd:9
@@ -244,31 +240,35 @@ msgstr ""
 msgid "Sargento de la Puerta"
 msgstr ""
 
-#: scripts/content/ch.gd:91
-msgid "Calle Mayor"
-msgstr ""
-
-#: scripts/content/ch.gd:91
-msgid "Puerta Oeste"
-msgstr ""
-
-#: scripts/content/ch.gd:91
-msgid "Norte: de allí viene la lluvia"
-msgstr ""
-
-#: scripts/content/ch.gd:92
-msgid "camino de las aldeas"
+#: scripts/content/ch.gd:90
+msgid "Cuartel"
 msgstr ""
 
 #: scripts/content/ch.gd:93
+msgid "Calle Mayor"
+msgstr ""
+
+#: scripts/content/ch.gd:93
+msgid "Puerta Oeste"
+msgstr ""
+
+#: scripts/content/ch.gd:93
+msgid "Norte: de allí viene la lluvia"
+msgstr ""
+
+#: scripts/content/ch.gd:94
+msgid "camino de las aldeas"
+msgstr ""
+
+#: scripts/content/ch.gd:95
 msgid "salón"
 msgstr ""
 
-#: scripts/content/ch.gd:94
+#: scripts/content/ch.gd:96
 msgid "puerta de los varones"
 msgstr ""
 
-#: scripts/content/ch.gd:94
+#: scripts/content/ch.gd:96
 msgid "puerta de las mujeres"
 msgstr ""
 
@@ -300,7 +300,7 @@ msgstr ""
 msgid "tu otro nieto"
 msgstr ""
 
-#: scripts/content/ch_a.gd:127 scripts/content/ch_d.gd:245
+#: scripts/content/ch_a.gd:127 scripts/content/ch_d.gd:390
 msgid "tu hijo mayor"
 msgstr ""
 
@@ -376,11 +376,11 @@ msgstr ""
 msgid "Girar"
 msgstr ""
 
-#: scripts/content/ch_a.gd:155 scripts/content/ch_a.gd:156 scripts/content/ch_c.gd:469 scripts/content/ch_c.gd:470
+#: scripts/content/ch_a.gd:155 scripts/content/ch_a.gd:156 scripts/content/ch_c.gd:469 scripts/content/ch_c.gd:470 …
 msgid "un cofre"
 msgstr ""
 
-#: scripts/content/ch_a.gd:157 scripts/content/ch_a.gd:158 scripts/content/ch_c.gd:300 scripts/content/ch_c.gd:471
+#: scripts/content/ch_a.gd:157 scripts/content/ch_a.gd:158 scripts/content/ch_c.gd:300 scripts/content/ch_c.gd:471 …
 msgid "una tablilla"
 msgstr ""
 
@@ -1560,7 +1560,7 @@ msgstr ""
 msgid "Se rió, y su madre se lo llevó. Yo cené frío, solo, del lado de los varones."
 msgstr ""
 
-#: scripts/content/ch_a.gd:703 scripts/content/ch_b.gd:600 scripts/content/ch_c.gd:494
+#: scripts/content/ch_a.gd:703 scripts/content/ch_b.gd:600 scripts/content/ch_c.gd:494 scripts/content/ch_d.gd:590
 msgid "Prueba · "
 msgstr ""
 
@@ -1596,7 +1596,7 @@ msgstr ""
 msgid "Acércate a la tablilla y empieza a escribir"
 msgstr ""
 
-#: scripts/content/ch_a.gd:99 scripts/content/ch_d.gd:419
+#: scripts/content/ch_a.gd:99 scripts/content/ch_d.gd:564
 msgid "Escribir"
 msgstr ""
 
@@ -1868,7 +1868,7 @@ msgstr ""
 msgid "el Círculo oficiante"
 msgstr ""
 
-#: scripts/content/ch_b.gd:303 scripts/content/ch_d.gd:26 scripts/content/ch_d.gd:405
+#: scripts/content/ch_b.gd:303 scripts/content/ch_d.gd:52 scripts/content/ch_d.gd:550
 msgid "tu hermano"
 msgstr ""
 
@@ -3129,807 +3129,919 @@ msgid "Atrevido. Canto yo, canta mi soprano; tú busca dónde casan las tres. Si
 msgstr ""
 
 #: scripts/content/ch_d.gd:101
-msgid "Excelencia… yo sólo leía el acta."
-msgstr ""
-
-#: scripts/content/ch_d.gd:102
-msgid "¡Hermano! ¡Déjame bajar, Esfera! Yo se lo explicaré al Consejo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:102
-msgid "(Mirar. Como miraste en la Puerta.)"
-msgstr ""
-
-#: scripts/content/ch_d.gd:103
-msgid "No. Nada que digas hoy lo salvaría, y a ti te perdería. Tu misión no es morir en esa sala."
-msgstr ""
-
-#: scripts/content/ch_d.gd:104
-msgid "Esta vez no hay sargento que apunte tu silencio. Sólo tú."
-msgstr ""
-
-#: scripts/content/ch_d.gd:110
-msgid "Mi hermano. El mejor de los Cuadrados: justo, sensato, alegre. Condenado por haber visto."
-msgstr ""
-
-#: scripts/content/ch_d.gd:112
-msgid "Sube conmigo. Más alto. Te enseñaré de qué estás hecho, y de qué estoy hecho yo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:114
-msgid "Asciende (mantén {rise}) hasta dejar la ciudad muy abajo"
-msgstr ""
-
-#: scripts/content/ch_d.gd:114
-msgid "Asciende (mantén el botón de subir) hasta dejar la ciudad muy abajo"
-msgstr ""
-
-#: scripts/content/ch_d.gd:124
-msgid "Aquí tienes un Punto."
-msgstr ""
-
-#: scripts/content/ch_d.gd:127
-msgid "Lo muevo: una Línea. Dos puntos terminales."
-msgstr ""
-
-#: scripts/content/ch_d.gd:130
-msgid "La muevo paralela a sí misma: un Cuadrado. Cuatro puntos terminales. Eres tú."
-msgstr ""
-
-#: scripts/content/ch_d.gd:131
-msgid "Y ahora lo muevo en la dirección que tu nieto intuyó y tú mandaste a la cama. Hacia Arriba."
-msgstr ""
-
-#: scripts/content/ch_d.gd:135
-msgid "Ocho puntos terminales. Seis lados, y cada uno es… un Cuadrado. Tres pulgadas en todos los sentidos. *Tres al cubo.*"
-msgstr ""
-
-#: scripts/content/ch_d.gd:137
-msgid "Fíjate en cómo lo ves: unas caras más claras, otras más oscuras. Luz y sombra. Así se ve la profundidad desde fuera, igual que tú leías los ángulos en la niebla."
-msgstr ""
-
-#: scripts/content/ch_d.gd:139
-msgid "Lo adoré. No hay otra palabra. Le llamé Maestro, y lo era."
-msgstr ""
-
-#: scripts/content/ch_d.gd:141
-msgid "Maestro: me habéis mostrado las entrañas de mis compatriotas desde la tierra de Tres Dimensiones. Llevadme ahora a la de Cuatro."
-msgstr ""
-
-#: scripts/content/ch_d.gd:142
-msgid "¿Qué dices?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:143
-msgid "Desde allí miraríamos este Espacio y veríamos el interior de todo Sólido. Vuestras propias entrañas."
-msgstr ""
-
-#: scripts/content/ch_d.gd:143
-msgid "(Callar. Has visto bastante.)"
-msgstr ""
-
-#: scripts/content/ch_d.gd:144
-msgid "Pude callar. Había visto más que nadie en mil años. No callé: un Cuadrado que ha contado hasta tres quiere contar hasta cuatro."
-msgstr ""
-
-#: scripts/content/ch_d.gd:145
-msgid "No existe tal tierra. La sola idea es inconcebible."
-msgstr ""
-
-#: scripts/content/ch_d.gd:169
-msgid "Vuestra propia Analogía, Maestro. Punto, Línea, Cuadrado, Cubo: uno, dos, cuatro, ocho puntos terminales. ¿Qué sigue?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:170
-msgid "Dieciséis."
-msgstr ""
-
-#: scripts/content/ch_d.gd:170
-msgid "Diez."
-msgstr ""
-
-#: scripts/content/ch_d.gd:170
-msgid "Doce."
-msgstr ""
-
-#: scripts/content/ch_d.gd:176
-msgid "Dieciséis. Y sus límites: dos Puntos, cuatro Líneas, seis Cuadrados… *ocho Cubos*. Un Cubo movido en una dirección nueva. ¡Casi lo veo!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:176
-msgid "No… el doble cada vez: *dieciséis*. Y sus límites: dos Puntos, cuatro Líneas, seis Cuadrados… ocho Cubos. ¡Casi lo veo!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:178
-msgid "Eso que gira ahí no está en el Espacio. Está en ti. Es la sombra de una sombra, y es lo más grande que has pensado nunca."
-msgstr ""
-
-#: scripts/content/ch_d.gd:180
-msgid "Basta. Son fantasías. Analogías sin objeto."
-msgstr ""
-
-#: scripts/content/ch_d.gd:181
-msgid "¿No es cierto que en vuestro país se han visto Seres entrar en cuartos cerrados, como vos en el mío?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:181
-msgid "(Ceder.) Perdonad, Maestro."
-msgstr ""
-
-#: scripts/content/ch_d.gd:182
-msgid "No cedí. Tú has elegido la prudencia dos veces y yo te he desmentido dos veces: así fue. No sabía parar."
-msgstr ""
-
-#: scripts/content/ch_d.gd:183
-msgid "…Se cuenta. Visiones. Cosas del cerebro de quien las ve. Nadie las cree."
-msgstr ""
-
-#: scripts/content/ch_d.gd:184
-msgid "«Un truco de mago.» «Visiones del cerebro.» El Rey, tú, la Esfera. Cada mundo tiene su frase para lo que le queda por encima."
-msgstr ""
-
-#: scripts/content/ch_d.gd:186
-msgid "¡Entonces existe! ¡Y más allá, la Quinta, la Sexta, la Séptima Dimensión! ¡Llevadme! ¡Hacia Arriba de Arriba!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:188
-msgid "¡SILENCIO!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:195
-msgid "Un estrépito. Y me hallé de nuevo en mi estudio, en el Plano, oyendo acercarse el Grito de Paz de mi esposa."
-msgstr ""
-
-#: scripts/content/ch_d.gd:216 scripts/content/ch_d.gd:247
-msgid "Capítulo IX · Hacia Arriba, no hacia el Norte"
-msgstr ""
-
-#: scripts/content/ch_d.gd:218
-msgid "Capítulo IX"
-msgstr ""
-
-#: scripts/content/ch_d.gd:218
-msgid "Hacia Arriba, no hacia el Norte"
-msgstr ""
-
-#: scripts/content/ch_d.gd:218
-msgid "Donde se visita el reino más pequeño y más feliz, y se pierde a un discípulo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:219
-msgid "Aquella noche soñé. La Esfera estaba otra vez a mi lado, y su brillo ya no mostraba enojo. «Te he tratado con dureza», dijo. «Ven: te debo una última lección.»"
-msgstr ""
-
-#: scripts/content/ch_d.gd:220
-msgid "Acércate a esa luz diminuta"
-msgstr ""
-
-#: scripts/content/ch_d.gd:222
-msgid "Contempla Puntolandia: el Abismo de Ninguna Dimensión. Esa criatura es un Ser como nosotros, pero no conoce largo, ni ancho, ni alto. No conoce siquiera el número Dos. Él es su Mundo, su Universo. Escúchalo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:223
-msgid "¡Infinita beatitud de la existencia! Ello es; y nada hay fuera de Ello."
-msgstr ""
-
-#: scripts/content/ch_d.gd:224
-msgid "Ello llena todo el Espacio, y lo que llena, lo es. Lo que piensa, lo dice; lo que dice, lo oye; Ello es Pensador, Palabra y Oyente; el Uno, y sin embargo el Todo en Todo. ¡Ah, la dicha de Ser!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:225
-msgid "¡Calla, criatura! No eres el Todo: eres la Nada. Un punto."
-msgstr ""
-
-#: scripts/content/ch_d.gd:225
-msgid "Escucha: hay otros. Hay líneas, planos, sólidos. Yo vengo de fuera de ti."
-msgstr ""
-
-#: scripts/content/ch_d.gd:225
-msgid "Hola. ¿Me oyes?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:228
-msgid "¡Ah, el gozo, el gozo del Pensamiento! ¿Qué no alcanzará Ello pensando? Su propio Pensamiento viene a Ello sugiriéndole su menosprecio, para realzar con ello su dicha. ¡Dulce rebelión que acaba en triunfo!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:229
-msgid "«Otros.» «Fuera.» ¡Qué fecunda es la mente de Ello, que inventa palabras sin objeto para deleitarse en su propia unidad! ¡Ah, el poder creador del Todo en Uno!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:230
-msgid "«¿Me oyes?», se pregunta Ello a sí mismo, pues no hay otro a quien preguntar. Y se responde: sí. ¡Ah, la dicha de la conversación perfecta!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:231
-msgid "Ya ves lo poco que logran tus palabras. Todo lo que oye, cree haberlo pensado él. Nada que tú o yo hagamos lo sacará de su contento."
-msgstr ""
-
-#: scripts/content/ch_d.gd:232
-msgid "Aprende esto: estar satisfecho de uno mismo es ser vil e ignorante. Aspirar es mejor que ser ciega e impotentemente feliz."
-msgstr ""
-
-#: scripts/content/ch_d.gd:233
-msgid "El Punto, el Rey de la Línea… ¿y yo, ante vos? ¿Y vos, ante la Cuarta?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:233
-msgid "Lo he comprendido, Maestro."
-msgstr ""
-
-#: scripts/content/ch_d.gd:234
-msgid "…Vuelve a tu mundo. Enseña lo que has visto. Y sí: quizá por eso te elegí a ti y no a un Círculo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:235
-msgid "Vuelve a tu mundo. Enseña lo que has visto. No esperes que te lo agradezcan."
-msgstr ""
-
-#: scripts/content/ch_d.gd:246
-msgid "un heraldo"
-msgstr ""
-
-#: scripts/content/ch_d.gd:248
-msgid "Desperté gozoso. Iba a evangelizar a toda Planilandia, de las mujeres a los Círculos. Empezaría por mi esposa."
-msgstr ""
-
-#: scripts/content/ch_d.gd:251
-msgid "(En la calle.) ¡Oíd, oíd! ¡Resolución del Alto Consejo! Todo aquel que pervierta las mentes del pueblo con delirios, pretendiendo revelaciones de Otro Mundo, será arrestado, encarcelado o ejecutado, según su número de lados."
-msgstr ""
-
-#: scripts/content/ch_d.gd:252
-msgid "Lo oíste leer anoche, desde arriba, de boca de tu hermano. Ahora suena distinto: suena desde tu altura."
-msgstr ""
-
-#: scripts/content/ch_d.gd:255
-msgid "Buenos días, padre. ¿Ha oído el pregón? Ya era hora. La semana pasada un Triángulo decía en mi consulta que oía voces de «fuera». Lo denuncié, naturalmente."
-msgstr ""
-
-#: scripts/content/ch_d.gd:256
-msgid "Mis hijos. Pentágonos de carácter y posición. Me habrían entregado al Prefecto con lágrimas sinceras."
-msgstr ""
-
-#: scripts/content/ch_d.gd:258
-msgid "Habla con tu esposa"
-msgstr ""
-
-#: scripts/content/ch_d.gd:259
-msgid "¡Esposo! Anoche desapareciste. Te busqué por toda la casa. ¿Dónde estabas?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:260
-msgid "Fuera del Plano, querida. Arriba. He visto nuestra casa por dentro, toda a la vez."
-msgstr ""
-
-#: scripts/content/ch_d.gd:260
-msgid "Me caí por la trampilla del sótano y quedé sin sentido."
-msgstr ""
-
-#: scripts/content/ch_d.gd:261
-msgid "Estuve a un grano de arena de decírselo. El heraldo volvió a pasar bajo el muro. Dije: «Me caí por la trampilla del sótano»."
-msgstr ""
-
-#: scripts/content/ch_d.gd:262
-msgid "Pero, esposo… nuestra casa no tiene sótano."
-msgstr ""
-
-#: scripts/content/ch_d.gd:263
-msgid "Tienes fiebre. Acuéstate. Y no hables así delante de los chicos."
-msgstr ""
-
-#: scripts/content/ch_d.gd:264
-msgid "Ella no sabe leer ni contar. La ley se ocupó de eso. Tus hijos sí saben, y no preguntan. Te queda uno: el que preguntó por 3³."
-msgstr ""
-
-#: scripts/content/ch_d.gd:266
-msgid "un cuadrado móvil"
-msgstr ""
-
-#: scripts/content/ch_d.gd:267
-msgid "Enséñale a tu nieto lo que has visto"
-msgstr ""
-
-#: scripts/content/ch_d.gd:268
-msgid "Ven, pequeño. Cierra la puerta. ¿Recuerdas lo que dijiste de 3³? Tenías razón. Mira este cuadrado. Vamos a moverlo, no hacia el Norte, sino hacia Arriba."
-msgstr ""
-
-#: scripts/content/ch_d.gd:270
-msgid "La lección"
-msgstr ""
-
-#: scripts/content/ch_d.gd:270
-msgid "Mueve el cuadrado hacia Arriba. *({move} / flechas)*"
-msgstr ""
-
-#: scripts/content/ch_d.gd:270
-msgid "Mueve el cuadrado hacia Arriba. *(usa la palanca)*"
-msgstr ""
-
-#: scripts/content/ch_d.gd:270
-msgid "Mueve el cuadrado hacia Arriba. *(stick izquierdo)*"
-msgstr ""
-
-#: scripts/content/ch_d.gd:273 scripts/content/ch_d.gd:362
-msgid "Arriba"
-msgstr ""
-
-#: scripts/content/ch_d.gd:274
-msgid "Eso es el Norte."
-msgstr ""
-
-#: scripts/content/ch_d.gd:274
-msgid "Eso es el Sur."
-msgstr ""
-
-#: scripts/content/ch_d.gd:274
-msgid "Eso es el Este."
-msgstr ""
-
-#: scripts/content/ch_d.gd:274
-msgid "Eso es el Oeste."
-msgstr ""
-
-#: scripts/content/ch_d.gd:282
-msgid "*Tu nieto:* «%s»"
-msgstr ""
-
-#: scripts/content/ch_d.gd:284
-msgid "*No ocurre nada. No hay tecla para lo que quieres decir.*"
-msgstr ""
-
-#: scripts/content/ch_d.gd:284 scripts/content/ch_d.gd:284
-msgid "*No ocurre nada. No hay botón para lo que quieres decir.*"
-msgstr ""
-
-#: scripts/content/ch_d.gd:289
-msgid "(En la calle, otra vez.) …¡arrestado, encarcelado o ejecutado!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:290
-msgid "Abuelito… lo de 3³ era sólo una broma. Claro que no quería decir nada. Y entonces no sabíamos nada de la Ley nueva. Y yo no dije nada de la Tercera Dimensión."
-msgstr ""
-
-#: scripts/content/ch_d.gd:291
-msgid "Y seguro que no dije ni una palabra de «hacia Arriba, no hacia el Norte», porque sería una tontería. ¿Cómo va a moverse una cosa hacia Arriba y no hacia el Norte? Ni un bebé sería tan bobo. ¡Ja, ja, ja!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:292
-msgid "¡No es ninguna bobada! Mira: lo muevo… no así, sino… ¡de algún modo!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:292
-msgid "(Soltar el cuadrado.) Tienes razón. Era una broma."
-msgstr ""
-
-#: scripts/content/ch_d.gd:295
-msgid "Agité aquel cuadrado como un loco, sin propósito alguno. El niño se reía cada vez más alto, para que se oyera desde la calle."
-msgstr ""
-
-#: scripts/content/ch_d.gd:296
-msgid "No lo solté. Lo agité como un loco, sin propósito alguno, mientras el niño se reía cada vez más alto, para que se oyera desde la calle."
-msgstr ""
-
-#: scripts/content/ch_d.gd:297
-msgid "¡El abuelo no me está enseñando, está jugando conmigo!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:303
-msgid "Abrió la puerta y huyó. Diez años, y ya sabía lo que yo iba a tardar un año entero en olvidar: cuándo conviene reírse."
-msgstr ""
-
-#: scripts/content/ch_d.gd:312
-msgid "el Prefecto"
-msgstr ""
-
-#: scripts/content/ch_d.gd:313
-msgid "el conferenciante"
-msgstr ""
-
-#: scripts/content/ch_d.gd:318
-msgid "Capítulo X"
-msgstr ""
-
-#: scripts/content/ch_d.gd:318
-msgid "El juicio"
-msgstr ""
-
-#: scripts/content/ch_d.gd:318
-msgid "Donde se pregunta a un Cuadrado hacia dónde cae Arriba."
-msgstr ""
-
-#: scripts/content/ch_d.gd:319
-msgid "Callé once meses. Escribí en secreto un tratado, «De Planilandia a Pensamientolandia», fingiendo hablar de una tierra imaginaria. No pude dibujar un solo diagrama: en mi mundo no hay tablillas, sólo líneas."
-msgstr ""
-
-#: scripts/content/ch_d.gd:320
-msgid "Lo peor era mirar. Veía una raya y sabía que era un Cuadrado; veía mi casa y recordaba sus cinco lados a la vez. Cerraba el ojo para volver a ver el Cubo, y cada noche lo veía un poco peor."
-msgstr ""
-
-#: scripts/content/ch_d.gd:321
-msgid "Y un día acudí a una sesión de la Sociedad Especulativa local, en el palacio del Prefecto."
-msgstr ""
-
-#: scripts/content/ch_d.gd:322
-msgid "Entra en el Palacio y toma asiento en la Sociedad Especulativa"
-msgstr ""
-
-#: scripts/content/ch_d.gd:325
-msgid "…y queda así demostrado, señores, por qué la Providencia ha limitado a Dos el número de las Dimensiones, y por qué el atributo de verlo todo, la omnividencia, pertenece sólo al Ser Supremo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:327
-msgid "Pues ¿quién de nosotros podría ver el interior de una casa cerrada? ¿Quién, el interior de su prójimo? Sería tanto como ver *desde ningún sitio*."
-msgstr ""
-
-#: scripts/content/ch_d.gd:328
-msgid "Tú. Tú lo has visto. Tu casa. Tus hijos. Sus entrañas latiendo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:329
-msgid "(Callar, con más esfuerzo.)"
-msgstr ""
-
-#: scripts/content/ch_d.gd:330
-msgid "Una tercera dirección es, por tanto, no ya falsa: es *impensable*. Ninguna mente sana ha podido jamás concebirla."
-msgstr ""
-
-#: scripts/content/ch_d.gd:331
-msgid "Aquí puedes elegir lo que quieras. Te aviso de que no servirá."
-msgstr ""
-
-#: scripts/content/ch_d.gd:332
-msgid "Supongamos, como fábula, que alguien la hubiera visto…"
-msgstr ""
-
-#: scripts/content/ch_d.gd:333
-msgid "Callé, sí. Unos tres granos de arena. Luego me oí decir: «Supongamos, como fábula, que alguien la hubiera visto…»."
-msgstr ""
-
-#: scripts/content/ch_d.gd:334
-msgid "Llegué hasta la puerta. Con el perímetro ya en el umbral me oí decir: «Supongamos, como fábula, que alguien la hubiera visto…»."
-msgstr ""
-
-#: scripts/content/ch_d.gd:335
-msgid "Un personaje ficticio, digamos. Una noche lo arrancan del Plano. Ve su ciudad por dentro. Ve el Consejo. Ve una Figura hecha de Círculos…"
-msgstr ""
-
-#: scripts/content/ch_d.gd:336
-msgid "…y no era ficticio. ¡Era yo! ¡Lo vi! Existe la Tercera Dimensión: ¡hacia Arriba, no hacia el Norte! ¡Sacudíos el prejuicio y creed!"
-msgstr ""
-
-#: scripts/content/ch_d.gd:337
-msgid "Guardias. Al Consejo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:339
-msgid "Me olvidé de mí mismo. Es la expresión exacta: por una vez me olvidé del Cuadrado prudente que firmaba, aplaudía y callaba."
-msgstr ""
-
-#: scripts/content/ch_d.gd:346
-msgid "el Presidente"
-msgstr ""
-
-#: scripts/content/ch_d.gd:349 scripts/content/ch_d.gd:349
-msgid "un guardia de dos grados"
-msgstr ""
-
-#: scripts/content/ch_d.gd:350
-msgid "Capítulo X · El juicio"
-msgstr ""
-
-#: scripts/content/ch_d.gd:351
-msgid "A la mañana siguiente me hallé en el mismo punto de la sala donde, un año antes, se había posado la Esfera. Me dejaron contarlo todo sin interrumpirme."
-msgstr ""
-
-#: scripts/content/ch_d.gd:353
-msgid "Fíjate en los guardias. Han cambiado a los de rango por Isósceles de dos o tres grados. Sabes lo que significa: quien te oiga hoy no llegará a la noche."
-msgstr ""
-
-#: scripts/content/ch_d.gd:355
-msgid "El Consejo ha escuchado. Le haré sólo dos preguntas, Cuadrado. La primera: usted repite «hacia Arriba, no hacia el Norte». Sea tan amable de *indicarnos esa dirección*. Muévase hacia ella."
-msgstr ""
-
-#: scripts/content/ch_d.gd:359
-msgid "Primera pregunta"
-msgstr ""
-
-#: scripts/content/ch_d.gd:359
-msgid "Muévete hacia Arriba."
-msgstr ""
-
-#: scripts/content/ch_d.gd:368
-msgid "el Este"
-msgstr ""
-
-#: scripts/content/ch_d.gd:368
-msgid "el Oeste"
-msgstr ""
-
-#: scripts/content/ch_d.gd:368
-msgid "el Norte"
-msgstr ""
-
-#: scripts/content/ch_d.gd:368
-msgid "el Sur"
-msgstr ""
-
-#: scripts/content/ch_d.gd:369
-msgid "*El Presidente:* «Eso es %s, caballero.»"
-msgstr ""
-
-#: scripts/content/ch_d.gd:371
-msgid "*Nada. Tu cuerpo no tiene con qué.*"
-msgstr ""
-
-#: scripts/content/ch_d.gd:377
-msgid "No puedo señalarla. Pero existe."
-msgstr ""
-
-#: scripts/content/ch_d.gd:378
-msgid "La segunda. ¿Puede, con diagramas o descripciones —que no sean enumerar lados y ángulos imaginarios—, mostrarnos esa Figura que llama Cubo?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:379
-msgid "tablilla del acusado"
-msgstr ""
-
-#: scripts/content/ch_d.gd:390
-msgid "Un Cuadrado…"
-msgstr ""
-
-#: scripts/content/ch_d.gd:390
-msgid "…otro Cuadrado, más «arriba»…"
-msgstr ""
-
-#: scripts/content/ch_d.gd:390
-msgid "…y unidos. ¿No lo veis?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:391
-msgid "Veo un Cuadrado montado sobre otro y cuatro rayas que los cosen. Una figura Irregular de muchos lados. ¿Eso es su Cubo?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:393
-msgid "Tú, lector, has visto un cubo en ese dibujo. Tú puedes. Imagina ahora tener la verdad entera y ningún papel donde quepa."
-msgstr ""
-
-#: scripts/content/ch_d.gd:394
-msgid "Nada más puedo decir. Me encomiendo a la Verdad, cuya causa acabará por prevalecer."
-msgstr ""
-
-#: scripts/content/ch_d.gd:394
-msgid "Retiro lo dicho. Fue la fiebre."
-msgstr ""
-
-#: scripts/content/ch_d.gd:394
-msgid "Retractarse"
-msgstr ""
-
-#: scripts/content/ch_d.gd:395
-msgid "Pensé en decirlo. La frase estaba hecha, con sus cinco lados y ninguna ventana. No la dije. Es de lo poco de lo que estoy seguro."
-msgstr ""
-
-#: scripts/content/ch_d.gd:397
-msgid "El Consejo comparte su confianza en la Verdad. Si ella quiere que salga usted de la cárcel a evangelizar el mundo, ella proveerá. Prisión perpetua. Sin más rigor que el necesario para que no escape. Podrá ver a su hermano, que le precedió."
-msgstr ""
-
-#: scripts/content/ch_d.gd:404
-msgid "el manuscrito"
-msgstr ""
-
-#: scripts/content/ch_d.gd:406
-msgid "Epílogo · La celda"
-msgstr ""
-
-#: scripts/content/ch_d.gd:407
-msgid "Siete años. Mi hermano viene cada semana. Es de lo poco que me permiten, y lo que más me duele."
-msgstr ""
-
-#: scripts/content/ch_d.gd:408
-msgid "Habla con tu hermano"
-msgstr ""
-
-#: scripts/content/ch_d.gd:409
-msgid "Hermano: tú estabas allí. La viste aparecer en la sala. Un punto, un Círculo que crecía, que menguaba. Oíste lo que dijo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:410
-msgid "Vi un Círculo que cambiaba de tamaño, sí. Y por haberlo visto estoy aquí. ¿Qué más quieres que haya visto?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:411
-msgid "Te lo he explicado cada semana, durante siete años. La Analogía. El Cubo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:412
-msgid "Y cada semana te escucho con gusto, porque eres mi hermano. Pero no. No creo en tu Esfera. Lo siento. ¿Cómo va a moverse algo hacia Arriba y no hacia el Norte?"
-msgstr ""
-
-#: scripts/content/ch_d.gd:413
-msgid "No tengo un solo converso. La Revelación del milenio se hizo para mí, y para nada. Prometeo fue encadenado por bajar el fuego a los mortales; yo, pobre Prometeo de Planilandia, estoy preso por no haberles bajado nada."
-msgstr ""
-
-#: scripts/content/ch_d.gd:419
-msgid "Vuelve al manuscrito"
-msgstr ""
-
-#: scripts/content/ch_d.gd:421
-msgid "Dicen que mi hija sabe contar hasta diez. Es lo único que he enseñado en mi vida que ha prendido."
-msgstr ""
-
-#: scripts/content/ch_d.gd:422
-msgid "El hijo de mi antiguo criado, el de diez grados y medio, pasa algunas tardes bajo el muro y dice mi nombre en voz alta. Es toda mi fama."
-msgstr ""
-
-#: scripts/content/ch_d.gd:423
-msgid "El Prefecto no tuvo que buscar testigos contra mí: mi tablilla estaba llena desde lo de la Puerta Oeste. De eso, al menos, no me avergüenzo."
-msgstr ""
-
-#: scripts/content/ch_d.gd:424
-msgid "Pienso a veces en el calderero. En que dictaminé su raya con el mismo aplomo con que el Consejo dictaminó la mía."
-msgstr ""
-
-#: scripts/content/ch_d.gd:425
-msgid "No me arrepiento de haber hablado. Me arrepiento de los años en que no pregunté."
-msgstr ""
-
-#: scripts/content/ch_d.gd:426
-msgid "A veces pienso que habría sido mejor aplaudir y callar, como sabía hacer tan bien. Luego recuerdo el Cubo, y se me pasa. Casi siempre."
-msgstr ""
-
-#: scripts/content/ch_d.gd:427
-msgid "Dudé toda mi vida en voz baja. Sólo una vez hablé en voz alta, y fue ésta."
-msgstr ""
-
-#: scripts/content/ch_d.gd:429
-msgid "Y sin embargo existo con la esperanza de que estas memorias lleguen, no sé cómo, a las mentes de la humanidad de Alguna Dimensión, y susciten una raza de rebeldes que se nieguen a ser confinados en una Dimensionalidad limitada."
-msgstr ""
-
-#: scripts/content/ch_d.gd:432
-msgid "Esa es la esperanza de mis horas más luminosas. Ay, no siempre es así."
-msgstr ""
-
-#: scripts/content/ch_d.gd:433
-msgid "Hay momentos en que no puedo decir con honradez que recuerde la forma exacta del Cubo, una vez visto y tantas veces añorado. Y el precepto, «hacia Arriba, no hacia el Norte», me persigue como una Esfinge que devora el alma."
-msgstr ""
-
-#: scripts/content/ch_d.gd:436
-msgid "Hay horas de flaqueza en que Cubos y Esferas se desvanecen hacia el fondo de lo apenas posible; en que la Tierra de las Tres Dimensiones parece casi tan visionaria como la de Una o la de Ninguna…"
-msgstr ""
-
-#: scripts/content/ch_d.gd:437
-msgid "…en que hasta este muro que me priva de la libertad, estas tablillas en que escribo, y todas las realidades sustanciales de Planilandia, no parecen más que el engendro de una imaginación enferma, o la tela sin fundamento de un sueño."
-msgstr ""
-
-#: scripts/content/ch_d.gd:44
-msgid "Capítulo VIII · Espaciolandia"
-msgstr ""
-
-#: scripts/content/ch_d.gd:440
-msgid "Has recuperado %d de 22 secciones del manuscrito. Las que faltan esperan en sus capítulos."
-msgstr ""
-
-#: scripts/content/ch_d.gd:440
-msgid "Planilandia"
-msgstr ""
-
-#: scripts/content/ch_d.gd:440
-msgid "El manuscrito está completo: 22 de 22 secciones. Alguien, en Alguna Dimensión, lo ha leído."
-msgstr ""
-
-#: scripts/content/ch_d.gd:441
-msgid "Edwin A. Abbott"
-msgstr ""
-
-#: scripts/content/ch_d.gd:441
-msgid "Flatland, 1884"
-msgstr ""
-
-#: scripts/content/ch_d.gd:441
-msgid "Hacia Arriba, no hacia el Norte."
-msgstr ""
-
-#: scripts/content/ch_d.gd:45
-msgid "Un horror indecible. Oscuridad. Luego una sensación mareante de una vista que no era ver: vi una Línea que no era Línea; un Espacio que no era Espacio. Yo era yo y no lo era."
-msgstr ""
-
-#: scripts/content/ch_d.gd:46
-msgid "Grité: «¡Esto es la locura, o es el Infierno!»"
-msgstr ""
-
-#: scripts/content/ch_d.gd:47
-msgid "Capítulo VIII"
-msgstr ""
-
-#: scripts/content/ch_d.gd:47
-msgid "Espaciolandia"
-msgstr ""
-
-#: scripts/content/ch_d.gd:47
-msgid "«Ni lo uno ni lo otro. Es el Conocimiento; son las Tres Dimensiones. Abre el ojo de nuevo y procura mirar con firmeza.»"
-msgstr ""
-
-#: scripts/content/ch_d.gd:56
 msgid "Mira. No con el borde de tu ojo: con todo él. Lo que hay debajo de ti es tu mundo. Entero."
 msgstr ""
 
-#: scripts/content/ch_d.gd:57
+#: scripts/content/ch_d.gd:102
 msgid "Tu casa. No su raya: *su forma*. Los cinco lados a la vez. Y dentro de ella, sin pared que lo impida, todo."
 msgstr ""
 
-#: scripts/content/ch_d.gd:58
+#: scripts/content/ch_d.gd:103
 msgid "Y vi a la Esfera. No una rebanada: él. Lo que yo había tomado por un Círculo era una cosa con un *dentro* que no se veía y un *fuera* por todas partes. Era hermoso de un modo para el que aún no tengo palabra."
 msgstr ""
 
-#: scripts/content/ch_d.gd:60
+#: scripts/content/ch_d.gd:105
 msgid "Arrastra el ratón para mirar alrededor · {move} para volar · {rise} / {sink} para subir y bajar · rueda: acercar"
 msgstr ""
 
-#: scripts/content/ch_d.gd:60
+#: scripts/content/ch_d.gd:105
 msgid "Palanca para volar · arrastra por la derecha para mirar · botones para subir y bajar · pellizca para acercar"
 msgstr ""
 
-#: scripts/content/ch_d.gd:60
+#: scripts/content/ch_d.gd:105
 msgid "Stick derecho para mirar alrededor · stick izquierdo para volar · {rise} / {sink} para subir y bajar"
 msgstr ""
 
-#: scripts/content/ch_d.gd:61
-msgid "Vuela sobre tu casa y mírala por dentro"
-msgstr ""
-
-#: scripts/content/ch_d.gd:63
+#: scripts/content/ch_d.gd:109
 msgid "Mis hijos, dormidos en sus cuartos del Oeste. Mis dos nietos. Mi hija. Los criados. Y… veo dentro de *ellos*. Sus entrañas. Les late algo."
 msgstr ""
 
-#: scripts/content/ch_d.gd:64
+#: scripts/content/ch_d.gd:110
+msgid "Y mi alacena, abierta como un plato: dos cofres y *una* tablilla. La otra sigue en el suelo del salón, donde la dejó él."
+msgstr ""
+
+#: scripts/content/ch_d.gd:111
 msgid "Desde Arriba no hay dentro que se esconda. Así vi yo tu alacena. Así te toqué el estómago."
 msgstr ""
 
-#: scripts/content/ch_d.gd:65
-msgid "Y mi esposa. Recorre el salón de punta a punta. Me busca."
+#: scripts/content/ch_d.gd:112
+msgid "Tu esposa recorre el salón de punta a punta. Para ella has desaparecido sin cruzar ninguna puerta. Como el Forastero. Como tú ante el Rey de la Línea."
 msgstr ""
 
-#: scripts/content/ch_d.gd:66
-msgid "Para ella has desaparecido sin cruzar ninguna puerta. Como el Forastero. Como tú ante el Rey de la Línea."
+#: scripts/content/ch_d.gd:114
+msgid "Mi nieto pequeño, dormido. Y bajo su almohada, una tablilla: tres cuadrados de tres por tres, uno al lado del otro, y una palabra: «pisos»."
 msgstr ""
 
-#: scripts/content/ch_d.gd:67
+#: scripts/content/ch_d.gd:115
+msgid "Lo intentó a escondidas. Como tú esta noche. Él tampoco tenía dónde poner el «encima»."
+msgstr ""
+
+#: scripts/content/ch_d.gd:117
+msgid "El cofre del Prefecto. Dentro, un acta con la fecha de hoy, ya firmada. «Se resuelve: prisión perpetua para el Escribano.» Y el Consejo aún no se ha reunido."
+msgstr ""
+
+#: scripts/content/ch_d.gd:118
+msgid "Mil años repitiendo la misma resolución. Ni siquiera hace falta la sesión."
+msgstr ""
+
+#: scripts/content/ch_d.gd:119
+msgid "Mira dentro de lo que nunca has visto"
+msgstr ""
+
+#: scripts/content/ch_d.gd:124
+msgid "*Dentro de la sala cerrada, junto al calderero, cae un estilete que nadie ha traído.*"
+msgstr ""
+
+#: scripts/content/ch_d.gd:126
+msgid "Ahora hazlo tú. Lo que yo hice con tu alacena. Baja hasta casi tocar tu tablilla, tómala y déjala donde estaba."
+msgstr ""
+
+#: scripts/content/ch_d.gd:128 scripts/content/ch_d.gd:128
+msgid "Baja con {sink} hasta la tablilla y mantén {act} para tomarla; suéltalo para dejarla caer."
+msgstr ""
+
+#: scripts/content/ch_d.gd:128
+msgid "Baja hasta la tablilla y mantén el botón de acción para tomarla; suéltalo para dejarla caer."
+msgstr ""
+
+#: scripts/content/ch_d.gd:130
+msgid "Devuelve la tablilla a tu alacena cerrada"
+msgstr ""
+
+#: scripts/content/ch_d.gd:133
+msgid "Cerrada por sus cuatro lados. Y dentro, dos tablillas. Mañana la contarás de memoria y no faltará ninguna."
+msgstr ""
+
+#: scripts/content/ch_d.gd:134
+msgid "Ya lo ves: no es magia. Es un sitio más."
+msgstr ""
+
+#: scripts/content/ch_d.gd:135
+msgid "Llevas aún el estilete del calderero, en el estudio. El Hospital está al Este. Nadie vigila el techo de una sala cerrada."
+msgstr ""
+
+#: scripts/content/ch_d.gd:136
 msgid "Ven. Hay algo que debes oír. Es la primera hora del primer día del año 2000, y el Alto Consejo de tu país está reunido, como lo estuvo hace mil años, y hace dos mil."
 msgstr ""
 
-#: scripts/content/ch_d.gd:69
+#: scripts/content/ch_d.gd:147
+msgid "El Hospital. En una sala cerrada, en una camilla, el calderero. Lo tienen metido en un marco que le fuerza los ángulos. Está vivo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:148
+msgid "Desde aquí se ve que sus tres lados están bien. Sólo son distintos."
+msgstr ""
+
+#: scripts/content/ch_d.gd:150
+msgid "El Hospital. Una sala cerrada, vacía. En el suelo, marcas en el papel, como las de la plaza."
+msgstr ""
+
+#: scripts/content/ch_d.gd:151
+msgid "Firmaste como perito. O miraste la niebla."
+msgstr ""
+
+#: scripts/content/ch_d.gd:154
 msgid "Vuela hacia el sur: la Sala del Consejo, en el Palacio"
 msgstr ""
 
-#: scripts/content/ch_d.gd:72
+#: scripts/content/ch_d.gd:158
 msgid "¡Mi hermano! Es el Escribano Mayor del Consejo. Está leyendo."
 msgstr ""
 
-#: scripts/content/ch_d.gd:73
+#: scripts/content/ch_d.gd:160
 msgid "«…considerando que cada milenio han turbado a los Estados gentes mal intencionadas que pretenden haber recibido revelaciones de Otro Mundo…»"
 msgstr ""
 
-#: scripts/content/ch_d.gd:74
+#: scripts/content/ch_d.gd:161
 msgid "«…se resuelve: que en el primer día de cada milenio los Prefectos busquen a tales extraviados; que se destruya sin examen al que sea Isósceles; se azote y encarcele al Equilátero; se envíe al Manicomio al Cuadrado o Pentágono; y se arreste a cualquiera de rango superior.»"
 msgstr ""
 
-#: scripts/content/ch_d.gd:75
+#: scripts/content/ch_d.gd:162
 msgid "Ya oyes tu destino. Y, sin embargo, voy a decírselo a ellos también. Mira cómo me ven."
 msgstr ""
 
-#: scripts/content/ch_d.gd:85
+#: scripts/content/ch_d.gd:172
 msgid "¡Consejeros de Planilandia! Vengo a proclamar que existe una tierra de Tres Dimensiones."
 msgstr ""
 
-#: scripts/content/ch_d.gd:87
+#: scripts/content/ch_d.gd:174
 msgid "Desde arriba vi lo que ellos veían: un Círculo surgido de la nada en mitad de la sala. Los consejeros jóvenes retrocedieron. El Presidente no se movió."
 msgstr ""
 
-#: scripts/content/ch_d.gd:89
+#: scripts/content/ch_d.gd:176
 msgid "Guardias."
 msgstr ""
 
-#: scripts/content/ch_d.gd:94
+#: scripts/content/ch_d.gd:181
 msgid "Ha vuelto a ocurrir, como en el año mil y en el año cero. No ha ocurrido nada. Los guardias que lo han visto serán destruidos. El Escribano, que también lo ha visto, y cuyo rango impide destruirlo: prisión perpetua."
+msgstr ""
+
+#: scripts/content/ch_d.gd:188
+msgid "Excelencia… yo sólo leía el acta."
+msgstr ""
+
+#: scripts/content/ch_d.gd:189
+msgid "¡Hermano! ¡Déjame bajar, Esfera! Yo se lo explicaré al Consejo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:189
+msgid "(Mirar. Como miraste en la Puerta.)"
+msgstr ""
+
+#: scripts/content/ch_d.gd:190
+msgid "No. Nada que digas hoy lo salvaría, y a ti te perdería. Tu misión no es morir en esa sala."
+msgstr ""
+
+#: scripts/content/ch_d.gd:191
+msgid "Esta vez no hay sargento que apunte tu silencio. Sólo tú."
+msgstr ""
+
+#: scripts/content/ch_d.gd:197
+msgid "Mi hermano. El mejor de los Cuadrados: justo, sensato, alegre. Condenado por haber visto."
+msgstr ""
+
+#: scripts/content/ch_d.gd:199
+msgid "Sube conmigo. Más alto. Te enseñaré de qué estás hecho, y de qué estoy hecho yo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:202
+msgid "Asciende (mantén {rise}) hasta dejar la ciudad muy abajo"
+msgstr ""
+
+#: scripts/content/ch_d.gd:202
+msgid "Asciende (mantén el botón de subir) hasta dejar la ciudad muy abajo"
+msgstr ""
+
+#: scripts/content/ch_d.gd:212
+msgid "Aquí tienes un Punto."
+msgstr ""
+
+#: scripts/content/ch_d.gd:215
+msgid "Lo muevo: una Línea. Dos puntos terminales."
+msgstr ""
+
+#: scripts/content/ch_d.gd:218
+msgid "La muevo paralela a sí misma: un Cuadrado. Cuatro puntos terminales. Eres tú."
+msgstr ""
+
+#: scripts/content/ch_d.gd:219
+msgid "Y ahora lo muevo en la dirección que tu nieto intuyó y tú mandaste a la cama. Hacia Arriba."
+msgstr ""
+
+#: scripts/content/ch_d.gd:223
+msgid "Ocho puntos terminales. Seis lados, y cada uno es… un Cuadrado. Tres pulgadas en todos los sentidos. *Tres al cubo.*"
+msgstr ""
+
+#: scripts/content/ch_d.gd:227
+msgid "Fíjate en cómo lo ves: unas caras más claras, otras más oscuras. Luz y sombra. Así se ve la profundidad desde fuera, igual que tú leías los ángulos en la niebla."
+msgstr ""
+
+#: scripts/content/ch_d.gd:230
+msgid "Lo adoré. No hay otra palabra. Le llamé Maestro, y lo era."
+msgstr ""
+
+#: scripts/content/ch_d.gd:232
+msgid "Ahora mira lo que ven tus compatriotas cuando un Cubo atraviesa su mundo. Bajemos."
+msgstr ""
+
+#: scripts/content/ch_d.gd:235
+msgid "un Pentágono que pasaba"
+msgstr ""
+
+#: scripts/content/ch_d.gd:243
+msgid "Arriba, la línea de ese Pentágono: lo que él ve. Abajo, el Plano. Lo que cruce el Plano, lo verá él."
+msgstr ""
+
+#: scripts/content/ch_d.gd:249
+msgid "Un hexágono, salido de un Cubo. Y tú, en el salón, mirando cómo un Círculo crecía y menguaba. Ahora sabes qué era."
+msgstr ""
+
+#: scripts/content/ch_d.gd:251
+msgid "Hay otra manera de que te vean sin cruzar tu Plano. Mira: enciendo una luz."
+msgstr ""
+
+#: scripts/content/ch_d.gd:255
+msgid "Esto es lo único que tus compatriotas podrían ver de él: su sombra. Dos cuadrados y cuatro rayas. Recuérdala."
+msgstr ""
+
+#: scripts/content/ch_d.gd:265
+msgid "Maestro: me habéis mostrado las entrañas de mis compatriotas desde la tierra de Tres Dimensiones. Llevadme ahora a la de Cuatro."
+msgstr ""
+
+#: scripts/content/ch_d.gd:266
+msgid "¿Qué dices?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:267
+msgid "Desde allí miraríamos este Espacio y veríamos el interior de todo Sólido. Vuestras propias entrañas."
+msgstr ""
+
+#: scripts/content/ch_d.gd:267
+msgid "(Callar. Has visto bastante.)"
+msgstr ""
+
+#: scripts/content/ch_d.gd:268
+msgid "Pude callar. Había visto más que nadie en mil años. No callé: un Cuadrado que ha contado hasta tres quiere contar hasta cuatro."
+msgstr ""
+
+#: scripts/content/ch_d.gd:269
+msgid "No existe tal tierra. La sola idea es inconcebible."
+msgstr ""
+
+#: scripts/content/ch_d.gd:275
+msgid "Vuestra propia Analogía, Maestro. Punto, Línea, Cuadrado, Cubo: uno, dos, cuatro, ocho puntos terminales. ¿Qué sigue?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:276
+msgid "Dieciséis."
+msgstr ""
+
+#: scripts/content/ch_d.gd:276
+msgid "Diez."
+msgstr ""
+
+#: scripts/content/ch_d.gd:276
+msgid "Doce."
+msgstr ""
+
+#: scripts/content/ch_d.gd:283
+msgid "Dieciséis. Y sus límites: dos Puntos, cuatro Líneas, seis Cuadrados… *ocho Cubos*. Un Cubo movido en una dirección nueva. ¡Casi lo veo!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:283
+msgid "No… el doble cada vez: *dieciséis*. Y sus límites: dos Puntos, cuatro Líneas, seis Cuadrados… ocho Cubos. ¡Casi lo veo!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:287
+msgid "Eso que gira ahí no está en el Espacio. Está en ti. Es la sombra de una sombra, igual que la sombra del Cubo en tu Plano. Y es lo más grande que has pensado nunca."
+msgstr ""
+
+#: scripts/content/ch_d.gd:289
+msgid "Basta. Son fantasías. Analogías sin objeto."
+msgstr ""
+
+#: scripts/content/ch_d.gd:290
+msgid "¿No es cierto que en vuestro país se han visto Seres entrar en cuartos cerrados, como vos en el mío?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:290
+msgid "(Ceder.) Perdonad, Maestro."
+msgstr ""
+
+#: scripts/content/ch_d.gd:291
+msgid "No cedí. Tú has elegido la prudencia dos veces y yo te he desmentido dos veces: así fue. No sabía parar."
+msgstr ""
+
+#: scripts/content/ch_d.gd:292
+msgid "…Se cuenta. Visiones. Cosas del cerebro de quien las ve. Nadie las cree."
+msgstr ""
+
+#: scripts/content/ch_d.gd:294
+msgid "«Un truco de mago.» «Visiones del cerebro.» El Rey, tú, la Esfera. Cada mundo tiene su frase para lo que le queda por encima."
+msgstr ""
+
+#: scripts/content/ch_d.gd:296
+msgid "¡Entonces existe! ¡Y más allá, la Quinta, la Sexta, la Séptima Dimensión! ¡Llevadme! ¡Hacia Arriba de Arriba!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:298
+msgid "¡SILENCIO!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:315
+msgid "Un estrépito. Y me hallé de nuevo en mi estudio, en el Plano, oyendo acercarse el Grito de Paz de mi esposa."
+msgstr ""
+
+#: scripts/content/ch_d.gd:32
+msgid "tu tablilla"
+msgstr ""
+
+#: scripts/content/ch_d.gd:34
+msgid "la tablilla del nieto"
+msgstr ""
+
+#: scripts/content/ch_d.gd:36
+msgid "el cofre del Prefecto"
+msgstr ""
+
+#: scripts/content/ch_d.gd:361 scripts/content/ch_d.gd:392
+msgid "Capítulo IX · Hacia Arriba, no hacia el Norte"
+msgstr ""
+
+#: scripts/content/ch_d.gd:363
+msgid "Capítulo IX"
+msgstr ""
+
+#: scripts/content/ch_d.gd:363
+msgid "Hacia Arriba, no hacia el Norte"
+msgstr ""
+
+#: scripts/content/ch_d.gd:363
+msgid "Donde se visita el reino más pequeño y más feliz, y se pierde a un discípulo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:364
+msgid "Aquella noche soñé. La Esfera estaba otra vez a mi lado, y su brillo ya no mostraba enojo. «Te he tratado con dureza», dijo. «Ven: te debo una última lección.»"
+msgstr ""
+
+#: scripts/content/ch_d.gd:365
+msgid "Acércate a esa luz diminuta"
+msgstr ""
+
+#: scripts/content/ch_d.gd:367
+msgid "Contempla Puntolandia: el Abismo de Ninguna Dimensión. Esa criatura es un Ser como nosotros, pero no conoce largo, ni ancho, ni alto. No conoce siquiera el número Dos. Él es su Mundo, su Universo. Escúchalo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:368
+msgid "¡Infinita beatitud de la existencia! Ello es; y nada hay fuera de Ello."
+msgstr ""
+
+#: scripts/content/ch_d.gd:369
+msgid "Ello llena todo el Espacio, y lo que llena, lo es. Lo que piensa, lo dice; lo que dice, lo oye; Ello es Pensador, Palabra y Oyente; el Uno, y sin embargo el Todo en Todo. ¡Ah, la dicha de Ser!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:370
+msgid "¡Calla, criatura! No eres el Todo: eres la Nada. Un punto."
+msgstr ""
+
+#: scripts/content/ch_d.gd:370
+msgid "Escucha: hay otros. Hay líneas, planos, sólidos. Yo vengo de fuera de ti."
+msgstr ""
+
+#: scripts/content/ch_d.gd:370
+msgid "Hola. ¿Me oyes?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:373
+msgid "¡Ah, el gozo, el gozo del Pensamiento! ¿Qué no alcanzará Ello pensando? Su propio Pensamiento viene a Ello sugiriéndole su menosprecio, para realzar con ello su dicha. ¡Dulce rebelión que acaba en triunfo!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:374
+msgid "«Otros.» «Fuera.» ¡Qué fecunda es la mente de Ello, que inventa palabras sin objeto para deleitarse en su propia unidad! ¡Ah, el poder creador del Todo en Uno!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:375
+msgid "«¿Me oyes?», se pregunta Ello a sí mismo, pues no hay otro a quien preguntar. Y se responde: sí. ¡Ah, la dicha de la conversación perfecta!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:376
+msgid "Ya ves lo poco que logran tus palabras. Todo lo que oye, cree haberlo pensado él. Nada que tú o yo hagamos lo sacará de su contento."
+msgstr ""
+
+#: scripts/content/ch_d.gd:377
+msgid "Aprende esto: estar satisfecho de uno mismo es ser vil e ignorante. Aspirar es mejor que ser ciega e impotentemente feliz."
+msgstr ""
+
+#: scripts/content/ch_d.gd:378
+msgid "El Punto, el Rey de la Línea… ¿y yo, ante vos? ¿Y vos, ante la Cuarta?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:378
+msgid "Lo he comprendido, Maestro."
+msgstr ""
+
+#: scripts/content/ch_d.gd:379
+msgid "…Vuelve a tu mundo. Enseña lo que has visto. Y sí: quizá por eso te elegí a ti y no a un Círculo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:380
+msgid "Vuelve a tu mundo. Enseña lo que has visto. No esperes que te lo agradezcan."
+msgstr ""
+
+#: scripts/content/ch_d.gd:39
+msgid "el calderero"
+msgstr ""
+
+#: scripts/content/ch_d.gd:391
+msgid "un heraldo"
+msgstr ""
+
+#: scripts/content/ch_d.gd:393
+msgid "Desperté gozoso. Iba a evangelizar a toda Planilandia, de las mujeres a los Círculos. Empezaría por mi esposa."
+msgstr ""
+
+#: scripts/content/ch_d.gd:396
+msgid "(En la calle.) ¡Oíd, oíd! ¡Resolución del Alto Consejo! Todo aquel que pervierta las mentes del pueblo con delirios, pretendiendo revelaciones de Otro Mundo, será arrestado, encarcelado o ejecutado, según su número de lados."
+msgstr ""
+
+#: scripts/content/ch_d.gd:397
+msgid "Lo oíste leer anoche, desde arriba, de boca de tu hermano. Ahora suena distinto: suena desde tu altura."
+msgstr ""
+
+#: scripts/content/ch_d.gd:400
+msgid "Buenos días, padre. ¿Ha oído el pregón? Ya era hora. La semana pasada un Triángulo decía en mi consulta que oía voces de «fuera». Lo denuncié, naturalmente."
+msgstr ""
+
+#: scripts/content/ch_d.gd:401
+msgid "Mis hijos. Pentágonos de carácter y posición. Me habrían entregado al Prefecto con lágrimas sinceras."
+msgstr ""
+
+#: scripts/content/ch_d.gd:403
+msgid "Habla con tu esposa"
+msgstr ""
+
+#: scripts/content/ch_d.gd:404
+msgid "¡Esposo! Anoche desapareciste. Te busqué por toda la casa. ¿Dónde estabas?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:405
+msgid "Fuera del Plano, querida. Arriba. He visto nuestra casa por dentro, toda a la vez."
+msgstr ""
+
+#: scripts/content/ch_d.gd:405
+msgid "Me caí por la trampilla del sótano y quedé sin sentido."
+msgstr ""
+
+#: scripts/content/ch_d.gd:406
+msgid "Estuve a un grano de arena de decírselo. El heraldo volvió a pasar bajo el muro. Dije: «Me caí por la trampilla del sótano»."
+msgstr ""
+
+#: scripts/content/ch_d.gd:407
+msgid "Pero, esposo… nuestra casa no tiene sótano."
+msgstr ""
+
+#: scripts/content/ch_d.gd:408
+msgid "Tienes fiebre. Acuéstate. Y no hables así delante de los chicos."
+msgstr ""
+
+#: scripts/content/ch_d.gd:409
+msgid "Ella no sabe leer ni contar. La ley se ocupó de eso. Tus hijos sí saben, y no preguntan. Te queda uno: el que preguntó por 3³."
+msgstr ""
+
+#: scripts/content/ch_d.gd:411
+msgid "un cuadrado móvil"
+msgstr ""
+
+#: scripts/content/ch_d.gd:412
+msgid "Enséñale a tu nieto lo que has visto"
+msgstr ""
+
+#: scripts/content/ch_d.gd:413
+msgid "Ven, pequeño. Cierra la puerta. ¿Recuerdas lo que dijiste de 3³? Tenías razón. Mira este cuadrado. Vamos a moverlo, no hacia el Norte, sino hacia Arriba."
+msgstr ""
+
+#: scripts/content/ch_d.gd:415
+msgid "La lección"
+msgstr ""
+
+#: scripts/content/ch_d.gd:415
+msgid "Mueve el cuadrado hacia Arriba. *({move} / flechas)*"
+msgstr ""
+
+#: scripts/content/ch_d.gd:415
+msgid "Mueve el cuadrado hacia Arriba. *(usa la palanca)*"
+msgstr ""
+
+#: scripts/content/ch_d.gd:415
+msgid "Mueve el cuadrado hacia Arriba. *(stick izquierdo)*"
+msgstr ""
+
+#: scripts/content/ch_d.gd:418 scripts/content/ch_d.gd:507
+msgid "Arriba"
+msgstr ""
+
+#: scripts/content/ch_d.gd:419
+msgid "Eso es el Norte."
+msgstr ""
+
+#: scripts/content/ch_d.gd:419
+msgid "Eso es el Sur."
+msgstr ""
+
+#: scripts/content/ch_d.gd:419
+msgid "Eso es el Este."
+msgstr ""
+
+#: scripts/content/ch_d.gd:419
+msgid "Eso es el Oeste."
+msgstr ""
+
+#: scripts/content/ch_d.gd:42
+msgid "el estilete del calderero"
+msgstr ""
+
+#: scripts/content/ch_d.gd:427
+msgid "*Tu nieto:* «%s»"
+msgstr ""
+
+#: scripts/content/ch_d.gd:429
+msgid "*No ocurre nada. No hay tecla para lo que quieres decir.*"
+msgstr ""
+
+#: scripts/content/ch_d.gd:429 scripts/content/ch_d.gd:429
+msgid "*No ocurre nada. No hay botón para lo que quieres decir.*"
+msgstr ""
+
+#: scripts/content/ch_d.gd:434
+msgid "(En la calle, otra vez.) …¡arrestado, encarcelado o ejecutado!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:435
+msgid "Abuelito… lo de 3³ era sólo una broma. Claro que no quería decir nada. Y entonces no sabíamos nada de la Ley nueva. Y yo no dije nada de la Tercera Dimensión."
+msgstr ""
+
+#: scripts/content/ch_d.gd:436
+msgid "Y seguro que no dije ni una palabra de «hacia Arriba, no hacia el Norte», porque sería una tontería. ¿Cómo va a moverse una cosa hacia Arriba y no hacia el Norte? Ni un bebé sería tan bobo. ¡Ja, ja, ja!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:437
+msgid "¡No es ninguna bobada! Mira: lo muevo… no así, sino… ¡de algún modo!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:437
+msgid "(Soltar el cuadrado.) Tienes razón. Era una broma."
+msgstr ""
+
+#: scripts/content/ch_d.gd:440
+msgid "Agité aquel cuadrado como un loco, sin propósito alguno. El niño se reía cada vez más alto, para que se oyera desde la calle."
+msgstr ""
+
+#: scripts/content/ch_d.gd:441
+msgid "No lo solté. Lo agité como un loco, sin propósito alguno, mientras el niño se reía cada vez más alto, para que se oyera desde la calle."
+msgstr ""
+
+#: scripts/content/ch_d.gd:442
+msgid "¡El abuelo no me está enseñando, está jugando conmigo!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:448
+msgid "Abrió la puerta y huyó. Diez años, y ya sabía lo que yo iba a tardar un año entero en olvidar: cuándo conviene reírse."
+msgstr ""
+
+#: scripts/content/ch_d.gd:45
+msgid "un Círculo"
+msgstr ""
+
+#: scripts/content/ch_d.gd:457
+msgid "el Prefecto"
+msgstr ""
+
+#: scripts/content/ch_d.gd:458
+msgid "el conferenciante"
+msgstr ""
+
+#: scripts/content/ch_d.gd:463
+msgid "Capítulo X"
+msgstr ""
+
+#: scripts/content/ch_d.gd:463
+msgid "El juicio"
+msgstr ""
+
+#: scripts/content/ch_d.gd:463
+msgid "Donde se pregunta a un Cuadrado hacia dónde cae Arriba."
+msgstr ""
+
+#: scripts/content/ch_d.gd:464
+msgid "Callé once meses. Escribí en secreto un tratado, «De Planilandia a Pensamientolandia», fingiendo hablar de una tierra imaginaria. No pude dibujar un solo diagrama: en mi mundo no hay tablillas, sólo líneas."
+msgstr ""
+
+#: scripts/content/ch_d.gd:465
+msgid "Lo peor era mirar. Veía una raya y sabía que era un Cuadrado; veía mi casa y recordaba sus cinco lados a la vez. Cerraba el ojo para volver a ver el Cubo, y cada noche lo veía un poco peor."
+msgstr ""
+
+#: scripts/content/ch_d.gd:466
+msgid "Y un día acudí a una sesión de la Sociedad Especulativa local, en el palacio del Prefecto."
+msgstr ""
+
+#: scripts/content/ch_d.gd:467
+msgid "Entra en el Palacio y toma asiento en la Sociedad Especulativa"
+msgstr ""
+
+#: scripts/content/ch_d.gd:470
+msgid "…y queda así demostrado, señores, por qué la Providencia ha limitado a Dos el número de las Dimensiones, y por qué el atributo de verlo todo, la omnividencia, pertenece sólo al Ser Supremo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:472
+msgid "Pues ¿quién de nosotros podría ver el interior de una casa cerrada? ¿Quién, el interior de su prójimo? Sería tanto como ver *desde ningún sitio*."
+msgstr ""
+
+#: scripts/content/ch_d.gd:473
+msgid "Tú. Tú lo has visto. Tu casa. Tus hijos. Sus entrañas latiendo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:474
+msgid "(Callar, con más esfuerzo.)"
+msgstr ""
+
+#: scripts/content/ch_d.gd:475
+msgid "Una tercera dirección es, por tanto, no ya falsa: es *impensable*. Ninguna mente sana ha podido jamás concebirla."
+msgstr ""
+
+#: scripts/content/ch_d.gd:476
+msgid "Aquí puedes elegir lo que quieras. Te aviso de que no servirá."
+msgstr ""
+
+#: scripts/content/ch_d.gd:477
+msgid "Supongamos, como fábula, que alguien la hubiera visto…"
+msgstr ""
+
+#: scripts/content/ch_d.gd:478
+msgid "Callé, sí. Unos tres granos de arena. Luego me oí decir: «Supongamos, como fábula, que alguien la hubiera visto…»."
+msgstr ""
+
+#: scripts/content/ch_d.gd:479
+msgid "Llegué hasta la puerta. Con el perímetro ya en el umbral me oí decir: «Supongamos, como fábula, que alguien la hubiera visto…»."
+msgstr ""
+
+#: scripts/content/ch_d.gd:480
+msgid "Un personaje ficticio, digamos. Una noche lo arrancan del Plano. Ve su ciudad por dentro. Ve el Consejo. Ve una Figura hecha de Círculos…"
+msgstr ""
+
+#: scripts/content/ch_d.gd:481
+msgid "…y no era ficticio. ¡Era yo! ¡Lo vi! Existe la Tercera Dimensión: ¡hacia Arriba, no hacia el Norte! ¡Sacudíos el prejuicio y creed!"
+msgstr ""
+
+#: scripts/content/ch_d.gd:482
+msgid "Guardias. Al Consejo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:484
+msgid "Me olvidé de mí mismo. Es la expresión exacta: por una vez me olvidé del Cuadrado prudente que firmaba, aplaudía y callaba."
+msgstr ""
+
+#: scripts/content/ch_d.gd:491
+msgid "el Presidente"
+msgstr ""
+
+#: scripts/content/ch_d.gd:494 scripts/content/ch_d.gd:494
+msgid "un guardia de dos grados"
+msgstr ""
+
+#: scripts/content/ch_d.gd:495
+msgid "Capítulo X · El juicio"
+msgstr ""
+
+#: scripts/content/ch_d.gd:496
+msgid "A la mañana siguiente me hallé en el mismo punto de la sala donde, un año antes, se había posado la Esfera. Me dejaron contarlo todo sin interrumpirme."
+msgstr ""
+
+#: scripts/content/ch_d.gd:498
+msgid "Fíjate en los guardias. Han cambiado a los de rango por Isósceles de dos o tres grados. Sabes lo que significa: quien te oiga hoy no llegará a la noche."
+msgstr ""
+
+#: scripts/content/ch_d.gd:500
+msgid "El Consejo ha escuchado. Le haré sólo dos preguntas, Cuadrado. La primera: usted repite «hacia Arriba, no hacia el Norte». Sea tan amable de *indicarnos esa dirección*. Muévase hacia ella."
+msgstr ""
+
+#: scripts/content/ch_d.gd:504
+msgid "Primera pregunta"
+msgstr ""
+
+#: scripts/content/ch_d.gd:504
+msgid "Muévete hacia Arriba."
+msgstr ""
+
+#: scripts/content/ch_d.gd:513
+msgid "el Este"
+msgstr ""
+
+#: scripts/content/ch_d.gd:513
+msgid "el Oeste"
+msgstr ""
+
+#: scripts/content/ch_d.gd:513
+msgid "el Norte"
+msgstr ""
+
+#: scripts/content/ch_d.gd:513
+msgid "el Sur"
+msgstr ""
+
+#: scripts/content/ch_d.gd:514
+msgid "*El Presidente:* «Eso es %s, caballero.»"
+msgstr ""
+
+#: scripts/content/ch_d.gd:516
+msgid "*Nada. Tu cuerpo no tiene con qué.*"
+msgstr ""
+
+#: scripts/content/ch_d.gd:522
+msgid "No puedo señalarla. Pero existe."
+msgstr ""
+
+#: scripts/content/ch_d.gd:523
+msgid "La segunda. ¿Puede, con diagramas o descripciones —que no sean enumerar lados y ángulos imaginarios—, mostrarnos esa Figura que llama Cubo?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:524
+msgid "tablilla del acusado"
+msgstr ""
+
+#: scripts/content/ch_d.gd:535
+msgid "Un Cuadrado…"
+msgstr ""
+
+#: scripts/content/ch_d.gd:535
+msgid "…otro Cuadrado, más «arriba»…"
+msgstr ""
+
+#: scripts/content/ch_d.gd:535
+msgid "…y unidos. ¿No lo veis?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:536
+msgid "Veo un Cuadrado montado sobre otro y cuatro rayas que los cosen. Una figura Irregular de muchos lados. ¿Eso es su Cubo?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:538
+msgid "Tú, lector, has visto un cubo en ese dibujo. Tú puedes. Imagina ahora tener la verdad entera y ningún papel donde quepa."
+msgstr ""
+
+#: scripts/content/ch_d.gd:539
+msgid "Nada más puedo decir. Me encomiendo a la Verdad, cuya causa acabará por prevalecer."
+msgstr ""
+
+#: scripts/content/ch_d.gd:539
+msgid "Retiro lo dicho. Fue la fiebre."
+msgstr ""
+
+#: scripts/content/ch_d.gd:539
+msgid "Retractarse"
+msgstr ""
+
+#: scripts/content/ch_d.gd:540
+msgid "Pensé en decirlo. La frase estaba hecha, con sus cinco lados y ninguna ventana. No la dije. Es de lo poco de lo que estoy seguro."
+msgstr ""
+
+#: scripts/content/ch_d.gd:542
+msgid "El Consejo comparte su confianza en la Verdad. Si ella quiere que salga usted de la cárcel a evangelizar el mundo, ella proveerá. Prisión perpetua. Sin más rigor que el necesario para que no escape. Podrá ver a su hermano, que le precedió."
+msgstr ""
+
+#: scripts/content/ch_d.gd:549
+msgid "el manuscrito"
+msgstr ""
+
+#: scripts/content/ch_d.gd:551
+msgid "Epílogo · La celda"
+msgstr ""
+
+#: scripts/content/ch_d.gd:552
+msgid "Siete años. Mi hermano viene cada semana. Es de lo poco que me permiten, y lo que más me duele."
+msgstr ""
+
+#: scripts/content/ch_d.gd:553
+msgid "Habla con tu hermano"
+msgstr ""
+
+#: scripts/content/ch_d.gd:554
+msgid "Hermano: tú estabas allí. La viste aparecer en la sala. Un punto, un Círculo que crecía, que menguaba. Oíste lo que dijo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:555
+msgid "Vi un Círculo que cambiaba de tamaño, sí. Y por haberlo visto estoy aquí. ¿Qué más quieres que haya visto?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:556
+msgid "Te lo he explicado cada semana, durante siete años. La Analogía. El Cubo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:557
+msgid "Y cada semana te escucho con gusto, porque eres mi hermano. Pero no. No creo en tu Esfera. Lo siento. ¿Cómo va a moverse algo hacia Arriba y no hacia el Norte?"
+msgstr ""
+
+#: scripts/content/ch_d.gd:558
+msgid "No tengo un solo converso. La Revelación del milenio se hizo para mí, y para nada. Prometeo fue encadenado por bajar el fuego a los mortales; yo, pobre Prometeo de Planilandia, estoy preso por no haberles bajado nada."
+msgstr ""
+
+#: scripts/content/ch_d.gd:564
+msgid "Vuelve al manuscrito"
+msgstr ""
+
+#: scripts/content/ch_d.gd:566
+msgid "Dicen que mi hija sabe contar hasta diez. Es lo único que he enseñado en mi vida que ha prendido."
+msgstr ""
+
+#: scripts/content/ch_d.gd:567
+msgid "El hijo de mi antiguo criado, el de diez grados y medio, pasa algunas tardes bajo el muro y dice mi nombre en voz alta. Es toda mi fama."
+msgstr ""
+
+#: scripts/content/ch_d.gd:568
+msgid "El Prefecto no tuvo que buscar testigos contra mí: mi tablilla estaba llena desde lo de la Puerta Oeste. De eso, al menos, no me avergüenzo."
+msgstr ""
+
+#: scripts/content/ch_d.gd:569
+msgid "Pienso a veces en el calderero. En que dictaminé su raya con el mismo aplomo con que el Consejo dictaminó la mía."
+msgstr ""
+
+#: scripts/content/ch_d.gd:570
+msgid "No me arrepiento de haber hablado. Me arrepiento de los años en que no pregunté."
+msgstr ""
+
+#: scripts/content/ch_d.gd:571
+msgid "A veces pienso que habría sido mejor aplaudir y callar, como sabía hacer tan bien. Luego recuerdo el Cubo, y se me pasa. Casi siempre."
+msgstr ""
+
+#: scripts/content/ch_d.gd:572
+msgid "Dudé toda mi vida en voz baja. Sólo una vez hablé en voz alta, y fue ésta."
+msgstr ""
+
+#: scripts/content/ch_d.gd:574
+msgid "Y sin embargo existo con la esperanza de que estas memorias lleguen, no sé cómo, a las mentes de la humanidad de Alguna Dimensión, y susciten una raza de rebeldes que se nieguen a ser confinados en una Dimensionalidad limitada."
+msgstr ""
+
+#: scripts/content/ch_d.gd:577
+msgid "Esa es la esperanza de mis horas más luminosas. Ay, no siempre es así."
+msgstr ""
+
+#: scripts/content/ch_d.gd:578
+msgid "Hay momentos en que no puedo decir con honradez que recuerde la forma exacta del Cubo, una vez visto y tantas veces añorado. Y el precepto, «hacia Arriba, no hacia el Norte», me persigue como una Esfinge que devora el alma."
+msgstr ""
+
+#: scripts/content/ch_d.gd:581
+msgid "Hay horas de flaqueza en que Cubos y Esferas se desvanecen hacia el fondo de lo apenas posible; en que la Tierra de las Tres Dimensiones parece casi tan visionaria como la de Una o la de Ninguna…"
+msgstr ""
+
+#: scripts/content/ch_d.gd:582
+msgid "…en que hasta este muro que me priva de la libertad, estas tablillas en que escribo, y todas las realidades sustanciales de Planilandia, no parecen más que el engendro de una imaginación enferma, o la tela sin fundamento de un sueño."
+msgstr ""
+
+#: scripts/content/ch_d.gd:585
+msgid "Has recuperado %d de 22 secciones del manuscrito. Las que faltan esperan en sus capítulos."
+msgstr ""
+
+#: scripts/content/ch_d.gd:585
+msgid "Planilandia"
+msgstr ""
+
+#: scripts/content/ch_d.gd:585
+msgid "El manuscrito está completo: 22 de 22 secciones. Alguien, en Alguna Dimensión, lo ha leído."
+msgstr ""
+
+#: scripts/content/ch_d.gd:586
+msgid "Edwin A. Abbott"
+msgstr ""
+
+#: scripts/content/ch_d.gd:586
+msgid "Flatland, 1884"
+msgstr ""
+
+#: scripts/content/ch_d.gd:586
+msgid "Hacia Arriba, no hacia el Norte."
+msgstr ""
+
+#: scripts/content/ch_d.gd:80
+msgid "Capítulo VIII · Espaciolandia"
+msgstr ""
+
+#: scripts/content/ch_d.gd:81
+msgid "Un horror indecible. Oscuridad. Luego una sensación mareante de una vista que no era ver: vi una Línea que no era Línea; un Espacio que no era Espacio. Yo era yo y no lo era."
+msgstr ""
+
+#: scripts/content/ch_d.gd:82
+msgid "Grité: «¡Esto es la locura, o es el Infierno!»"
+msgstr ""
+
+#: scripts/content/ch_d.gd:83
+msgid "Capítulo VIII"
+msgstr ""
+
+#: scripts/content/ch_d.gd:83
+msgid "Espaciolandia"
+msgstr ""
+
+#: scripts/content/ch_d.gd:83
+msgid "«Ni lo uno ni lo otro. Es el Conocimiento; son las Tres Dimensiones. Abre el ojo de nuevo y procura mirar con firmeza.»"
 msgstr ""
 
 #: scripts/content/ch_frame.gd:110
@@ -3960,59 +4072,59 @@ msgstr ""
 msgid "To\nThe Inhabitants of SPACE IN GENERAL\nAnd H. C. IN PARTICULAR\nThis Work is Dedicated\nBy a Humble Native of Flatland\nIn the Hope that\nEven as he was Initiated into the Mysteries\nOf THREE Dimensions\nHaving been previously conversant\nWith ONLY TWO\nSo the Citizens of that Celestial Region\nMay aspire yet higher and higher\nTo the Secrets of FOUR FIVE OR EVEN SIX Dimensions"
 msgstr ""
 
-#: scripts/game.gd:101
+#: scripts/game.gd:103
 msgid "Nuevo saber"
 msgstr ""
 
-#: scripts/game.gd:144
+#: scripts/game.gd:146
 msgid "Día %d."
 msgstr ""
 
-#: scripts/game.gd:164
+#: scripts/game.gd:166
 msgid "Logro"
 msgstr ""
 
-#: scripts/game.gd:214
+#: scripts/game.gd:216
 msgid "Sonido"
 msgstr ""
 
-#: scripts/game.gd:214
+#: scripts/game.gd:216
 msgid "silenciado"
 msgstr ""
 
-#: scripts/game.gd:214
+#: scripts/game.gd:216
 msgid "activado"
 msgstr ""
 
-#: scripts/game.gd:363 scripts/ui.gd:15
+#: scripts/game.gd:365 scripts/ui.gd:15
 msgid "Tú"
 msgstr ""
 
-#: scripts/game.gd:460 scripts/game.gd:501 scripts/game.gd:508 scripts/content/ch_a.gd:176 …
+#: scripts/game.gd:470 scripts/game.gd:511 scripts/game.gd:518 scripts/content/ch_a.gd:176 …
 msgid "Hablar"
 msgstr ""
 
-#: scripts/game.gd:620
+#: scripts/game.gd:630
 msgid "{look} mirar  ·  {move} volar  ·  {rise} / {sink} subir y bajar  ·  {journal} inventario"
 msgstr ""
 
-#: scripts/game.gd:620
+#: scripts/game.gd:630
 msgid "{view} vista  ·  {journal} inventario  ·  {history} historial  ·  {pause} menú"
 msgstr ""
 
-#: scripts/game.gd:622
+#: scripts/game.gd:632
 msgid "VISTA DEL PLANO  —  palanca: girar y avanzar  ·  ojo: volver a la lámina"
 msgstr ""
 
-#: scripts/game.gd:623
+#: scripts/game.gd:633
 msgid "VISTA DEL PLANO  —  stick: girar y avanzar  ·  {view} volver a la lámina"
 msgstr ""
 
-#: scripts/game.gd:624
+#: scripts/game.gd:634
 msgid "VISTA DEL PLANO  —  {move_left}/{move_right} girar  ·  {move_up}/{move_down} avanzar  ·  {view} volver a la lámina"
 msgstr ""
 
-#: scripts/game.gd:96
+#: scripts/game.gd:98
 msgid "Manuscrito · sección %d de 22"
 msgstr ""
 
@@ -4024,47 +4136,47 @@ msgstr ""
 msgid "Volver"
 msgstr ""
 
-#: scripts/main.gd:186 scripts/content/ch_a.gd:169 scripts/content/ch_a.gd:220 scripts/content/ch_b.gd:135 …
+#: scripts/main.gd:187 scripts/content/ch_a.gd:169 scripts/content/ch_a.gd:220 scripts/content/ch_b.gd:135 …
 msgid "Herejía"
 msgstr ""
 
-#: scripts/main.gd:186 scripts/content/ch_a.gd:615 scripts/content/ch_b.gd:199 scripts/content/ch_b.gd:367
+#: scripts/main.gd:187 scripts/content/ch_a.gd:615 scripts/content/ch_b.gd:199 scripts/content/ch_b.gd:367
 msgid "Cuestionar"
 msgstr ""
 
-#: scripts/main.gd:186 scripts/content/ch_b.gd:392
+#: scripts/main.gd:187 scripts/content/ch_b.gd:392
 msgid "Osadía"
 msgstr ""
 
-#: scripts/main.gd:186 scripts/content/ch_d.gd:233
+#: scripts/main.gd:187 scripts/content/ch_d.gd:378
 msgid "Atreverse"
 msgstr ""
 
-#: scripts/main.gd:186 scripts/content/ch_a.gd:319 scripts/content/ch_a.gd:688 scripts/content/ch_d.gd:260
+#: scripts/main.gd:187 scripts/content/ch_a.gd:319 scripts/content/ch_a.gd:688 scripts/content/ch_d.gd:405
 msgid "La verdad"
 msgstr ""
 
-#: scripts/main.gd:186 scripts/content/ch_b.gd:412
+#: scripts/main.gd:187 scripts/content/ch_b.gd:412
 msgid "Apelar"
 msgstr ""
 
-#: scripts/main.gd:187 scripts/content/ch_a.gd:616
+#: scripts/main.gd:188 scripts/content/ch_a.gd:616
 msgid "Obedecer"
 msgstr ""
 
-#: scripts/main.gd:187 scripts/content/ch_b.gd:269 scripts/content/ch_b.gd:487
+#: scripts/main.gd:188 scripts/content/ch_b.gd:269 scripts/content/ch_b.gd:487
 msgid "Ortodoxia"
 msgstr ""
 
-#: scripts/main.gd:187 scripts/content/ch_a.gd:319 scripts/content/ch_d.gd:260
+#: scripts/main.gd:188 scripts/content/ch_a.gd:319 scripts/content/ch_d.gd:405
 msgid "La mentira"
 msgstr ""
 
-#: scripts/main.gd:187 scripts/content/ch_a.gd:617 scripts/content/ch_a.gd:688
+#: scripts/main.gd:188 scripts/content/ch_a.gd:617 scripts/content/ch_a.gd:688
 msgid "Callar"
 msgstr ""
 
-#: scripts/main.gd:187 scripts/content/ch_c.gd:147
+#: scripts/main.gd:188 scripts/content/ch_c.gd:147
 msgid "Humildad"
 msgstr ""
 
@@ -4150,6 +4262,98 @@ msgstr ""
 
 #: scripts/minigames/cross_street.gd:52
 msgid "*Decoro* — Por esto existe la ley."
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:10
+msgid "un cuadrado que no cambia"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:10
+msgid "un rectángulo que se ensancha"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:11
+msgid "un triángulo que se vuelve hexágono"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:11
+msgid "un círculo que crece y mengua"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:12 scripts/minigames/cube_sections.gd:79
+msgid "una pirámide"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:12 scripts/minigames/cube_sections.gd:79
+msgid "un cono"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:13 scripts/minigames/cube_sections.gd:79
+msgid "un cilindro tumbado"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:13
+msgid "un cubo"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:43
+msgid "la sección"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:46
+msgid "De cara."
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:46
+msgid "De arista."
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:46
+msgid "Y ahora, de vértice."
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:52 scripts/minigames/cube_sections.gd:72 scripts/minigames/cube_sections.gd:79 scripts/minigames/sphere_predict.gd:31 …
+msgid "*La Esfera:* «%s»"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:56
+msgid "Las secciones del Cubo"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:56
+msgid "¿Qué verán tus compatriotas cuando el Cubo atraviese su Plano así?"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:59 scripts/minigames/line_section.gd:60 scripts/minigames/sphere_predict.gd:24 scripts/content/ch_c.gd:455
+msgid "*Lógica:* %s"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:59
+msgid "Fíjate en lo que toca primero el Plano: ¿una cara, una arista o un vértice?"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:61
+msgid "Lo que ven allá abajo"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:61
+msgid "la sección, en la lámina y en la línea"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:72
+msgid "Ahora, al revés. Esto no lo verás: sólo lo que ven ellos. Dime qué era."
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:75
+msgid "El sólido escondido"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:75
+msgid "¿Qué ha atravesado el Plano?"
+msgstr ""
+
+#: scripts/minigames/cube_sections.gd:79
+msgid "Era %s. Mira otra vez cómo crecía."
 msgstr ""
 
 #: scripts/minigames/feel.gd:25
@@ -4284,10 +4488,6 @@ msgstr ""
 msgid "El Rey te mide"
 msgstr ""
 
-#: scripts/minigames/line_section.gd:60 scripts/minigames/sphere_predict.gd:24 scripts/content/ch_c.gd:455
-msgid "*Lógica:* %s"
-msgstr ""
-
 #: scripts/minigames/line_section.gd:64
 msgid "¡Casi nada! Como un Punto."
 msgstr ""
@@ -4340,6 +4540,26 @@ msgstr ""
 msgid "«¡Señor! ¡Señor! ¡Por aquí, señor!»"
 msgstr ""
 
+#: scripts/minigames/shadow_turn.gd:25
+msgid "La sombra del Cubo"
+msgstr ""
+
+#: scripts/minigames/shadow_turn.gd:25
+msgid "Gira el Cubo con {move}. Cuando te guste su sombra, pulsa {act}."
+msgstr ""
+
+#: scripts/minigames/shadow_turn.gd:25
+msgid "Gira el Cubo con la palanca. Cuando te guste su sombra, toca el botón de acción."
+msgstr ""
+
+#: scripts/minigames/shadow_turn.gd:25
+msgid "Gira el Cubo con el stick. Cuando te guste su sombra, pulsa {act}."
+msgstr ""
+
+#: scripts/minigames/shadow_turn.gd:26
+msgid "Hecho"
+msgstr ""
+
 #: scripts/minigames/sphere_predict.gd:15
 msgid "la mitad de mi radio"
 msgstr ""
@@ -4368,10 +4588,6 @@ msgstr ""
 msgid "Piensa en tu sección ante el Rey: casi toda la diagonal seguía dentro aunque te apartaras un poco del centro."
 msgstr ""
 
-#: scripts/minigames/sphere_predict.gd:31 scripts/minigames/sphere_predict.gd:34 scripts/content/ch_c.gd:454
-msgid "*La Esfera:* «%s»"
-msgstr ""
-
 #: scripts/minigames/sphere_predict.gd:31
 msgid "Exacto: casi nada menos, aunque haya subido la mitad."
 msgstr ""
@@ -4382,6 +4598,18 @@ msgstr ""
 
 #: scripts/minigames/sphere_predict.gd:34
 msgid "No. Mírame: este es mi tamaño a esa altura. Menos de lo que crees al principio, mucho más deprisa al final."
+msgstr ""
+
+#: scripts/minigames/tesseract.gd:16
+msgid "Gira el teseracto: {move_left} / {move_right} y {move_up} / {move_down}."
+msgstr ""
+
+#: scripts/minigames/tesseract.gd:16
+msgid "Gira el teseracto con la palanca."
+msgstr ""
+
+#: scripts/minigames/tesseract.gd:16
+msgid "Gira el teseracto: stick izquierdo y stick derecho."
 msgstr ""
 
 #: scripts/minigames/voice_length.gd:12

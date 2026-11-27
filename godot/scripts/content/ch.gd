@@ -70,6 +70,8 @@ func town(open := {}) -> Dictionary:
 		if label != null: h.label = label
 		return h
 	var hospital: Dictionary = house.call('hospital', 56, 18, 8, 'Hospital de Reconfiguración'); hospital.labelSize = 0.7
+	# la sala cerrada del Hospital (C8-04): sólo se ve por dentro desde Arriba
+	if open.get('hospital_room', false): hospital.inner = [[-2.6, -2.2, 2.6, -2.2], [2.6, -2.2, 2.6, 1.6], [2.6, 1.6, -2.6, 1.6], [-2.6, 1.6, -2.6, -2.2]]
 	return {
 		bounds = {x0 = -120, y0 = -46, x1 = 76, y1 = 46}, fog = 13.0,
 		# el campo al Oeste de la Puerta, con árboles (§2, C2-07)

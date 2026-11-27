@@ -727,6 +727,25 @@ Capítulos VI y VII, con los sistemas que necesitan:
 
 Notas al margen: 6 más (el súbdito más corto, mil leguas, antes de entrar, el reloj de arena, 3³ en tres pisos, el vano del estudio). `--try=` admite `kingview`, `section`, `ear`, `harmony`, `square`, `cube`, `sphere`, `table` y `cupboard`.
 
+### 9.7 Estado: M4 implementado
+
+Capítulo VIII, con la geometría 3D, el transporte desde Arriba y tres minijuegos:
+
+| Id | Estado | Notas |
+|---|---|---|
+| S-12 (3D) | Hecho | `Geom3.cube/pyramid/prism_n/cone_n`, `section` (polígono convexo ordenado), `area` y `shadow` (luz puntual o direccional), con pruebas: cara → cuadrado de área l², vértice a media altura → hexágono regular, vértice a 1/6 → triángulo equilátero, sin corte → vacío, doce rayas de sombra. `Ent.set_shape(pts)` cambia la forma de una figura sin recrearla. |
+| S-13 Tomar desde Arriba | Hecho | `minigames/carry.gd`: `Carry.enable` (activo mientras dura el capítulo; {act} toma a menos de 3 u y por debajo de 6 u, suelta al dejar de pulsar) y `Carry.run` (espera a que una figura quede donde pide `goal`). Lo levantado pierde la sombra y sale de la línea del ojo (ya ocurría con `alt > 0`); una plomada vertical marca dónde caerá. |
+| C8-01 Vértigo | Hecho | `Cine.play` de 9 s con cuatro llaves (a ras del Plano: la ciudad es una raya; se abre; vista oblicua). La música entra a los 3,2 s, cuando la raya se abre. |
+| C8-02 Ver por dentro | Hecho | `_finds`: tres hallazgos en vuelo (la alacena y la casa, el nieto con su tablilla de «pisos», el cofre del Prefecto con el acta ya firmada), que se registran al pasar a menos de 4 u y por debajo de 8 u. Las marginalia también se recogen en vuelo (mujer encinta, el Círculo de catorce lados, el suelo del Consejo). `g.fly_to(x, y, r, alt_max, texto)`. |
+| C8-03 Coger desde Arriba | Hecho | La tablilla del salón vuelve a la alacena cerrada (`ALACENA_RECT`); `ACH_CUPBOARD`. Opcional: si llevas el estilete del III, aparece en el estudio y puede dejarse en la sala cerrada del Hospital (`flags.estilete_hospital`, anotación `hospital_miracle`). La mención del heraldo en el IX queda para M5. |
+| C8-04 El calderero | Hecho | `town({hospital_room = true})`: sala cerrada en el Hospital. Con protesta en la Puerta, el calderero vivo; si no, marcas en el suelo. Se ve al sobrevolarlo (opcional); `ACH_TINKER`. |
+| C8-05 Secciones del Cubo | Hecho, con cambio | `minigames/cube_sections.gd` (M-11). La escena baja a la Calle Mayor: el Cubo atraviesa el Plano allí, y la tira del ojo muestra lo que ve un Pentágono que pasa (`g.eye_src`, `eye_src_all`, `strip_in_space`). Las opciones son siluetas dibujadas en 2D (`OptCard.sil`), incluidas las de la ronda inversa, en vez de mallas 3D en un `SubViewport`. `ACH_SECTIONS` (nuevo) con todo acertado; saber `secciones`. |
+| C8-06 Sombra | Hecho | `minigames/shadow_turn.gd` (M-12): luz a 16 u sobre el Cubo; se gira con el stick (o las flechas) y {act} lo da por bueno; `flags.shadow_xf` (9 números). Saber `sombras`. |
+| C8-07 Teseracto | Hecho | `minigames/tesseract.gd` (M-13): XW con izquierda/derecha (stick izquierdo) e YZ con arriba/abajo o el stick derecho; gira solo, despacio, si nadie lo toca. `ACH_TESS`. Casillas `4d.*`, `3d.desde_arriba`, `3d.ve`, `3d.no_concibe`, `3d.rechazo`. |
+| C8-08 Caída | Hecho | `Cine.play` de 4 s que cae girando hasta ver la ciudad de canto, y el fundido se cierra en la raya. |
+
+`--try=` admite `ascent`, `sections`, `shadow`, `carry` y `tess`.
+
 ---
 
 ## 10. Riesgos
