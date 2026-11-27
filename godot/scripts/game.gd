@@ -5,8 +5,9 @@ signal frame(dt)
 signal talk_started(id)
 signal all_done
 
-const SAVE := "user://planilandia.json"
 const KEEP := &"__keep"
+# día del año de cada bloque (el expediente fecha sus anotaciones); el X ocurre en el año 2000
+const DAY := [358, 358, 359, 360, 361, 363, 364, 365, 365, 365, 330]
 
 var world: World
 var eye: Eye
@@ -42,14 +43,17 @@ var talk_ent = null      # la figura con la que se conversa ahora
 var hurt_cd := 0.0
 var stun := 0.0
 var _fwd := 0.0
+var slot := 1            # hueco de partida (1–3)
+var script_policy := ""  # --script=heretic|orthodox: política de elección del autómata
 
 static func fresh() -> Dictionary:
-	return {chapter = 0, max = 0, rep = {sac = 0, ciu = 0, aut = 0}, her = 0, know = {}, frags = {}, flags = {}}
+	return Profile.fresh_state()
 
 func _init() -> void:
-	state = fresh(); load_state()
-	var f := FileAccess.open("res://data/book.json", FileAccess.READ)
-	book = JSON.parse_string(f.get_as_text())
+	slot = int(Profile.data.last_slot)
+	state = fresh()
+	if not App.args.has("auto"): load_state()   # las pruebas empiezan siempre de cero
+	book = I18n.book()
 	world = World.new(); add_child(world)
 	eye = Eye.new(); add_child(eye)
 
@@ -60,17 +64,14 @@ func _ready() -> void:
 
 # ---------- estado ----------
 func load_state() -> void:
-	if not FileAccess.file_exists(SAVE): return
-	var f := FileAccess.open(SAVE, FileAccess.READ)
-	if f == null: return
-	var s = JSON.parse_string(f.get_as_text())
-	if s is Dictionary:
-		for k in s: state[k] = s[k]
-		state.chapter = int(state.chapter); state.max = int(state.max)
+	var s := Profile.read_slot(slot)
+	if s.is_empty(): return
+	for k in s: state[k] = s[k]
 
 func save() -> void:
-	var f := FileAccess.open(SAVE, FileAccess.WRITE)
-	if f: f.store_string(JSON.stringify(state))
+	if auto and not App.args.has("save"): return   # las pruebas no tocan las partidas del jugador
+	Profile.write_slot(slot, state)
+	Profile.unlock_chapter(int(state.max))
 
 func reset() -> void:
 	state = fresh(); save()
@@ -86,7 +87,7 @@ func frag(n: int) -> void:
 		world.fx_add("puff", p.x, p.y, 0.9, 1.3, gold); world.fx_add("puff", p.x, p.y, 1.3, 2.2, gold)
 		world.fx_add("spark", p.x, p.y, 0.7, 1.6, gold)
 		world.kick = 1.0
-	ui.toast("frag", "Manuscrito · sección %d de 22" % n, "«%s»" % book.fragments[n - 1].title)
+	ui.toast("frag", tr("Manuscrito · sección %d de 22") % n, "«%s»" % book.fragments[n - 1].title)
 
 func learn(id: String) -> void:
 	if state.know.has(id): return
@@ -97,41 +98,111 @@ func learn(id: String) -> void:
 func knows(id: String) -> bool:
 	return state.know.has(id)
 
+# reputaciones y herejía: siguen contando por dentro (el epílogo las usa), pero ya no se anuncian (T-01)
 func rep(f: String, d: int) -> void:
-	state.rep[f] = clampf(state.rep[f] + d, -5, 5); save(); Snd.sfx("good" if d > 0 else "bad")
-	ui.toast("good" if d > 0 else "bad", "Posición social", "%s: %s" % [{sac = "Sacerdocio", ciu = "Ciudadanía", aut = "Autoridad"}[f], "sube" if d > 0 else "baja"])
+	state.rep[f] = clampf(state.rep[f] + d, -5, 5); save()
 
 func her(d: int) -> void:
 	state.her = clampf(state.her + d, -5, 5); save()
-	if d > 0: Snd.sfx("her")
-	ui.toast("her", "Tu pensamiento", "Hacia la herejía" if d > 0 else "Hacia la ortodoxia")
+
+# ---------- expediente y relaciones (S-03) ----------
+# Anotación del expediente: idempotente por id. Quien la escribe, si está en escena, hace el gesto
+# (late una vez) y suena el punzón. No hay aviso en pantalla: el jugador lo descubrirá en el juicio.
+func note(id: String, w := 1) -> void:
+	for r in state.record:
+		if r.id == id: return
+	var who: String = book.get("record", {}).get(id, {}).get("who", "")
+	state.record.append({id = id, ch = int(state.chapter), day = DAY[clampi(int(state.chapter), 0, DAY.size() - 1)], who = who, w = w})
+	save()
+	if App.args.has("log"): print("  expediente: ", id, " (", who, ", peso ", w, ")")
+	var e = null
+	if actors.has(who) and is_instance_valid(actors[who]): e = actors[who]
+	elif world.ents.has(who): e = world.ents[who]
+	if e is Ent:
+		e.talk = maxf(e.talk, 0.8)
+		Snd.sfx_at("chalk", e.x, e.y, 4.0)
+
+# las anotaciones de más peso; a igualdad, por orden de llegada
+func record_top(n := 5) -> Array:
+	var idx := range(state.record.size())
+	idx.sort_custom(func(a, b):
+		var wa: int = state.record[a].w; var wb: int = state.record[b].w
+		return wa > wb or (wa == wb and a < b))
+	var out := []
+	for i in idx.slice(0, n): out.append(state.record[i])
+	return out
+
+# texto de una anotación en el idioma actual (no se guarda: se resuelve por id)
+func record_text(r: Dictionary) -> String:
+	var t: String = book.get("record", {}).get(r.id, {}).get("text", r.id)
+	return tr("Día %d.") % int(r.day) + " " + t
+
+# relaciones con nombre, de −2 a 2, sin aviso (T-02)
+func rel(who: String, d: int) -> void:
+	if not state.rel.has(who): state.rel[who] = 0
+	state.rel[who] = clampi(int(state.rel[who]) + d, -2, 2); save()
+
+func rel_of(who: String) -> int:
+	return int(state.rel.get(who, 0))
 
 func flag(k: String, v = KEEP):
 	if v is StringName and v == KEEP: return state.flags.get(k)
 	state.flags[k] = v; save()
 
-# ---------- entrada ----------
-func _unhandled_key_input(ev: InputEvent) -> void:
-	if not ev.pressed or ev.echo: return
-	var k: int = ev.physical_keycode
+# ---------- entrada (S-01) ----------
+var _axis_hot := {}   # ejes del mando ya inclinados: un stick mantenido cuenta como una sola pulsación
+
+func _unhandled_input(ev: InputEvent) -> void:
 	if not running: return
-	if k == KEY_J and not ui.pause_open and not ui.choosing and not ui.picking and not ui.dlg_open and not busy:
-		ui.toggle_journal(); return
-	if k == KEY_ESCAPE:
-		if ui.journal_open: ui.toggle_journal()
-		elif on_menu.is_valid(): on_menu.call()
+	if ev is InputEventJoypadMotion:
+		var hot := absf(ev.axis_value) >= 0.5
+		var was: bool = _axis_hot.get(ev.axis, false)
+		_axis_hot[ev.axis] = hot
+		if not hot or was: return
+	if ev.is_echo() or not ev.is_pressed(): return
+	if ev is InputEventMouseMotion: return
+	if ev.is_action_pressed("journal") and (ui.journal_open or (not ui.pause_open and not ui.settings_open and not ui.choosing and not ui.picking and not ui.dlg_open and not busy)):
+		ui.toggle_journal(); _done(); return
+	if ev.is_action_pressed("history") and not ui.pause_open and not ui.settings_open:
+		if ui.journal_open and ui._tab == "log": ui.toggle_journal()
+		elif ui.journal_open: ui.j_tab("log")
+		else: ui.toggle_journal("log")
+		_done(); return
+	if ev.is_action_pressed("pause") or (ev.is_action_pressed("ui_cancel") and ui.modal()):
+		if ui.settings_open: ui.close_settings()
+		elif ui.journal_open: ui.toggle_journal()
+		elif ui.pause_open: ui.toggle_pause()
+		elif ev.is_action_pressed("pause") and on_menu.is_valid(): on_menu.call()
+		_done(); return
+	if ev.is_action_pressed("mute"):
+		ui.toast("", tr("Sonido"), tr("silenciado") if Snd.toggle_mute() else tr("activado")); _done(); return
+	if ui.journal_open:
+		if ev.is_action_pressed("tab_prev"): ui.j_cycle(-1); _done()
+		elif ev.is_action_pressed("tab_next"): ui.j_cycle(1); _done()
 		return
-	if k == KEY_M:
-		ui.toast("", "Sonido", "silenciado" if Snd.toggle_mute() else "activado"); return
 	if ui.modal(): return
-	if k >= KEY_1 and k <= KEY_9:
-		if ui.pick_key(k - KEY_1): return
-	if k >= KEY_KP_1 and k <= KEY_KP_9:
-		if ui.pick_key(k - KEY_KP_1): return
-	if k == KEY_SPACE or k == KEY_ENTER or k == KEY_KP_ENTER:
-		if ui.advance(): get_viewport().set_input_as_handled(); return
-	if k == KEY_E: press_act()
-	elif k == KEY_V or k == KEY_TAB: toggle_view()
+	if ev is InputEventKey:
+		var k: int = ev.physical_keycode
+		if k >= KEY_1 and k <= KEY_9 and ui.pick_key(k - KEY_1): _done(); return
+		if k >= KEY_KP_1 and k <= KEY_KP_9 and ui.pick_key(k - KEY_KP_1): _done(); return
+	# elegir respuesta con el mando o las flechas: arriba/abajo (o izquierda/derecha en los paneles) y aceptar
+	if ui.choosing or ui.picking:
+		var step := 0
+		if ev.is_action_pressed("move_up") or ev.is_action_pressed("ui_up"): step = -1
+		elif ev.is_action_pressed("move_down") or ev.is_action_pressed("ui_down"): step = 1
+		elif ui.picking and (ev.is_action_pressed("move_left") or ev.is_action_pressed("ui_left")): step = -1
+		elif ui.picking and (ev.is_action_pressed("move_right") or ev.is_action_pressed("ui_right")): step = 1
+		if step != 0: ui.sel_move(step); _done(); return
+		if ev.is_action_pressed("advance") or ev.is_action_pressed("act"):
+			if ui.sel_accept(): _done(); return
+	if ev.is_action_pressed("advance"):
+		if ui.advance(): _done(); return
+	if ev.is_action_pressed("act"):
+		press_act()
+	elif ev.is_action_pressed("view"): toggle_view()
+
+func _done() -> void:
+	get_viewport().set_input_as_handled()
 
 func press_act() -> void:
 	if busy or locked or near == null or not is_instance_valid(near): return
@@ -144,28 +215,31 @@ func toggle_view() -> void:
 func set_view(v: String) -> void:
 	view = v
 
-static func _key(a: int, b := 0) -> bool:
-	return Input.is_physical_key_pressed(a) or (b != 0 and Input.is_physical_key_pressed(b))
-
-# dirección de movimiento (y = Norte) con magnitud 0..1; teclado o palanca
+# dirección de movimiento (y = Norte) con magnitud 0..1: teclado, mando o palanca táctil
 func axis() -> Vector2:
-	var v := Vector2(float(_key(KEY_D, KEY_RIGHT)) - float(_key(KEY_A, KEY_LEFT)), float(_key(KEY_W, KEY_UP)) - float(_key(KEY_S, KEY_DOWN)))
-	if v != Vector2.ZERO: return v.normalized() * (1.0 if _key(KEY_SHIFT) else 0.68)
+	var v := Input.get_vector("move_left", "move_right", "move_down", "move_up")
+	if v != Vector2.ZERO:
+		if Glyphs.pad(): return v   # el stick es analógico: inclinar más es correr
+		return v.normalized() * (1.0 if Input.is_action_pressed("run") else 0.68)
 	var s: Vector2 = ui.pad.stick
 	return Vector2(s.x, -s.y)
 
+# mirada libre (stick derecho), por segundo
+func look_axis() -> Vector2:
+	return Input.get_vector("look_left", "look_right", "look_up", "look_down")
+
 func act_held() -> bool:
-	return _key(KEY_E) or ui.pad.held("act")
+	return Input.is_action_pressed("act") or ui.pad.held("act")
 
 func up_held() -> bool:
-	return _key(KEY_R, KEY_SPACE) or ui.pad.held("up")
+	return Input.is_action_pressed("rise") or ui.pad.held("up")
 
 func down_held() -> bool:
-	return _key(KEY_F) or ui.pad.held("down")
+	return Input.is_action_pressed("sink") or ui.pad.held("down")
 
 # cualquier tecla «de más» (para las escenas en que no existe la dirección pedida)
 func other_held() -> bool:
-	return act_held() or up_held() or down_held() or _key(KEY_V)
+	return act_held() or up_held() or down_held() or Input.is_action_pressed("view")
 
 # ---------- utilidades de guion ----------
 var player: Ent:
@@ -212,10 +286,10 @@ func hurt(sev: float, at: Vector2) -> void:
 	world.shake = maxf(world.shake, 0.5 * sev)
 	Snd.spike(0.25 + 0.3 * sev)
 	if sev >= 0.8:
-		Snd.sfx("hurt"); Snd.sfx("stab"); Input.vibrate_handheld(90); ui.flash(0.24)
+		Snd.sfx("hurt"); Snd.sfx("stab"); App.rumble(0.5, 0.8, 0.09); ui.flash(0.24)
 		world.fx_add("puff", p.x, p.y, 0.5, 0.6)
 	else:
-		Snd.tone(520.0 - 180.0 * sev, 0.09, "square", 0.05 + 0.06 * sev); Input.vibrate_handheld(25)
+		Snd.tone(520.0 - 180.0 * sev, 0.09, "square", 0.05 + 0.06 * sev); App.rumble(0.3, 0.0, 0.025)
 		if sev >= 0.4: ui.flash(0.12)
 
 func _check_pricks(p: Ent, hits: Array) -> void:
@@ -262,7 +336,7 @@ func run_handler(o: Ent) -> void:
 	var h = handlers.get(o.id)
 	if h == null: return
 	busy = true; ui.prompt(null); vel = Vector2.ZERO
-	Input.vibrate_handheld(10)
+	App.rumble(0.15, 0.0, 0.01)
 	talk_ent = null if o.is_spot else o
 	if not o.is_spot and player != null and o.mv == null:
 		o.frozen = true
@@ -408,6 +482,7 @@ func _process(delta: float) -> void:
 	var dt := minf(0.05, delta)
 	var W := world; var p := player
 	if not paused:
+		if running: state.stats.play_s = float(state.stats.get("play_s", 0.0)) + delta
 		if p != null and running: move_player(dt, p)
 		for tk in tickers.duplicate():
 			if tk[0].call(dt) == true: tickers.erase(tk)
@@ -443,6 +518,10 @@ func move_player(dt: float, p: Ent) -> void:
 	var dir := ax / m if m > 0.01 else Vector2.ZERO
 	if can and p.mv == null:
 		if W.cam_mode == "free":
+			var lk := look_axis() * float(App.cfg.get("look_sens", 1.0))
+			if lk != Vector2.ZERO:
+				W.free.yaw = float(W.free.yaw) - lk.x * 2.2 * dt
+				W.free.pitch = clampf(float(W.free.pitch) + lk.y * 1.6 * dt, 0.12, 1.45)
 			var yaw: float = W.free.yaw
 			var f := Vector2(-sin(yaw), cos(yaw)); var r := Vector2(cos(yaw), sin(yaw))
 			var want := (f * dir.y + r * dir.x) * sp * 1.6
@@ -453,7 +532,7 @@ func move_player(dt: float, p: Ent) -> void:
 			var b: Dictionary = W.map.bounds
 			p.x = clampf(p.x, b.x0, b.x1); p.y = clampf(p.y, b.y0, b.y1)
 		elif view == "eye":
-			p.rot -= ax.x * 2.3 * dt
+			p.rot -= (ax.x + look_axis().x) * 2.3 * dt
 			_fwd = lerpf(_fwd, ax.y * (2.0 + 5.6 * absf(ax.y)) * speed_mul, 1.0 - exp(-dt * 10.0))
 			vel = Vector2(cos(p.rot), sin(p.rot)) * _fwd
 			p.x += vel.x * dt; p.y += vel.y * dt
@@ -475,7 +554,7 @@ func move_player(dt: float, p: Ent) -> void:
 	if near != null:
 		near_label = handlers[near.id].label
 		var who: String = near.nm if near.nm != "" else near.label
-		ui.prompt("[color=#a8392a][b]E[/b][/color]   %s%s" % [near_label, (" — " + who) if who != "" else ""])
+		ui.prompt("%s   %s%s" % [Glyphs.of("act"), tr(near_label), (" — " + tr(who)) if who != "" else ""])
 	else:
 		near_label = ""; ui.prompt(null)
 
@@ -483,9 +562,11 @@ func hud(p, e: float, strip: bool, free: bool) -> void:
 	ui.eye_frame.visible = strip and e < 0.5
 	ui.compass.visible = running and not free and e < 0.5 and not ui.touch
 	ui.keys_box.visible = running and not ui.touch and not ui.dlg_open and not ui.dlg.visible and ui.size.x > 900 and not ui.modal()
-	ui.keys_l.text = "ratón mirar  ·  WASD volar  ·  R / F subir y bajar  ·  J inventario" if free else "V vista  ·  J inventario  ·  M sonido  ·  Esc menú"
+	ui.keys_l.text = Glyphs.fill(tr("{look} mirar  ·  {move} volar  ·  {rise} / {sink} subir y bajar  ·  {journal} inventario") if free else tr("{view} vista  ·  {journal} inventario  ·  {history} historial  ·  {pause} menú"))
 	ui.eye_hint.visible = e > 0.9 and running and not busy and not hide_eye_hint and not ui.dlg.visible
-	ui.eye_hint.text = "VISTA DEL PLANO  —  palanca: girar y avanzar  ·  ojo: volver a la lámina" if ui.touch else "VISTA DEL PLANO  —  A/D girar  ·  W/S avanzar  ·  V volver a la lámina"
+	if ui.touch: ui.eye_hint.text = tr("VISTA DEL PLANO  —  palanca: girar y avanzar  ·  ojo: volver a la lámina")
+	elif Glyphs.pad(): ui.eye_hint.text = Glyphs.fill(tr("VISTA DEL PLANO  —  stick: girar y avanzar  ·  {view} volver a la lámina"))
+	else: ui.eye_hint.text = Glyphs.fill(tr("VISTA DEL PLANO  —  {move_left}/{move_right} girar  ·  {move_up}/{move_down} avanzar  ·  {view} volver a la lámina"))
 	var T = world.target_obj()
 	if p != null and T != null and e > 0.9:
 		var tp := World.pos_of(T)

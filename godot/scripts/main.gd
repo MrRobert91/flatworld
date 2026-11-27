@@ -10,11 +10,15 @@ var _shot_n := 0
 var _ov_t := 0.0
 
 func _ready() -> void:
-	_parse_args(); App.load_cfg()
+	_parse_args()
+	if App.args.has("test"): add_child(load("res://tests/run.gd").new()); return
+	App.load_cfg(); Keys.setup()
+	I18n.setup(App.args.get("lang", Profile.data.get("lang", "")))
 	get_window().size_changed.connect(_fit); _fit()
 	ui = UIRoot.new(); App.ui = ui; add_child(ui)
 	g = Game.new(); App.g = g; add_child(g)
 	g.auto = App.args.has("auto"); ui.auto = g.auto; g.bot = App.args.has("bot")
+	if App.args.has("script"): ui.auto_pick = _policy(App.args.script)
 	if App.args.has("touch") or DisplayServer.is_touchscreen_available(): ui.set_touch(true)
 	if App.args.has("speed"): Engine.time_scale = float(App.args.speed)
 	if App.args.has("mute"): AudioServer.set_bus_mute(0, true)
@@ -62,20 +66,43 @@ func _menu() -> void:
 	g.tick(func(dt): st.t += dt; g.world.focus = Vector2(-10 + sin(st.t * 0.05) * 30.0, 6 + cos(st.t * 0.07) * 5.0))
 	Snd.drone("flat")
 	ui.fade(false, 0.6)
+	_menu_main()
+
+func _menu_main() -> void:
 	var S: Dictionary = g.state
 	var items := []
 	if S.chapter > 0 or not S.frags.is_empty():
-		items.append(["Continuar — " + chapters[mini(S.chapter, chapters.size() - 1)][0], func(_b): _start(S.chapter)])
-	var sure := {on = false}
-	var newgame := func(b: Button):
-		if S.max > 0 and not sure.on:
-			sure.on = true; b.text = "¿BORRAR EL MANUSCRITO Y EMPEZAR? PULSA OTRA VEZ"; return
-		g.reset(); _start(0)
-	items.append(["Nueva partida", newgame])
-	if S.max > 0: items.append(["Capítulos", "chapters"])
+		items.append([ui.T("Continuar — ") + ui.T(chapters[mini(S.chapter, chapters.size() - 1)][0]), func(_b): _start(S.chapter)])
+	items.append(["Nueva partida", func(_b): _menu_slots(true)])
+	var used := Profile.list_slots().filter(func(x): return not x.empty)
+	if used.size() > 1 or (used.size() == 1 and used[0].n != g.slot): items.append(["Cargar partida", func(_b): _menu_slots(false)])
+	var mx := maxi(int(Profile.data.max_chapter), int(S.max))
+	if mx > 0: items.append(["Capítulos", "chapters"])
 	var names := []
 	for c in chapters: names.append(c[0])
-	ui.show_menu(items, names, S.max, _start)
+	ui.show_menu(items, names, mx, _start)
+
+# los tres huecos (T-12): «Nueva partida» pide hueco y nunca borra sin confirmar dos veces
+func _menu_slots(new_game: bool) -> void:
+	var items := []
+	for sl in Profile.list_slots():
+		var n: int = sl.n
+		var label := ui.T("Partida %d") % n + "  ·  "
+		if sl.empty: label += ui.T("vacía")
+		else: label += tr("%s  ·  %d min") % [ui.T(chapters[mini(sl.chapter, chapters.size() - 1)][0]).split(" · ")[0], int(sl.play_s / 60.0)]
+		if new_game:
+			var sure := {on = false}
+			var empty: bool = sl.empty
+			items.append([label, func(b: Button):
+				if not empty and not sure.on:
+					sure.on = true; b.text = ui.T("¿BORRAR LA PARTIDA %d Y EMPEZAR? PULSA OTRA VEZ") % n; return
+				Profile.data.last_slot = n; Profile.save(); Profile.clear_slot(n)
+				g.slot = n; g.reset(); _start(0), "sub"])
+		elif not sl.empty:
+			var ch: int = sl.chapter
+			items.append([label, func(_b): Profile.data.last_slot = n; Profile.save(); _start(ch), "sub"])
+	items.append(["Volver", func(_b): _menu_main(), "sub"])
+	ui.show_menu(items, [], -1, _start)
 
 func _start(i: int) -> void:
 	App.pending_start = i
@@ -87,7 +114,7 @@ func run(i: int) -> void:
 	if g.knows("vista"): g.eye.trace = 1.0
 	g.on_menu = func(): ui.toggle_pause(func(): App.pending_start = -1; get_tree().reload_current_scene())
 	while i < chapters.size():
-		g.state.chapter = i; g.state.max = maxi(g.state.max, i); g.save()
+		g.state.chapter = i; g.state.max = maxi(g.state.max, i); g.save(); Profile.unlock_chapter(i)
 		g.locked = false; g.view_lock = false; g.busy = false; g.speed_mul = 1.0; g.hide_eye_hint = false
 		g.need_act = ""; g.need_stick = false; Snd.tension(0.0)
 		if App.args.has("log"): print("== capítulo ", i, " ", chapters[i][0])
@@ -96,10 +123,71 @@ func run(i: int) -> void:
 		i += 1
 	g.state.chapter = 0; g.state.max = chapters.size() - 1; g.save()
 	if App.args.has("quit"):
-		print("FIN OK frags=", g.state.frags.size()); get_tree().quit(); return
+		var out := "FIN OK frags=%d margins=%d record=%d" % [g.state.frags.size(), g.state.margins.size(), g.state.record.size()]  # notr
+		if App.args.has("log"):
+			for r in g.record_top(5): print("  ", g.record_text(r))
+			if I18n.lang != I18n.SOURCE: print("  sin traducir: ", I18n.missing.size())
+		print(out); Profile.save(); get_tree().quit(); return
 	App.pending_start = -1; get_tree().reload_current_scene()
 
+func _cinetest() -> void:
+	var p := g.player; var W := g.world
+	await Cine.orbit(W, Vector2(p.x, p.y), PI / 2 - 0.01, 0.08, 3.0, 12.0)
+	await g.wait(0.6); Cine.orbit_end(W)
+	await Cine.play(W, [{t = 0.0, focus = Vector2(p.x, p.y), zoom = 40.0}, {t = 2.0, focus = Vector2(p.x + 6, p.y), zoom = 18.0}, {t = 3.0, zoom = 18.0}])
+	W.focus = null; W.zoom = W.base_zoom
+
+var _inj_t := 0.0
+var _inj := []
+func _inject(dt: float) -> void:
+	if _inj.is_empty() and not has_meta("inj"):
+		set_meta("inj", true)
+		for part in String(App.args.inject).split(","):
+			var f := part.split(":")
+			if f.size() >= 3: _inj.append(f)
+	_inj_t += dt / maxf(Engine.time_scale, 0.01)
+	while not _inj.is_empty() and float(_inj[0][0]) <= _inj_t:
+		var f: PackedStringArray = _inj.pop_front()
+		var ev: InputEvent
+		var up: InputEvent
+		match f[1]:
+			"joy":
+				var e := InputEventJoypadButton.new(); e.button_index = int(f[2]) as JoyButton; e.pressed = true; ev = e
+				var u := InputEventJoypadButton.new(); u.button_index = e.button_index; u.pressed = false; up = u
+			"axis":
+				var e := InputEventJoypadMotion.new(); e.axis = int(f[2]) as JoyAxis; e.axis_value = float(f[3]); ev = e
+				var u := InputEventJoypadMotion.new(); u.axis = e.axis; u.axis_value = 0.0; up = u
+			_:
+				var e := InputEventKey.new(); e.physical_keycode = OS.find_keycode_from_string(f[2]); e.keycode = e.physical_keycode; e.pressed = true; ev = e
+				var u := InputEventKey.new(); u.physical_keycode = e.physical_keycode; u.keycode = e.keycode; u.pressed = false; up = u
+		Input.parse_input_event(ev)
+		get_tree().create_timer(0.12, true, false, true).timeout.connect(func(): Input.parse_input_event(up))
+
+# --script=heretic|orthodox: el autómata elige por política (S-03, pruebas del expediente)
+const HERETIC := ["Herejía", "Cuestionar", "Osadía", "Atreverse", "La verdad", "Apelar"]
+const ORTHODOX := ["Obedecer", "Ortodoxia", "La mentira", "Callar", "Humildad"]
+func _policy(name: String) -> Callable:
+	return func(opts: Array) -> int:
+		var free := []
+		for k in opts.size():
+			if not ui._locked(opts[k]): free.append(k)
+		if free.is_empty(): return 0
+		if name == "heretic":
+			for k in free:
+				if opts[k].get("tag", "") in HERETIC: return k
+			for k in free:
+				if str(opts[k].get("id", "")) == "h": return k
+		elif name == "orthodox":
+			for k in free:
+				if opts[k].get("tag", "") in ORTHODOX: return k
+			for k in free:
+				if str(opts[k].get("id", "")) == "o": return k
+			for k in free:
+				if opts[k].get("tag", "") == "": return k
+		return free[0]
+
 func _process(dt: float) -> void:
+	if g == null: return
 	# autómata de pruebas: avanza textos, elige al azar y salta a los objetivos
 	if g.bot and g.running:
 		_bot_t += dt / maxf(Engine.time_scale, 0.01)
@@ -136,6 +224,11 @@ func _process(dt: float) -> void:
 					var gg: Array = W._gap(W.shape(a), W.shape(b), Vector2(a.x, a.y), Vector2(b.x, b.y))
 					if -gg[0] > worst: worst = -gg[0]; who = a.id + "/" + b.id
 			print("overlap ", snappedf(worst, 0.001), " ", who, " n=", L.size())
+	# --inject=t:joy:6,t:key:J,t:axis:1:1.0 → pulsaciones simuladas (prueba de mando y paneles con --shots)
+	if App.args.has("inject"): _inject(dt)
+	# --cinetest: prueba de raíles (S-08): órbita de la cámara y un plano de foco y zoom con franjas
+	if App.args.has("cinetest") and g.running and g.player != null and Time.get_ticks_msec() > 4000 and not has_meta("cine"):
+		set_meta("cine", true); _cinetest()
 	if App.args.has("open") and g.running and not ui.journal_open and Time.get_ticks_msec() > 5000 and not has_meta("opened"):
 		set_meta("opened", true); ui.toggle_journal(App.args.open)
 	if App.args.has("shots"):

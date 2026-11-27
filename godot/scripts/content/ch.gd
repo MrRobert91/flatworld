@@ -37,8 +37,11 @@ func _init(game: Game, u: UIRoot) -> void:
 func say(w: String, t: String) -> void: await ui.say(w, t)
 func choose(o: Array, e := true): return await ui.choose(o, e)
 func narr(t: String, w := false) -> void: await ui.narrate(t, w)
-# texto según el dispositivo: teclado o pantalla táctil
-func tx(kb: String, touch: String) -> String: return touch if ui.touch else kb
+# texto según el dispositivo: teclado, mando o pantalla táctil. Devuelve la plantilla sin rellenar:
+# la interfaz la traduce y sustituye después {act}, {view}, {move}… por los glifos del dispositivo (S-01)
+func tx(kb: String, touch: String, pad := '') -> String:
+	if ui.touch: return touch
+	return pad if Glyphs.pad() and pad != '' else kb
 
 # ---------- figuras ----------
 func _f(base: Dictionary, o: Dictionary) -> Dictionary:
@@ -117,7 +120,7 @@ func sight_round(kind: String, o := {}):
 		await e.move_to(p.x + cos(dir) * near, p.y + sin(dir) * near, 3.2)
 		e.rot = base
 	approach.call()
-	if e.woman: Snd.sfx('peace')
+	if e.woman: Snd.sfx_at('peace', e.x, e.y, 0.0, 'Grito de Paz')
 	var ans = await ui.panel(o.get('title', 'Reconocimiento por la vista'), o.get('text', '¿Qué figura se acerca? Observa cómo se apagan sus extremos en la niebla.'), o.get('options', CLASSES))
 	stop.call(); e.mv = null; e.rot = base
 	if o.get('reveal', true):
@@ -126,8 +129,8 @@ func sight_round(kind: String, o := {}):
 		Snd.sfx('good' if ok else 'bad')
 		var msg: String
 		if o.has('verdict'): msg = o.verdict.call(ans)
-		elif ok: msg = 'Cierto: %s. *La lámina te lo confirma.*' % NAME[kind]
-		else: msg = 'No: era %s %s. *Mírala desde arriba y compara con la línea.*' % ['una' if kind == 'mujer' else 'un', NAME[kind]]
+		elif ok: msg = tr('Cierto: %s. *La lámina te lo confirma.*') % tr(NAME[kind])
+		else: msg = tr('No: era %s %s. *Mírala desde arriba y compara con la línea.*') % [tr('una') if kind == 'mujer' else tr('un'), tr(NAME[kind])]
 		ui.note(msg, 4)
 		await g.wait(3.6)
 		g.set_view('eye'); W.focus = null; W.zoom = W.base_zoom
@@ -155,7 +158,7 @@ func feel(e: Ent, text := '') -> bool:
 	var da := App.ang_diff(a0, a1)
 	var arc := MeshInstance3D.new(); arc.mesh = ImmediateMesh.new(); arc.material_override = W.mat(3); W.fx.add_child(arc)
 	W.focus = v; W.zoom = 13
-	ui.panel_info('Reconocimiento por el tacto', text if text != '' else tx('Mantén pulsada E para recorrer el ángulo con tu lado. *Despacio: un ángulo agudo hiere.*', 'Mantén pulsado el botón «Palpar» para recorrer el ángulo con tu lado. *Despacio: un ángulo agudo hiere.*'))
+	ui.panel_info('Reconocimiento por el tacto', text if text != '' else tx('Mantén pulsado {act} para recorrer el ángulo con tu lado. *Despacio: un ángulo agudo hiere.*', 'Mantén pulsado el botón «Palpar» para recorrer el ángulo con tu lado. *Despacio: un ángulo agudo hiere.*'))
 	g.need_act = 'Palpar'
 	var st := {prog = 0.0}
 	await g.tick_until(func(dt) -> bool:

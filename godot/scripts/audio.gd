@@ -235,6 +235,47 @@ func sfx(n: String) -> void:
 			tone(t[0], t[1], t[2], t[3], t[4] if t.size() > 4 else 0.0, t[5] if t.size() > 5 else 0.0)
 	if SPIKE.has(n): spike(SPIKE[n])
 
+# ---------- sonido posicional (S-07) ----------
+# Un grupo de 8 reproductores 3D dentro del mundo: suenan desde un punto del Plano y se oyen desde el ojo
+# del Cuadrado (AudioListener3D de World). Si cap no está vacío, se muestra un subtítulo de sonido con la
+# dirección (T-11), como mucho uno cada 1,5 s.
+const POS_N := 8
+var _pos: Array[AudioStreamPlayer3D] = []
+var _pos_world: Node = null
+var _pos_i := 0
+var _cap_t := 0.0
+
+func _pos_pool() -> bool:
+	var W = App.g.world if App.g != null else null
+	if W == null or not is_instance_valid(W): return false
+	if _pos_world != W:
+		_pos.clear(); _pos_world = W
+		for i in POS_N:
+			var a := AudioStreamPlayer3D.new(); a.bus = "Sfx"
+			a.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+			a.unit_size = 4.0; a.max_distance = 40.0; a.panning_strength = 1.0
+			W.add_child(a); _pos.append(a)
+	return true
+
+func sfx_at(n: String, x: float, y: float, db := 0.0, cap := "") -> void:
+	var s := _sample("s_" + n)
+	if s == null or not _pos_pool(): sfx(n); return
+	var a: AudioStreamPlayer3D = null
+	for k in POS_N:
+		var c := _pos[(_pos_i + k) % POS_N]
+		if not c.playing: a = c; break
+	if a == null: a = _pos[_pos_i]
+	_pos_i = (_pos_i + 1) % POS_N
+	a.stream = s; a.position = Vector3(x, 0.2, -y)
+	a.volume_db = SFX_DB.get(n, -8.0) + db + 6.0; a.pitch_scale = 0.94 + randf() * 0.12
+	a.play()
+	if cap != "" and App.ui != null and App.g != null and App.g.player != null and Time.get_ticks_msec() > _cap_t:
+		_cap_t = Time.get_ticks_msec() + 1500
+		var p := App.g.player
+		var rel := App.ang_diff(p.rot, atan2(y - p.y, x - p.x))   # > 0: a la izquierda (sentido antihorario)
+		App.ui.caption(cap, 0.0 if absf(rel) < 0.35 else (-1.0 if rel > 0.0 else 1.0))
+	if SPIKE.has(n): spike(SPIKE[n] * 0.6)
+
 # ---------- música ----------
 # ánimo: 'flat' | 'home' | 'dream' | 'space' | 'cell' | 'temple' | 'color' | 'none'
 func drone(mode: String) -> void:

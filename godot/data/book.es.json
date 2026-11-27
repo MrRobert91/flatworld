@@ -203,7 +203,7 @@
  "knowledge": {
   "linea": {
    "title": "Todo es una línea",
-   "text": "Desde dentro del plano, toda figura —triángulo, cuadrado o círculo— se ve como un segmento de línea. Pulsa *V* para mirar como mira un planilandés."
+   "text": "Desde dentro del plano, toda figura —triángulo, cuadrado o círculo— se ve como un segmento de línea. Pulsa *{view}* para mirar como mira un planilandés."
   },
   "norte": {
    "title": "El Norte y la lluvia",
@@ -276,6 +276,112 @@
   "punto": {
    "title": "Puntolandia",
    "text": "El Punto es su propio universo. Todo lo que oye, cree haberlo pensado él. Estar satisfecho de uno mismo es ser vil e ignorante."
+  }
+ },
+ "record": {
+  "gate_false_regular": {
+   "who": "guardia",
+   "text": "Puerta Oeste. El perito Cuadrado declara Regular a un Irregular de veintitrés grados de desviación. El sargento lo desmiente palpando. Se ignora si fue la niebla."
+  },
+  "gate_protest": {
+   "who": "inspector",
+   "text": "Puerta Oeste. El perito Cuadrado cuestiona la consunción de un Irregular ante testigos: «¿No basta con vigilarlo?»."
+  },
+  "college_color": {
+   "who": "prefecto",
+   "text": "Asamblea del Color (relato del Archivo). El ciudadano Cuadrado se une al grito de la multitud cromática. Sin consecuencias inmediatas."
+  },
+  "temple_whisper": {
+   "who": "circulo",
+   "text": "Templo. Durante el cántico, el Cuadrado susurra una pregunta sobre la Configuración de un Irregular. Lo oye un Pentágono de la fila."
+  },
+  "temple_mother": {
+   "who": "circulo",
+   "text": "Templo. En plena adopción de un Regular, el Cuadrado pide en voz alta que la madre pueda visitar al niño."
+  },
+  "temple_appeal": {
+   "who": "novicio",
+   "text": "Templo. El Cuadrado pide «humildemente» que se reconsidere la prohibición de educar a las mujeres. Anotado a petición de nadie."
+  },
+  "hospital_miracle": {
+   "who": "medico",
+   "text": "Hospital de Reconfiguración. Aparece en una sala cerrada un estilete que nadie trajo. El calderero dice que es suyo."
+  },
+  "estilete_en_poder": {
+   "who": "prefecto",
+   "text": "Registro. Al detenido se le encuentra un estilete de calderero, del que no sabe explicar la procedencia."
+  }
+ },
+ "people": {
+  "esposa": {
+   "name": "Tu esposa",
+   "lv": {
+    "-2": "Ya no te pregunta adónde vas.",
+    "-1": "Te habla con la cortesía de las visitas.",
+    "0": "Te quiere como se quiere en Planilandia: de frente y a distancia.",
+    "1": "Te espera despierta cuando sales de noche.",
+    "2": "Sospecha que ves algo que ella no ve, y no te lo reprocha."
+   }
+  },
+  "nieto": {
+   "name": "Tu nieto, el Hexágono",
+   "lv": {
+    "-2": "Te esquiva en el pasillo.",
+    "-1": "Te contesta con las frases del maestro.",
+    "0": "Un niño listo que aún no sabe que lo es.",
+    "1": "Te mira como a quien sabe cosas.",
+    "2": "Vuelve a preguntarte lo que nadie le deja preguntar."
+   }
+  },
+  "hija": {
+   "name": "Tu hija",
+   "lv": {
+    "-2": "Ha dejado de pedirte nada.",
+    "-1": "Sabe que hay cosas que no le corresponden.",
+    "0": "Menea la espalda con un vaivén muy distinguido.",
+    "1": "Cuenta hasta diez cuando su madre no mira.",
+    "2": "Cuenta hasta diez, y luego pregunta qué viene después."
+   }
+  },
+  "hermano": {
+   "name": "Tu hermano",
+   "lv": {
+    "-2": "Te pisa el lado cuando hablas de más.",
+    "-1": "Te pide prudencia con los ojos.",
+    "0": "Tu hermano. Un Cuadrado sensato, como tú lo eras.",
+    "1": "Te escucha, aunque no te crea.",
+    "2": "Te cree, o finge muy bien."
+   }
+  },
+  "criado": {
+   "name": "El criado",
+   "lv": {
+    "-2": "Te abre la puerta sin una palabra.",
+    "-1": "«Sí, señor. Claro, señor.»",
+    "0": "Un Isósceles de diez grados, fiel y callado.",
+    "1": "Te habla de su chico, el de los diez grados y medio.",
+    "2": "Daría un grado por ti, si los grados se dieran."
+   }
+  },
+  "calderero": {
+   "name": "El calderero",
+   "lv": {
+    "-2": "Lo firmaste tú.",
+    "-1": "Callaste cuando hacía falta una voz.",
+    "0": "El de la esquina. Cuarenta años afilando punzones.",
+    "1": "Alguien habló por él una vez.",
+    "2": "Te devolvió un estilete. Tú intentaste devolverle algo más."
+   }
+  },
+  "archivero": {
+   "name": "El viejo archivero",
+   "lv": {
+    "-2": "Te cierra la puerta del Archivo.",
+    "-1": "Te recomienda los manuales.",
+    "0": "Un Hexágono viejo que guarda lo que nadie lee.",
+    "1": "Te enseña lo que hay detrás de los manuales.",
+    "2": "Te ha dicho, en voz baja, que él también lo piensa."
+   }
   }
  }
 }

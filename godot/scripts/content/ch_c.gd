@@ -215,7 +215,7 @@ func ch7() -> void:
 	await say('esfera', 'Ahí la tienes, en el suelo. Ve luego a tu alacena, si quieres: falta una.')
 	await say('yo', '…Es mi tablilla. La de las cuentas del mes.')
 	await say('esfera', 'Y ahora, desde aquí arriba, veo algo más: tu interior. Tus entrañas, abiertas como una casa sin tejado. Voy a tocarte el estómago. No te alarmes.')
-	Snd.sfx('stab'); Input.vibrate_handheld(120); g.player.guts.visible = true; W.zoom = 20; await g.wait(1.6); g.player.guts.visible = false; W.zoom = W.base_zoom
+	Snd.sfx('stab'); App.rumble(0.6, 1.0, 0.12); g.player.guts.visible = true; W.zoom = 20; await g.wait(1.6); g.player.guts.visible = false; W.zoom = W.base_zoom
 	await say('yo', '¡Ah! Un dolor… *dentro*. Nada me ha tocado el perímetro. Me ha tocado por dentro.')
 	await say('asombro', 'Por un instante tú también lo has visto: lo que hay dentro de ti, desde un sitio que no es ningún sitio.')
 	Snd.tension(0.8)

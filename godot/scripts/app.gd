@@ -5,7 +5,9 @@ static var g: Game
 static var ui: UIRoot
 static var pending_start := -1   # capítulo a lanzar tras recargar la escena (-1: menú)
 static var args := {}            # --ch=N --auto --bot --touch --shots=dir --dpr=2.6
-static var cfg := {scale = 1.0}  # ajustes del jugador (tamaño de interfaz)
+# ajustes del jugador: tamaño de interfaz, velocidad de texto (0 lenta, 1 normal, 2 rápida, 3 instantánea),
+# avance automático, reducir movimiento, subtítulos de sonido, sensibilidad de la mirada y teclas reasignadas
+static var cfg := {scale = 1.0, text_speed = 1, auto_adv = false, reduce_motion = false, sound_captions = true, look_sens = 1.0, bindings = {}}
 static var _dpr := 0.0
 
 const CFG := "user://planilandia_cfg.json"
@@ -48,6 +50,11 @@ static func ang_diff(a: float, b: float) -> float:
 
 static func ease(t: float) -> float:
 	return t * t * (3.0 - 2.0 * t)
+
+# vibración: mando (motor débil y fuerte, 0..1) y, en el móvil, el vibrador del teléfono
+static func rumble(weak: float, strong: float, sec: float) -> void:
+	for j in Input.get_connected_joypads(): Input.start_joy_vibration(j, clampf(weak, 0, 1), clampf(strong, 0, 1), sec)
+	if OS.has_feature("mobile") or OS.has_feature("web"): Input.vibrate_handheld(int(sec * 1000.0))
 
 # ---------- ajustes ----------
 static func load_cfg() -> void:

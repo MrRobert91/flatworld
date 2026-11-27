@@ -87,9 +87,39 @@ papel de acuarela (el tiempo de los colores), papel gris (la celda) y un cianoti
   el texto y los botones tienen el tamaño de cualquier aplicación nativa (botones de 48 puntos o más).
 - Texto oscuro sobre cartelas de papel, con contraste alto; los colores de cada personaje se oscurecen
   para leerse sobre papel.
-- Ajustes en el menú y en la pausa: tamaño de interfaz (pequeño, normal, grande, muy grande), sonido y
-  pantalla completa. Se guardan en `user://planilandia_cfg.json`.
-- Menú de pausa (botón ☰ o Esc) con acceso al manuscrito y salida al menú.
+- Panel de **Ajustes** (menú y pausa): tamaño de interfaz, pantalla completa, velocidad del texto (lenta,
+  normal, rápida, instantánea), avance automático, subtítulos de sonido, reducir movimiento (sin sacudidas
+  ni latidos de cámara, barridos más lentos), sensibilidad del stick derecho y **reasignación de teclas**.
+  Se guardan en `user://planilandia_cfg.json`.
+- Menú de pausa (botón ☰, Esc o Vista/Share en el mando) con acceso al manuscrito, al historial y salida al menú.
+- **Mando** (Xbox, PlayStation, Nintendo, Steam Deck): todo el juego, los menús y las respuestas se manejan
+  con él. Los textos que nombran un control (`{act}`, `{view}`, `{move}`…) muestran el glifo del último
+  dispositivo usado (`scripts/ui/glyphs.gd`). Las acciones se registran en `scripts/sys/keys.gd`.
+
+  | Acción | Teclado | Mando |
+  |---|---|---|
+  | Mover · girar en el ojo | WASD / flechas (Mayús corre) | stick izquierdo (inclinar más es correr) |
+  | Interactuar · palpar · continuar | E · Espacio / Intro | A |
+  | Cambiar de vista | V / Tab | Y |
+  | Inventario (pestañas con Q / Tab) | J | Menú (LB / RB) |
+  | Pausa | Esc | Vista |
+  | Subir / bajar (Espacio) | R / F | RB / LB (o gatillos) |
+  | Mirar (Espacio) | ratón | stick derecho |
+  | Historial | H | R3 |
+  | Saltar lo ya leído (mantener) | Ctrl | B |
+
+- **Lectura:** historial de las últimas 200 intervenciones (pestaña del inventario, H o la pausa); las líneas
+  ya leídas en cualquier partida se saltan manteniendo Ctrl / B; las respuestas ya elegidas alguna vez
+  llevan un punto de tinta.
+- **Tres partidas** (`user://slot_<n>.json`) y un perfil por instalación (`user://profile.json`: capítulos
+  desbloqueados, líneas leídas, opciones elegidas). La partida antigua (`planilandia.json`) se migra sola
+  al hueco 1 y se conserva como `planilandia.v1.bak`.
+- **Sin avisos por elección:** la herejía y las reputaciones cuentan por dentro; las decisiones dejan
+  anotaciones en un expediente (`g.note`) que se leerá en el juicio, y siete personas recuerdan cómo las
+  trataste (`g.rel`, pestaña «Personas» del inventario).
+- **Idiomas:** el texto español es el msgid de gettext; la interfaz traduce por dentro (`I18n.t`).
+  `python3 godot/tools/extract_strings.py` genera `data/i18n/planilandia.pot` y actualiza `en.po`
+  (`--check` falla si queda un texto con formato sin `tr()`). `--lang=en` arranca en inglés.
 - Para probar un móvil en escritorio: `godot -- --touch --dpr=2.6` con una ventana de 2280×820.
 
 ## La visión del ojo
@@ -150,7 +180,7 @@ Sigue siendo la línea que describe el libro, y la niebla sigue siendo lo que pe
 project.godot · main.tscn · export_presets.cfg
 Dockerfile · docker-compose.yml · docker/nginx.conf   imagen de la exportación web
 build/web/             exportación web (versionada)
-scripts/main.gd        arranque, menú, cadena de capítulos
+scripts/main.gd        arranque, menú y huecos de partida, cadena de capítulos
 scripts/game.gd        bucle, entrada, guardado, utilidades de guion
 scripts/world.gd       mundo plano: mapa, muros, colisiones, cámara
 scripts/entity.gd      figuras · geo.gd  mallas
@@ -158,7 +188,12 @@ scripts/eye.gd         la vista 1D · shaders/eye_*.gdshader
 scripts/ui.gd          HUD, diálogos, inventario, menú · pad.gd  controles táctiles
 scripts/audio.gd       música generativa y efectos · space.gd  objetos de Espaciolandia
 scripts/content/       ch.gd (base y minijuegos) · ch_a…ch_d.gd (capítulos)
-data/book.json         las 22 secciones y los saberes
+scripts/sys/           profile.gd (autoload Profile: perfil y huecos) · keys.gd (acciones de entrada)
+                       i18n.gd (traducciones) · cine.gd (raíles de cámara)
+scripts/ui/            glyphs.gd · letterbox.gd (franjas de cine) · settings_panel.gd
+data/book.es.json      las 22 secciones, los saberes, el expediente y las personas
+data/i18n/             planilandia.pot · en.po
+tests/run.gd           pruebas unitarias
 assets/models/         espacio.glb (generado con Blender)
 assets/audio/          instrumentos (m_*) y efectos (s_*) generados con tools/make_audio.py
 tools/                 blender_assets.py · espacio.blend · export.sh · make_audio.py
@@ -170,8 +205,20 @@ Para regenerar los modelos y el icono: `blender --background --python godot/tool
 
 ```bash
 godot --headless --path godot -- --auto --ch=0 --quit --log   # recorre todo el guion sin interfaz
+godot --headless --path godot -- --auto --ch=0 --quit --log --script=heretic    # elige siempre la herejía
+godot --headless --path godot -- --auto --ch=0 --quit --log --script=orthodox   # … o la ortodoxia
+godot --headless --path godot -- --auto --ch=0 --quit --log --lang=en           # cuenta lo que falta traducir
+godot --headless --path godot -- --test                         # pruebas unitarias (tests/run.gd)
+python3 godot/tools/extract_strings.py --check                  # textos y traducciones al día
 godot --path godot -- --bot --speed=5 --ch=0 --quit --log     # un autómata juega con la interfaz real
 ```
+
+`--auto` empieza siempre de cero y no toca las partidas del jugador. Al terminar imprime
+`FIN OK frags=22 margins=… record=…` y, con `--log`, las anotaciones de más peso del expediente.
+
+Para probar el mando sin mando: `--inject=1.2:joy:12,2.0:joy:0` simula pulsaciones (segundo:joy:botón,
+segundo:axis:eje:valor o segundo:key:J), y `--shots=dir --every=1` guarda capturas. `--cinetest` prueba los
+raíles de cámara (órbita y plano con franjas).
 
 El autómata salta a los objetivos y elige al azar; no prueba los minijuegos que piden entrada manual
 (palpar un ángulo, la lección del nieto, la primera pregunta del juicio).

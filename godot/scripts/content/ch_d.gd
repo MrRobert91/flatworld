@@ -57,7 +57,7 @@ func ch8() -> void:
 	await say('asombro', 'Tu casa. No su raya: *su forma*. Los cinco lados a la vez. Y dentro de ella, sin pared que lo impida, todo.')
 	await say('narr', 'Y vi a la Esfera. No una rebanada: él. Lo que yo había tomado por un Círculo era una cosa con un *dentro* que no se veía y un *fuera* por todas partes. Era hermoso de un modo para el que aún no tengo palabra.')
 	g.end_scene()
-	ui.note(tx('Arrastra el ratón para mirar alrededor · WASD para volar · R / F para subir y bajar · rueda: acercar', 'Palanca para volar · arrastra por la derecha para mirar · botones para subir y bajar · pellizca para acercar'), 14)
+	ui.note(tx('Arrastra el ratón para mirar alrededor · {move} para volar · {rise} / {sink} para subir y bajar · rueda: acercar', 'Palanca para volar · arrastra por la derecha para mirar · botones para subir y bajar · pellizca para acercar', 'Stick derecho para mirar alrededor · stick izquierdo para volar · {rise} / {sink} para subir y bajar'), 14)
 	await g.go_to(-28, 17, 6, 'Vuela sobre tu casa y mírala por dentro')
 	g.begin_scene()
 	await say('yo', 'Mis hijos, dormidos en sus cuartos del Oeste. Mis dos nietos. Mi hija. Los criados. Y… veo dentro de *ellos*. Sus entrañas. Les late algo.')
@@ -111,7 +111,7 @@ func ch8() -> void:
 	g.frag(18)
 	await say('esfera', 'Sube conmigo. Más alto. Te enseñaré de qué estás hecho, y de qué estoy hecho yo.')
 	g.end_scene()
-	g.alt_max = 44; g.objective(tx('Asciende (mantén R) hasta dejar la ciudad muy abajo', 'Asciende (mantén el botón de subir) hasta dejar la ciudad muy abajo'), null)
+	g.alt_max = 44; g.objective(tx('Asciende (mantén {rise}) hasta dejar la ciudad muy abajo', 'Asciende (mantén el botón de subir) hasta dejar la ciudad muy abajo'), null)
 	await g.until(func(): return p.alt > 32, func(): p.alt = 34.0)
 	g.objective('', null); g.alt_min = 30
 	# --- los Sólidos ---
@@ -184,7 +184,7 @@ func ch8() -> void:
 	await say('logica', '«Un truco de mago.» «Visiones del cerebro.» El Rey, tú, la Esfera. Cada mundo tiene su frase para lo que le queda por encima.')
 	_anger(sph, 0.75); g.her(1); Snd.tension(0.55)
 	await say('yo', '¡Entonces existe! ¡Y más allá, la Quinta, la Sexta, la Séptima Dimensión! ¡Llevadme! ¡Hacia Arriba de Arriba!')
-	_anger(sph, 1.0); Snd.sfx('gavel'); Input.vibrate_handheld(200)
+	_anger(sph, 1.0); Snd.sfx('gavel'); App.rumble(0.8, 1.0, 0.2)
 	await say('esfera', '¡SILENCIO!')
 	g.frag(19); ui.close_dlg(); stop_tess.call(); stop_spin.call(); tess.queue_free(); cube.queue_free()
 	Snd.sfx('fall'); Snd.tension(0.0); g.alt_min = 0; ui.fade(true, 1.9)
@@ -267,7 +267,7 @@ func ch9() -> void:
 	o = await g.talk_begin('nieto', 'Enséñale a tu nieto lo que has visto')
 	await say('yo', 'Ven, pequeño. Cierra la puerta. ¿Recuerdas lo que dijiste de 3³? Tenías razón. Mira este cuadrado. Vamos a moverlo, no hacia el Norte, sino hacia Arriba.')
 	ui.close_dlg()
-	ui.panel_info('La lección', tx('Mueve el cuadrado hacia Arriba. *(WASD / flechas)*', 'Mueve el cuadrado hacia Arriba. *(usa la palanca)*'))
+	ui.panel_info('La lección', tx('Mueve el cuadrado hacia Arriba. *({move} / flechas)*', 'Mueve el cuadrado hacia Arriba. *(usa la palanca)*', 'Mueve el cuadrado hacia Arriba. *(stick izquierdo)*'))
 	if not (g.auto or g.bot):
 		var L := {tried = {}, tm = 0.0, said = 0.0}
 		g.need_stick = true; g.need_act = 'Arriba'
@@ -279,9 +279,9 @@ func ch9() -> void:
 				if ax.dot(Vector2(d[1], d[2])) > 0.5:
 					mov.x = clampf(mov.x + d[1] * 3 * dt, -34.6, -32.3); mov.y = clampf(mov.y + d[2] * 3 * dt, 8, 11.5)
 					if not L.tried.has(d[0]):
-						L.tried[d[0]] = 1; ui.note('*Tu nieto:* «%s»' % d[3], 3); Snd.blip('nino')
+						L.tried[d[0]] = 1; ui.note(tr('*Tu nieto:* «%s»') % tr(d[3]), 3); Snd.blip('nino')
 			if g.other_held() and L.tm - L.said > 2:
-				L.said = L.tm; ui.note(tx('*No ocurre nada. No hay tecla para lo que quieres decir.*', '*No ocurre nada. No hay botón para lo que quieres decir.*'), 3); Snd.sfx('bad')
+				L.said = L.tm; ui.note(tx('*No ocurre nada. No hay tecla para lo que quieres decir.*', '*No ocurre nada. No hay botón para lo que quieres decir.*', '*No ocurre nada. No hay botón para lo que quieres decir.*'), 3); Snd.sfx('bad')
 			return L.tried.size() >= 3 or L.tm > 16)
 		g.need_stick = false; g.need_act = ''
 	ui.panel_info(null); await g.wait(1.2)
@@ -366,7 +366,7 @@ func ch10() -> void:
 			if Vector2(dx, dy).length() > 1.6:
 				Q.tries += 1
 				var m := ('el Este' if dx > 0 else 'el Oeste') if absf(dx) > absf(dy) else ('el Norte' if dy > 0 else 'el Sur')
-				ui.note('*El Presidente:* «Eso es %s, caballero.»' % m, 3.5); Snd.blip('circ'); p.x = x0; p.y = y0; g.vel = Vector2.ZERO
+				ui.note(tr('*El Presidente:* «Eso es %s, caballero.»') % tr(m), 3.5); Snd.blip('circ'); p.x = x0; p.y = y0; g.vel = Vector2.ZERO
 			if g.other_held() and Q.tm - Q.said > 2.5:
 				Q.said = Q.tm; g.set_view('top'); ui.note('*Nada. Tu cuerpo no tiene con qué.*', 3); Snd.sfx('bad')
 			return Q.tries >= 3 or Q.tm > 22)
@@ -437,5 +437,5 @@ func ch10() -> void:
 	await narr('…en que hasta este muro que me priva de la libertad, estas tablillas en que escribo, y todas las realidades sustanciales de Planilandia, no parecen más que el engendro de una imaginación enferma, o la tela sin fundamento de un sueño.', true)
 	await ui.fade(true, 2.5)
 	var n: int = g.state.frags.size()
-	await ui.title('FIN', 'Planilandia', 'El manuscrito está completo: 22 de 22 secciones. Alguien, en Alguna Dimensión, lo ha leído.' if n >= 22 else 'Has recuperado %d de 22 secciones del manuscrito. Las que faltan esperan en sus capítulos.' % n, 6.0)
+	await ui.title('FIN', 'Planilandia', 'El manuscrito está completo: 22 de 22 secciones. Alguien, en Alguna Dimensión, lo ha leído.' if n >= 22 else tr('Has recuperado %d de 22 secciones del manuscrito. Las que faltan esperan en sus capítulos.') % n, 6.0)
 	await ui.title('Edwin A. Abbott', 'Flatland, 1884', 'Hacia Arriba, no hacia el Norte.', 5.0)

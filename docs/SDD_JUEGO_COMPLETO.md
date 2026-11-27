@@ -204,7 +204,7 @@ Coordenadas en el lienzo de 640×480 de `SlateBoard` (ya usado por `slate_anim`)
 
 ### S-01 · Entrada unificada y mando (`T-10`)
 
-- **InputMap** en `project.godot` con las acciones: `move_left/right/up/down`, `run`, `act`, `view`, `journal`, `pause`, `rise`, `sink`, `look_x+/-`, `look_y+/-`, `advance`, `history`, `skip_hold`. Cada una con su tecla actual y su evento de mando (`JoypadButton`/`JoypadMotion` con zona muerta de 0,2).
+- **InputMap** (registrado al arrancar desde `sys/keys.gd`, para poder reasignar) con las acciones: `move_left/right/up/down`, `run`, `act`, `view`, `journal`, `pause`, `rise`, `sink`, `look_x+/-`, `look_y+/-`, `advance`, `history`, `skip_hold`. Cada una con su tecla actual y su evento de mando (`JoypadButton`/`JoypadMotion` con zona muerta de 0,2).
 - `Game._key()` se sustituye por `Input.is_action_pressed()`; `axis()` combina `Input.get_vector("move_left", "move_right", "move_down", "move_up")` (y = Norte) con la palanca táctil, como ahora. La carrera con mando es analógica (la magnitud del stick ya funciona como en la palanca táctil).
 - `_unhandled_key_input` pasa a `_unhandled_input` con `event.is_action_pressed(...)`.
 - **Vista libre** (Espacio): `look_*` del stick derecho modifica `W.free.yaw/pitch` a 2,2 rad/s (escalado por sensibilidad en ajustes); el ratón sigue igual.
@@ -244,8 +244,9 @@ func record_top(n := 5) -> Array                # por peso descendente; a iguald
   | II · calderero, «¿Qué ha visto?» | — | `calderero +1` |
   | III · dictamen «Equilátero» | `gate_false_regular` (w 3) | `calderero +1` |
   | III · «¿No basta con vigilarlo?» | `gate_protest` (w 3) | `calderero +1` |
-  | IV · «¡Color para todos!» | `college_color` (w 1) | `archivero +1` |
-  | V · susurro herético en el cántico | `temple_whisper` (w 2) | `hermano -1` (te pisa el lado) |
+  | IV · «¡Color para todos!» | `college_color` (w 1) | — |
+  | IV · archivero: «Yo también lo pienso» / «Un Cuadrado que mira la mano» / «Una disposición sabia» | — | `archivero +1` / `+1` / `−1` |
+  | V · susurro herético en el cántico | `temple_whisper` (w 2) | `hermano -1` (te pisa el lado; cuando exista `C5-01`) |
   | V · «¡Dejad al menos que la madre lo visite!» | `temple_mother` (w 3) | — |
   | V · «Humildemente, pido que se reconsidere» | `temple_appeal` (w 2) | — |
   | VIII · el estilete dejado en el Hospital | `hospital_miracle` (w 2) | `calderero +1` |
@@ -306,7 +307,7 @@ static func orbit(W: World, center: Vector2, from_pitch: float, to_pitch: float,
 ### S-09 · Diálogo: historial, auto-avance, saltar lo leído (`T-09`)
 
 - `UIRoot.log: Array` de `{who, text}` (tope de 200), añadido en `say()` y `narrate()` al terminar de escribirse cada bloque. Pestaña «Historial» en el inventario y botón en la pausa; acción `history`.
-- **Velocidad de texto:** `_type_step` usa `cps = [28, 45, 80, INF][cfg.text_speed]`.
+- **Velocidad de texto:** `_type_step` usa `CPS = [30, 62, 110, INF][cfg.text_speed]` (la «normal» es la velocidad actual, 62 letras por segundo).
 - **Auto-avance:** si `cfg.auto_adv`, al terminar de escribirse un bloque se espera `1.2 + 0.045 * len(text)` s y se avanza solo. Se suspende si hay elecciones o un panel.
 - **Saltar lo leído:** mientras `skip_hold` está pulsado, `say()` comprueba `Profile.seen(msgid)` y, si lo está, completa el bloque y avanza a los 0,08 s. Se detiene en la primera línea no leída y en toda elección. El `msgid` es el texto **antes de traducir** (ver S-10), así que funciona en cualquier idioma.
 - **Opciones ya elegidas:** `choose()` recibe opciones con `id`; la clave es `"<cap>.<escena>.<id>"`, donde la escena se toma del manejador activo (`g.handlers` conoce el id de la figura) o de un parámetro opcional `key`. Las opciones con la clave en `Profile.picked` muestran un punto de tinta.
@@ -575,10 +576,10 @@ Un mapa (el interior del Colegio) con 5 *spots*, uno por minijuego (M-01, M-02, 
 | Comando | Qué comprueba |
 |---|---|
 | `godot --headless --path godot -- --auto --ch=0 --quit --log` | Recorre todo el guion (ya existe). Debe terminar con `FIN OK frags=22 margins=0`. |
-| `… -- --auto --script=heretic --quit --log` | Igual, eligiendo siempre la opción con `tag` de herejía o cuestionar. Comprueba que `record` tenga al menos 6 entradas y que el X lea 5. |
+| `… -- --auto --script=heretic --quit --log` | Igual, eligiendo siempre la opción con `tag` de herejía o cuestionar. Comprueba que `record` tenga al menos 4 entradas (6 cuando existan `hospital_miracle` y `estilete_en_poder`) y que el X lea 5. |
 | `… -- --auto --script=orthodox --quit --log` | Siempre la ortodoxa: `record` vacío y la línea alternativa del Presidente. |
 | `… -- --auto --lang=en --quit --log` | Sin cadenas sin traducir (S-10). |
-| `godot --headless --path godot -s tests/run.gd` | Pruebas unitarias: `test_geom3`, `test_sketch`, `test_save` (migración v1 → v2) y `test_i18n` (todo msgid del `.pot` existe en `en.po`). |
+| `godot --headless --path godot -- --test` | Pruebas unitarias (`tests/run.gd`, lanzado desde `main.gd` para que existan los autoloads): `test_geom3`, `test_sketch`, `test_save` (migración v1 → v2) y `test_i18n` (todo msgid del `.pot` existe en `en.po`). |
 | `python3 godot/tools/extract_strings.py --check` | Falla si hay cadenas con `%` sin `tr()` o si el `.pot` está desactualizado. |
 
 `--script=<nombre>` es un parámetro nuevo: en `ui.choose`, con `g.auto`, en lugar de la opción 1 se elige según la política (`heretic`: la primera con `tag` en {Herejía, Cuestionar, Osadía, Atreverse, La verdad}; `orthodox`: la primera sin `tag`, o con {Obedecer, Ortodoxia, La mentira}).
@@ -622,6 +623,23 @@ Un mapa (el interior del Colegio) con 5 *spots*, uno por minijuego (M-01, M-02, 
 | **Total** | | **≈ 19,5** | |
 
 Orden justificado: M0 primero porque el mando y la localización tocan todas las cadenas y entradas, y hacerlo al final multiplica el trabajo. M1 produce la demo, que es lo que necesita la página de la tienda (Next Fest) mientras se hace el resto.
+
+---
+
+### 9.3 Estado: M0 implementado
+
+Rama `diseno-juego-completo`. Lo hecho, y en qué se aparta de lo especificado arriba:
+
+| Componente | Estado | Notas |
+|---|---|---|
+| S-01 Entrada y mando | Hecho | Acciones en `sys/keys.gd` (no en `project.godot`); A/B también en `ui_accept`/`ui_cancel`. Menús, pausa, inventario y ajustes navegables con foco; las respuestas (`choose`) y los paneles (`panel`) con cruceta o stick y A. Glifos **de texto** (`ui/glyphs.gd`: «A», «Cruz», «RB»…); la fuente de iconos queda para M6. `Ch.tx(kb, touch, pad)` devuelve la plantilla con `{act}`, `{view}`, `{move}`… y la interfaz la rellena. Reasignación de teclas (no de mando) en Ajustes. `App.rumble`. Stick derecho: mirada libre y giro en el ojo. |
+| S-02 Estado v2, perfil, huecos | Hecho | Autoload `Profile` (`sys/profile.gd`). Escritura atómica (temporal + renombrar; en web, directa). Menú: Continuar, Nueva partida (elige hueco; los ocupados piden confirmación), Cargar partida, Capítulos (por perfil). `stats.play_s` cuenta el tiempo. `--auto` no lee ni escribe partidas (`--save` lo fuerza). |
+| S-03 Expediente y relaciones | Hecho | `g.note/record_top/record_text/rel/rel_of`; sin avisos en `rep()`/`her()`. Anotaciones enganchadas en III, IV y V; `hospital_miracle` y `estilete_en_poder` tienen texto pero esperan a `C8-04` y al X. La pestaña «Posición» pasa a ser **«Personas»** (siete relaciones con frase, `book.people`). |
+| S-07 Audio posicional | Hecho (solo posicional) | `AudioListener3D` en el ojo del Cuadrado; `Snd.sfx_at` con 8 reproductores 3D; subtítulos de sonido con dirección. El Grito de Paz ya es posicional donde suena hoy; el bucle por figura (`Ent.cry`) se añade con `C2-02` (M1). Leitmotivs y mono, en M3. |
+| S-08 Raíles y franjas | Hecho | `Cine.play` (llaves de foco/zoom o de cámara libre), `Cine.orbit` (para `P-03`), `ui/letterbox.gd` con «mantén para saltar». Reducir movimiento. Aún no lo usa ningún capítulo (prueba: `--cinetest`). |
+| S-09 Lectura | Hecho | Historial (pestaña, H/R3, pausa), velocidad de texto, avance automático, saltar lo leído (Ctrl/B), punto de tinta en las respuestas ya elegidas. La clave de una elección es el capítulo más un hash de sus textos. |
+| S-10 Localización | Infraestructura | `I18n.t()` dentro de `say/narrate/choose/note/panel/panel_info/objective/title/toast/chapter_tag` y en los nombres de quien habla. `book.json` → `book.es.json` (y `book.<lang>.json` opcional). `tools/extract_strings.py` (910 textos) y `--check`. `en.po` sin traducir (M6); `--lang=en` informa de cuántos textos faltan. |
+| Pruebas | Hecho | `-- --test` (86 comprobaciones: migración, perfil, i18n, teclas y glifos, raíles), `--script=heretic/orthodox`, `--lang=en`, y el autómata `--bot` recorre el juego entero. Para probar el mando sin mando: `--inject`. |
 
 ---
 

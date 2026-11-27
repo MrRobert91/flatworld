@@ -71,6 +71,9 @@ var roofs := {}           # columna → [[y_bajo, y_alto], ...] : donde la lluvi
 var _greet_t := 0.0
 var _free_tgt := Vector3.ZERO
 var _free_ok := false
+var rail := {}            # raíl de cámara libre (Cine.play): {pos, look, fov}
+var orbit := {}           # órbita lenta (Cine.orbit): {center, pitch, dist, yaw}
+var listener: AudioListener3D   # el oído del Cuadrado, no la cámara (S-07)
 const COL := 0.5          # anchura de columna de lluvia
 
 func _init() -> void:
@@ -90,6 +93,19 @@ func _init() -> void:
 	trail = MeshInstance3D.new(); trail.mesh = ImmediateMesh.new(); trail.material_override = mat(0); add_child(trail)
 	rain_im = MeshInstance3D.new(); rain_im.mesh = ImmediateMesh.new(); rain_im.material_override = mat(2); add_child(rain_im)
 	fx_im = MeshInstance3D.new(); fx_im.mesh = ImmediateMesh.new(); fx_im.material_override = mat(3); add_child(fx_im)
+	listener = AudioListener3D.new(); add_child(listener)
+
+func _ready() -> void:
+	listener.make_current()
+
+# el sonido corresponde a lo que oye el Cuadrado aunque el jugador mire la lámina: la escucha va en su
+# ojo y mira hacia donde él mira (en 3D, un punto del plano está en (x, alt, -y))
+func _place_listener(p) -> void:
+	if p == null:
+		listener.global_transform = cam.global_transform; return
+	var pos := Vector3(p.x, maxf(0.2, p.alt), -p.y)
+	var dir := Vector3(cos(p.rot), 0.0, -sin(p.rot))
+	listener.look_at_from_position(pos, pos + dir, Vector3.UP)
 
 # material plano compartido por capa (prioridad de dibujo)
 func mat(prio: int) -> ShaderMaterial:
@@ -587,6 +603,7 @@ static func pos_of(o) -> Vector2:
 
 func update(dt: float, player) -> void:
 	time += dt
+	_place_listener(player)
 	rain_cur = lerpf(rain_cur, rain, minf(1.0, dt * 0.8))
 	Snd.rain(rain_cur * (1.0 - 0.6 * eye_t))
 	var gm: ShaderMaterial = ground.material_override
@@ -658,6 +675,7 @@ func update_cam(dt: float, p) -> void:
 		f = f.lerp(talk_cur, 0.5 * talk_w); zmul = 1.0 - 0.13 * talk_w
 	shake = maxf(0.0, shake - dt * 2.2)
 	kick = maxf(0.0, kick - dt * 1.6)
+	if bool(App.cfg.get("reduce_motion", false)): shake = 0.0; kick = 0.0
 	zmul *= 1.0 - 0.07 * sin(kick * PI) * kick
 	if cam_mode != _last_mode:
 		if cam_mode == "free": _free_intro = 0.0
@@ -666,6 +684,20 @@ func update_cam(dt: float, p) -> void:
 	cam_x = lerpf(cam_x, f.x + shift_cur + lead.x, k); cam_y = lerpf(cam_y, f.y + shift_y_cur + lead.y, k)
 	zoom_cur = lerpf(zoom_cur, zoom * zmul + speed_zoom, minf(1.0, dt * 2.0))
 	var gm: ShaderMaterial = ground.material_override
+	# órbita del lector (P-03): la única inclinación permitida en el Plano además de la vista del ojo
+	if not orbit.is_empty():
+		var c: Vector2 = orbit.center; var op: float = orbit.pitch; var od: float = orbit.dist; var oy: float = orbit.yaw
+		var ot := Vector3(c.x, 0.0, -c.y)
+		var opos := ot + Vector3(sin(oy) * cos(op) * od, sin(op) * od, cos(oy) * cos(op) * od)
+		cam.fov = 42; cam.near = 0.02
+		cam.look_at_from_position(opos, ot, Vector3.UP if op < 1.55 else Vector3(sin(oy), 0, cos(oy)) * -1.0)
+		gm.set_shader_parameter("u_fade", 0.0)
+		return
+	if cam_mode == "free" and not rail.is_empty():
+		cam.fov = rail.fov; cam.near = 0.2
+		cam.look_at_from_position(rail.pos, rail.look, Vector3.UP)
+		gm.set_shader_parameter("u_fade", 0.0)
+		return
 	if cam_mode == "free" and p != null:
 		var cp := cos(free.pitch as float)
 		var tgt := Vector3(p.x, p.alt, -p.y)
@@ -674,7 +706,7 @@ func update_cam(dt: float, p) -> void:
 		if not _free_ok: _free_tgt = tgt; _free_ok = true
 		_free_tgt = _free_tgt.lerp(tgt, minf(1.0, dt * 5.0)); tgt = _free_tgt + Vector3(sx, 0, sy)
 		# llegada al Espacio: la cámara baja desde muy alto girando alrededor de la figura
-		_free_intro = minf(1.0, _free_intro + dt / 3.2)
+		_free_intro = minf(1.0, _free_intro + dt / (4.8 if bool(App.cfg.get("reduce_motion", false)) else 3.2))
 		var fi := 1.0 - App.ease(_free_intro)
 		var yaw: float = free.yaw + fi * 1.9
 		var pitch: float = lerpf(free.pitch, 1.42, fi)

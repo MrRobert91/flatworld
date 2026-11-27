@@ -23,7 +23,7 @@ func prologue() -> void:
 	await ui.fade(false, 1.2)
 	await narr('Siete años llevo en esta celda.')
 	await narr('Esa raya pálida que tienes delante no es un defecto de tu vista. Es *todo* lo que ve un habitante de mi mundo: una línea, más clara donde la pared está cerca, más oscura donde se aleja.')
-	ui.note(tx('Gira con A / D. Avanza con W / S.', 'Arrastra el pulgar por la izquierda de la pantalla: a los lados giras, hacia delante avanzas.'), 60)
+	ui.note(tx('Gira con {move_left} / {move_right}. Avanza con {move_up} / {move_down}.', 'Arrastra el pulgar por la izquierda de la pantalla: a los lados giras, hacia delante avanzas.', 'Gira y avanza con el stick izquierdo.'), 60)
 	g.objective('Mira a tu alrededor')
 	var st := {turned = 0.0, last = g.player.rot}
 	await g.until(func():
@@ -33,14 +33,14 @@ func prologue() -> void:
 	await narr('Cuatro paredes. Las reconozco por cómo se apagan en la niebla: así se deduce aquí un ángulo. Me costó años de colegio aprenderlo.')
 	await narr('Pero tú no eres de aquí. Tú vienes de un mundo con una dirección de sobra. Voy a concederte, lector, lo que a mí me costó la libertad: *mirar desde arriba*.')
 	g.view_lock = false; g.hide_eye_hint = false
-	g.objective(tx('Pulsa V para elevarte sobre el plano', 'Toca el botón del ojo para elevarte sobre el plano'))
+	g.objective(tx('Pulsa {view} para elevarte sobre el plano', 'Toca el botón del ojo para elevarte sobre el plano'))
 	await g.until(func(): return g.view == 'top' and g.world.eye_t < 0.05, func(): g.set_view('top'))
 	g.objective(''); g.show_strip = true
 	await narr('Ese soy yo. Un Cuadrado. Cuatro lados iguales, cuatro ángulos rectos: un caballero de la clase profesional, o eso era.')
 	await narr('Arriba, en ese marco, sigue mi ojo: lo que yo veo mientras tú me ves a mí. Ningún compatriota mío ha contemplado jamás esta lámina. Disfrútala con un poco de culpa.')
 	g.add(F_circ('moneda', 0, 2.2, {name = 'una moneda', noGuts = true, r = 0.7}))
 	await narr('Los de tu mundo lo entendéis con una moneda sobre la mesa. Desde arriba: un círculo. Baja ahora el ojo hasta el borde de la mesa y dime qué queda de ella.')
-	g.objective(tx('Colócate frente a la moneda y pulsa V', 'Colócate frente a la moneda y toca el botón del ojo'))
+	g.objective(tx('Colócate frente a la moneda y pulsa {view}', 'Colócate frente a la moneda y toca el botón del ojo'))
 	await g.until(func(): return g.view == 'eye' and g.world.eye_t > 0.95 and g.eye.sees('moneda'), func(): pass)
 	g.objective('')
 	await narr('Una línea. Triángulo, cuadrado, círculo, esposa, sacerdote: aquí todos somos, unos para otros, una línea que brilla y se apaga.')
@@ -68,7 +68,7 @@ func ch1() -> void:
 	W.add_spot({id = 'tejado', x = -28, y = 27, label = 'el vértice del tejado'})
 	W.add_spot({id = 'alacena', x = -23.3, y = 20.4, label = 'la alacena'})
 	await intro('Capítulo I', 'La casa de cinco lados', 'Donde se aprende de dónde viene la lluvia y por qué puerta entra cada cual.', 'home')
-	await narr(tx('Mi estudio, bajo el vértice del tejado. Muévete con WASD o las flechas.', 'Mi estudio, bajo el vértice del tejado. Arrastra el pulgar por la izquierda de la pantalla para moverte: cuanto más lejos, más deprisa.'))
+	await narr(tx('Mi estudio, bajo el vértice del tejado. Muévete con {move} o las flechas.', 'Mi estudio, bajo el vértice del tejado. Arrastra el pulgar por la izquierda de la pantalla para moverte: cuanto más lejos, más deprisa.', 'Mi estudio, bajo el vértice del tejado. Muévete con el stick izquierdo: cuanto más lo inclines, más deprisa.'))
 	await narr('Aquel día llovía. Siempre que empiezo a recordar, llueve.')
 
 	var f_alacena := func():
@@ -82,7 +82,7 @@ func ch1() -> void:
 		await say('hija', '¿Me enseñarás a contar, como al nieto? Sólo hasta diez.')
 		var c = await choose([{t = 'Las niñas no necesitan contar, hija.', id = 'o'}, {t = 'Cuando tu madre no mire. Hasta diez.', id = 'h', tag = 'Herejía'}, {t = '(Cambiar de tema.) Qué bien meneas la espalda.', id = 's'}])
 		if c == 'o': await say('hija', 'Ya. Eso dice la institutriz.'); g.her(-1)
-		if c == 'h': await say('hija', '¡Uno, dos, tres…!'); await say('decoro', 'Hace trescientos años que la ley prohíbe exactamente esto.'); g.her(1); g.flag('hijaCuenta', 1)
+		if c == 'h': await say('hija', '¡Uno, dos, tres…!'); await say('decoro', 'Hace trescientos años que la ley prohíbe exactamente esto.'); g.her(1); g.flag('hijaCuenta', 1); g.rel('hija', 1)
 		if c == 's': await say('hija', '¿Verdad que sí?')
 	g.on('hija', 'Hablar', f_hija)
 	var f_hijo := func():
@@ -137,8 +137,8 @@ func ch1() -> void:
 		await say('narr', 'Un Isósceles de diez grados. Soldados y obreros lo son todos: dos lados largos, una base mínima, una punta que da miedo. Apenas se les considera figuras.')
 		await say('criado', 'Mi chico ha salido de diez grados y medio, señor. Medio grado más que yo. A este paso, en cien generaciones, un biznieto mío será Equilátero.')
 		var c = await choose([{t = 'Es un buen muchacho. Me alegro por ti.', id = 'a'}, {t = 'No te hagas ilusiones por encima de tu ángulo.', id = 'b'}, {t = '(Asentir sin decir nada.)', id = 'c'}])
-		if c == 'a': await say('criado', 'Dios… quiero decir, los Círculos se lo paguen, señor.'); g.rep('ciu', 1)
-		if c == 'b': await say('criado', 'No, señor. Claro que no, señor.'); g.rep('ciu', -1)
+		if c == 'a': await say('criado', 'Dios… quiero decir, los Círculos se lo paguen, señor.'); g.rep('ciu', 1); g.rel('criado', 1)
+		if c == 'b': await say('criado', 'No, señor. Claro que no, señor.'); g.rep('ciu', -1); g.rel('criado', -1)
 		await say('logica', 'Entre los tuyos, cada hijo gana un lado entero. Entre los suyos, medio grado, y sólo si trabajan sin tacha. Alguien diseñó esa diferencia.')
 		g.learn('herencia')
 	await g.all({
@@ -181,7 +181,7 @@ func town_folk() -> void:
 		if st.t > 3.2:
 			st.t = 0.0
 			var d := g.npc('dama'); var p := g.player
-			if d != null and p != null and Vector2(d.x - p.x, d.y - p.y).length() < 14 and not g.busy: Snd.sfx('peace'))
+			if d != null and p != null and Vector2(d.x - p.x, d.y - p.y).length() < 14 and not g.busy: Snd.sfx_at('peace', d.x, d.y, 0.0, 'Grito de Paz'))
 	var f_dama := func():
 		await say('dama', '¡Paz, paz! Buenos días, caballero. Disculpe que no me detenga: si dejo de gritar, me multan; si dejo de menearme, me denuncian.')
 		await say('narr', 'El Grito de Paz. De niño me parecía el sonido mismo de la calle, como la lluvia.')
@@ -205,7 +205,7 @@ func ch2() -> void:
 	g.add({id = 'irregular', pts = [[0.95, 0], [-0.3, 0.8], [-0.62, -0.38]], voice = 'tri', x = -48, y = 2.4, name = 'un calderero', rot = 0.2})
 	g.world.add_spot({id = 'voz', x = 26, y = -5.5, label = 'una voz en la niebla'})
 	await intro('Capítulo II', 'La Calle Mayor', 'Donde se aprende quién es quién, y cómo averiguarlo sin perder un ángulo.', 'flat')
-	await narr(tx('La Calle Mayor. Desde arriba la ves entera; yo veía rayas que se cruzaban en la niebla. Prueba a recorrerla con mi ojo (V), si te atreves.', 'La Calle Mayor. Desde arriba la ves entera; yo veía rayas que se cruzaban en la niebla. Prueba a recorrerla con mi ojo (el botón del ojo), si te atreves.'))
+	await narr(tx('La Calle Mayor. Desde arriba la ves entera; yo veía rayas que se cruzaban en la niebla. Prueba a recorrerla con mi ojo ({view}), si te atreves.', 'La Calle Mayor. Desde arriba la ves entera; yo veía rayas que se cruzaban en la niebla. Prueba a recorrerla con mi ojo (el botón del ojo), si te atreves.'))
 
 	var f_irregular := func():
 		await say('irregular', 'Buenos días, señor. ¿Algún punzón que afilar? ¿Una bisagra? Llevo cuarenta años en esta esquina.')
@@ -215,7 +215,7 @@ func ch2() -> void:
 			await say('recelo', 'Nadie con prisa lleva cuarenta años en la misma esquina.'); g.flag('sospecha', 1)
 		if c == 'q':
 			await say('irregular', 'He visto que a quien no molesta, a veces lo dejan en paz. Con eso me basta. Tenga: se le había caído este estilete.')
-			await say('narr', 'Me devolvió un estilete que yo no había echado en falta. Recuerdo que pensé: qué equilátero tan decente.'); g.flag('amable', 1); g.rep('ciu', 1)
+			await say('narr', 'Me devolvió un estilete que yo no había echado en falta. Recuerdo que pensé: qué equilátero tan decente.'); g.flag('amable', 1); g.rep('ciu', 1); g.rel('calderero', 1)
 	g.on('irregular', 'Hablar', f_irregular)
 
 	var f_noble := func():
@@ -305,9 +305,9 @@ func ch3() -> void:
 		if ans is String and ans == k: hits += 1
 	g.flag('aciertos', hits)
 	g.set_view('top'); g.locked = false; W.fog = 13.0
-	if hits >= 4: await say('guardia', '%d de cinco, señor. Con ojos así, yo sería Hexágono.' % hits)
-	elif hits >= 2: await say('guardia', '%d de cinco. No está mal, con esta niebla.' % hits)
-	else: await say('guardia', '%d de cinco… Hoy la niebla está muy cerrada, señor. Lo apuntaré así.' % hits)
+	if hits >= 4: await say('guardia', tr('%d de cinco, señor. Con ojos así, yo sería Hexágono.') % hits)
+	elif hits >= 2: await say('guardia', tr('%d de cinco. No está mal, con esta niebla.') % hits)
+	else: await say('guardia', tr('%d de cinco… Hoy la niebla está muy cerrada, señor. Lo apuntaré así.') % hits)
 	if hits >= 4: g.rep('aut', 1)
 	await say('guardia', 'Viene uno más. Ése me lo conozco: el calderero de la esquina. Pero la orden es mirarlos a todos.')
 	ui.close_dlg(); g.set_view('eye'); g.locked = true; W.fog = 2.7; W.remove('irregular'); await g.wait(1.2)
@@ -321,10 +321,11 @@ func ch3() -> void:
 		await say('guardia', '¿Regular…? Con perdón, señor: ése camina torcido desde que lo conozco. Voy a palparlo, que para eso no hace falta Colegio.')
 		await say('guardia', 'Cincuenta y uno. Setenta y cuatro. Y el otro… cincuenta y cinco. Señor perito: o la niebla le ha engañado, o me ha engañado usted.')
 		g.rep('aut', -2); g.rep('ciu', 1); g.her(1)
+		g.note('gate_false_regular', 3); g.rel('calderero', 1)
 	elif dict == 'irr':
 		await say('yo', 'Irregular. Los lados no casan.')
 		await say('guardia', 'Lo que yo decía. Buen ojo, señor.')
-		g.rep('aut', 1); g.her(-1)
+		g.rep('aut', 1); g.her(-1); g.rel('calderero', -1)
 	else:
 		await say('yo', 'La niebla… no sabría decirlo.')
 		await say('guardia', 'Pues lo palpo yo, que para eso no hace falta Colegio. Cincuenta y uno. Setenta y cuatro. Cincuenta y cinco. Irregular como una piedra.')
@@ -341,12 +342,14 @@ func ch3() -> void:
 		await say('inspector', '«No ha hecho daño.» ¿Y cómo lo sabría usted? Usted palpa un ángulo y deduce una persona. Con éste palpa uno y no sabe nada de los otros dos. Si toleramos eso, caballero, se acabó el tacto, la vista y la confianza. Me extraña tener que explicárselo a un Cuadrado.')
 		await say('recelo', 'Ha apuntado algo en su tablilla. No era el ángulo del calderero.')
 		g.rep('aut', -1); g.rep('sac', -1); g.her(1)
+		g.note('gate_protest', 3); g.rel('calderero', 1)
 	elif c == 'o':
 		await say('inspector', 'Exacto. Da gusto oír a un hombre de sus ángulos.')
 		await say('irregular', '(No te mira. Mira la calle, la esquina donde ya no estará.)')
-		g.rep('sac', 1); g.her(-1)
+		g.rep('sac', 1); g.her(-1); g.rel('calderero', -1)
 	else:
 		await say('inspector', 'Bien. Firme aquí como perito.')
+		g.rel('calderero', -1)
 		await say('decoro', 'Has firmado. Callar también tiene letra.')
 	await say('narr', 'Entonces yo lo creía. Lo escribí, incluso: que el Irregular incurable debía ser *consumido sin dolor y con misericordia*. Me parecía una frase compasiva.')
 	await say('narr', 'Recuerdo que aquel día protesté. O quiero recordarlo así: en una celda, la memoria es generosa con uno mismo.' if c == 'd' else 'Aquel día no protesté. Eso sí lo recuerdo con exactitud.')
