@@ -35,7 +35,9 @@ var near_label := ""
 var vel := Vector2.ZERO
 var moved := 0.0
 var on_line := false
-var need_act := ""       # un minijuego pide el botón de acción (con esta etiqueta) aunque haya escena
+var need_act := "":      # un minijuego pide el botón de acción (con esta etiqueta) aunque haya escena
+	set(v): need_act = v; _latch = false
+var _latch := false      # «pulsar en vez de mantener» (T-11): el botón de acción queda echado hasta otra pulsación
 var need_stick := false  # ídem para la palanca
 var on_menu := Callable()
 var epoch := 0
@@ -152,6 +154,9 @@ func margin(id: String) -> void:
 	Snd.sfx("quill"); world.remove_spot(id); off(id)
 	if not state.margins.has(id):
 		state.margins[id] = 1; Profile.unlock_gallery(id); ui.new_pages = true; save()
+		# todas las marginalia del juego, en alguna partida (la galería las recuerda)
+		var all_m: Array = book.get("margins", [])
+		if all_m.all(func(m): return Profile.data.gallery.has(m.id)): achieve("ACH_MARGIN")
 	if M.has("text"): await ui.narrate(M.text)
 
 func margin_def(id: String) -> Dictionary:
@@ -162,7 +167,7 @@ func margin_def(id: String) -> Dictionary:
 # logros (Steam en M6): por ahora, el perfil los recuerda y un aviso discreto los anuncia
 func achieve(id: String) -> void:
 	if auto or Profile.data.ach.has(id): return
-	Profile.data.ach[id] = 1; Profile.touch(0.0)
+	Profile.data.ach[id] = 1; Profile.touch(0.0); Platform.unlock(id)
 	ui.toast("frag", tr("Logro"), tr(book.get("achievements", {}).get(id, id)))
 
 # tabla de analogías (S-05): marca la casilla (1 = nueva, sin leer; 2 = ya vista en el inventario)
@@ -236,6 +241,7 @@ func _unhandled_input(ev: InputEvent) -> void:
 	if ev.is_action_pressed("advance"):
 		if ui.advance(): _done(); return
 	if ev.is_action_pressed("act"):
+		if need_act != "" and bool(App.cfg.get("hold_toggle", false)): _latch = not _latch
 		press_act()
 	elif ev.is_action_pressed("view"): toggle_view()
 
@@ -274,9 +280,12 @@ func axis() -> Vector2:
 
 # mirada libre (stick derecho), por segundo
 func look_axis() -> Vector2:
-	return Input.get_vector("look_left", "look_right", "look_up", "look_down")
+	var v := Input.get_vector("look_left", "look_right", "look_up", "look_down")
+	if bool(App.cfg.get("invert_y", false)): v.y = -v.y
+	return v
 
 func act_held() -> bool:
+	if _latch and need_act != "": return true
 	return Input.is_action_pressed("act") or ui.pad.held("act")
 
 func up_held() -> bool:

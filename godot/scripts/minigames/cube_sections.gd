@@ -58,6 +58,7 @@ static func run(c: Ch, mesh: MeshInstance3D, at: Vector2, L := 4.0) -> Dictionar
 			if ans == P[0] or k == tries - 1: break
 			ui.note(ui.T('*Lógica:* %s') % ui.T('Fíjate en lo que toca primero el Plano: ¿una cara, una arista o un vértice?'), 5.0)
 		if ans == P[0]: hits += 1
+		if ans == P[0] and P[0] == 'tri_hex': g.achieve('ACH_HEX')
 		ui.panel_info('Lo que ven allá abajo', 'la sección, en la lámina y en la línea')
 		await pass_through(c, C, b, at, sec, mesh, L)
 		ui.panel_info(null)
@@ -75,7 +76,7 @@ static func run(c: Ch, mesh: MeshInstance3D, at: Vector2, L := 4.0) -> Dictionar
 	var guess = await ui.panel('El sólido escondido', '¿Qué ha atravesado el Plano?', SOLIDS)
 	if g.auto or g.bot: guess = pick.id
 	var hidden_ok: bool = guess == pick.id
-	if hidden_ok: Snd.sfx('good')
+	if hidden_ok: Snd.sfx('good'); g.achieve('ACH_HIDDEN')
 	else: Snd.sfx('bad'); ui.note(ui.T('*La Esfera:* «%s»') % ui.T('Era %s. Mira otra vez cómo crecía.') % ui.T({pyramid = 'una pirámide', cone = 'un cono', cylinder = 'un cilindro tumbado'}[pick.id]), 5.0)
 	g.world.remove('secc')
 	return {pred = hits, hidden = hidden_ok}

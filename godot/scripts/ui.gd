@@ -151,6 +151,7 @@ func _init() -> void:
 	serif = FontVariation.new(); serif.base_font = F_SERIF; serif.variation_opentype = {ts.name_to_tag("wght"): 620}
 	serif_it = FontVariation.new(); serif_it.base_font = F_SERIF_IT; serif_it.variation_opentype = {ts.name_to_tag("wght"): 620}
 	caps = FontVariation.new(); caps.base_font = F_CAPS; caps.spacing_glyph = 2
+	apply_fonts()
 
 func _ready() -> void:
 	paper = ColorRect.new(); paper.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(paper)
@@ -293,6 +294,12 @@ func fmt(t: String, em := "i") -> String:
 func T(t: String) -> String:
 	return Glyphs.fill(I18n.t(t))
 
+# «letra clara» (S-17): el texto corrido pasa a la letra de sistema, más legible en pantallas pequeñas
+func apply_fonts() -> void:
+	var plain := bool(App.cfg.get("plain_font", false))
+	serif.base_font = ThemeDB.fallback_font if plain else F_SERIF
+	serif_it.base_font = ThemeDB.fallback_font if plain else F_SERIF_IT
+
 func modal() -> bool:
 	return journal_open or menu_open or pause_open or settings_open
 
@@ -413,7 +420,7 @@ func _build_menu() -> void:
 	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 0); v.alignment = BoxContainer.ALIGNMENT_CENTER; menu_split.add_child(v)
 	var over := _lbl("EDWIN A. ABBOTT  ·  1884", caps, 13, App.SOFT); over.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(over)
 	var ft := FontVariation.new(); ft.base_font = F_FELL; ft.spacing_glyph = 6
-	menu_title = _lbl("PLANILANDIA", ft, 96, App.INK); menu_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(menu_title)
+	menu_title = _lbl(T("PLANILANDIA"), ft, 96, App.INK); menu_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(menu_title)
 	var rule := Rule.new(); rule.custom_minimum_size = Vector2(240, 14); rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v.add_child(rule)
 	var sub := _lbl("Un romance de muchas dimensiones", serif_it, 24, App.ACC); sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(sub)
 	var v2 := VBoxContainer.new(); v2.add_theme_constant_override("separation", 10); v2.alignment = BoxContainer.ALIGNMENT_CENTER; menu_split.add_child(v2)
@@ -488,8 +495,11 @@ func _layout() -> void:
 	note_l.custom_minimum_size.x = minf(size.x - 60.0, 720.0)
 	t_title.custom_minimum_size.x = minf(size.x - 40.0, 1000.0); t_sub.custom_minimum_size.x = minf(size.x - 60.0, 680.0)
 	t_title.add_theme_font_size_override("font_size", int(clampf(minf(size.x * 0.07, size.y * 0.16), 34, 76)))
-	var sbw := minf(minf(640.0, size.x - 60.0), (size.y - 90.0) * 640.0 / 420.0)
+	# la pizarra deja sitio debajo para el cuadro de diálogo (en pantallas bajas se encoge)
+	var sbw := minf(minf(640.0, size.x - 60.0), (size.y - 250.0) * 640.0 / 420.0)
+	sbw = maxf(sbw, 260.0)
 	slate_board.custom_minimum_size = Vector2(sbw, sbw * 420.0 / 640.0)
+	if draw_b != null: draw_b.custom_minimum_size = slate_board.custom_minimum_size
 	j_split.vertical = port or size.x < 700
 	j_ls.custom_minimum_size = Vector2(size.x - 40, minf(190, size.y * 0.3)) if j_split.vertical else Vector2(clampf(size.x * 0.32, 230, 320), 120)
 	# menú: en un móvil apaisado, título a la izquierda y botones a la derecha
@@ -537,7 +547,10 @@ func _process(dt: float) -> void:
 	if note_box.visible:
 		note_box.reset_size(); note_box.position = Vector2((size.x - note_box.size.x) / 2.0, ty)
 	if slate_box.visible:
-		slate_box.reset_size(); slate_box.position = Vector2((size.x - slate_box.size.x) / 2.0, maxf(6.0, (size.y - slate_box.size.y) * 0.3))
+		slate_box.reset_size()
+		var sy := (size.y - slate_box.size.y) * 0.3
+		if dlg.visible or picking: sy = minf(sy, size.y - 215.0 - slate_box.size.y)
+		slate_box.position = Vector2((size.x - slate_box.size.x) / 2.0, maxf(6.0, sy))
 	if prompt_box.visible:
 		prompt_box.reset_size(); prompt_box.position = Vector2((size.x - prompt_box.size.x) / 2.0, size.y * 0.80 - prompt_box.size.y)
 	keys_box.reset_size(); keys_box.position = Vector2(size.x - keys_box.size.x - 14, size.y - keys_box.size.y - 12)

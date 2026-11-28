@@ -40,7 +40,8 @@ def is_text(s):
     bare = FMT.sub("", re.sub(r"\[/?[a-z_]+(=[^\]]*)?\]", "", s))
     if not re.search(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{2,}", bare):
         return False
-    return " " in s or s[0].isupper() or re.search(r"[^\x00-\x7f]", s) is not None
+    first = re.search(r"[A-Za-z]", s)
+    return " " in s or (first is not None and first.group(0).isupper()) or re.search(r"[^\x00-\x7f]", s) is not None
 
 
 def code_part(line):

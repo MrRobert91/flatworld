@@ -85,5 +85,7 @@ static func key_name(action: String) -> String:
 			var pk: Key = e.physical_keycode
 			var kc := DisplayServer.keyboard_get_keycode_from_physical(pk) if DisplayServer.get_name() != "headless" else pk
 			var s := OS.get_keycode_string(kc if kc != KEY_NONE else pk)
-			return {"Space": "Espacio", "Escape": "Esc", "Shift": "Mayús", "Ctrl": "Ctrl", "Enter": "Intro", "Left": "←", "Right": "→", "Up": "↑", "Down": "↓"}.get(s, s)
+			var es := {"Space": "Espacio", "Escape": "Esc", "Shift": "Mayús", "Ctrl": "Ctrl", "Enter": "Intro", "Left": "←", "Right": "→", "Up": "↑", "Down": "↓"}
+			if I18n.lang != "es": return {"Left": "←", "Right": "→", "Up": "↑", "Down": "↓"}.get(s, s)
+			return es.get(s, s)
 	return "—"

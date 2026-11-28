@@ -760,7 +760,7 @@ func ch10() -> void:
 	await ui.title('Hacia Arriba, no hacia el Norte.', 'Planilandia', 'El manuscrito está completo: 22 de 22 secciones. Alguien, en Alguna Dimensión, lo ha leído.' if n >= 22 else tr('Has recuperado %d de 22 secciones del manuscrito. Las que faltan esperan en sus capítulos.') % n, 6.0)
 	await ui.title('Edwin A. Abbott', 'Flatland, 1884', 'Un romance de muchas dimensiones.', 5.0)
 	# C10-09 · tras los créditos
-	Profile.unlock_gallery('prefacio'); Profile.unlock_mode('college')
+	Profile.unlock_gallery('prefacio'); Profile.unlock_mode('college'); g.achieve('ACH_END')
 	if not g.auto: ui.toast('frag', tr('Galería'), tr('El Prefacio del Editor a la segunda edición'))
 
 # las condiciones del cierre del manuscrito (book.epilogue): flag:x · rel:x>=n · rep:x>=n · her>=n · choice:x=v · always

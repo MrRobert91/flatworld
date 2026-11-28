@@ -772,6 +772,22 @@ Capítulos IX y X, el cierre en la mesa del lector, las láminas y la galería:
 
 Notas al margen: 6 más (Ello, la trampilla, el tablero del nieto, el banco grabado, la silla vacía, una muesca de más). `--try=` admite `lamina`, `restraint`, `brother`, `closing` y `treatise`.
 
+### 9.9 Estado: M6 implementado (candidata a versión)
+
+| Componente | Estado | Notas |
+|---|---|---|
+| Inglés completo | Hecho | `en.po` con los 1416 textos de la interfaz y el guion, y `book.en.json` (las 22 secciones, saberes, expediente, personas, notas al margen, logros, tabla, argumentos, cierre y Prefacio). Las citas del libro siguen el inglés de Abbott donde el guion lo parafrasea. El recorrido `--lang=en` termina con **0 textos sin traducir**; el contador sólo cuenta lo que parece español (`I18n._plain`), porque los textos del libro ya llegan traducidos. El extractor ahora reconoce textos que empiezan por paréntesis («(Callar.)»). En el primer arranque se usa el idioma del sistema si está traducido. |
+| §7 Plataforma | Hecho | Autoload `Platform` (`sys/platform.gd`): GodotSteam si existe el singleton `Steam` (inicio con `APP_ID`, `run_callbacks`, logros con `setAchievement`/`storeStats`, `overlay_toggled`); si no, nada. `g.achieve` sube a Steam; los logros del perfil se resincronizan al arrancar. El overlay pausa la partida. **Sin probar con Steam real**: no hay `APP_ID` ni la extensión en este entorno. |
+| Demo | Hecho | Característica `demo` (preajuste Web) o `--demo`: el juego termina tras el bloque III con una pantalla de lista de deseos y el menú de capítulos se limita a III. **La exportación web pasa a ser la demo.** |
+| Exportación | Hecho, parcial | Preajustes *Windows Desktop* y *macOS* y `tools/export.sh --steam` → `build/steam/` (sin versionar). En este entorno sólo están instaladas las plantillas de Web y Linux: las de Windows y macOS no se han podido generar. |
+| Logros | Hecho | 26 (los 24 de §7.1 del diseño, con `ACH_EAR` por `ACH_VOICE`, más `ACH_SECTIONS` y `ACH_BROTHER`). Nuevos ganchos: `ACH_TOYS`, `ACH_GATE`, `ACH_CIRCLE`, `ACH_FRAUD`, `ACH_HEX`, `ACH_HIDDEN`, `ACH_MARGIN` (todas las notas en la galería) y `ACH_END`. Prueba: cada logro del libro aparece en el código y tiene nombre en inglés. |
+| S-17 Ajustes | Hecho | Por grupos: Pantalla y texto (tamaño, pantalla completa, velocidad, avance automático, **letra clara**), Juego (deducciones, **pulsar o mantener**), Accesibilidad (patrones, subtítulos de sonido, reducir movimiento), Controles (mirada, **invertir Y**, teclas), **Sonido** (música, efectos y voces) e **Idioma** (vuelve al menú). |
+| Accesibilidad | Hecho | «Pulsar una vez»: con un minijuego que pide la acción, una pulsación la deja echada hasta la siguiente (`Game._latch`). «Letra clara»: la letra de sistema en lugar de Cormorant. Volúmenes por grupo (las voces, aparte). |
+| Modo Colegio | Hecho | `content/college.gd`: la sala del Colegio con cuatro mesas (vista, tacto, calle y secciones del Cubo), cinco rondas cada una y medallas de bronce, plata y oro en `Profile.data.college`. Entrada en el menú cuando se termina el juego (`--college` para probarlo). |
+| Corrección de errores | Hecho | La pizarra ya no tapa el cuadro de diálogo en pantallas bajas (deja 250 px y sube si hay diálogo). El resumen del Prefacio describía mal la primera objeción; corregido. |
+| Steam Deck | Sin probar | Sin hardware. La interfaz escala por puntos; ver la captura a 1280×800. |
+| Pendiente | — | Fuente de iconos para los glifos del mando (siguen siendo de texto); texto íntegro del Prefacio de 1884; prueba externa con 5 personas; subir los logros y la tienda a Steamworks. |
+
 ---
 
 ## 10. Riesgos

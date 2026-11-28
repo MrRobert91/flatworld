@@ -1,0 +1,816 @@
+{
+ "fragments": [
+  {
+   "title": "Of the nature of Flatland",
+   "hint": "Begin at the beginning: the cell.",
+   "text": [
+    "I call our world Flatland, not because we call it so, but to make its nature clearer to you, my happy readers, who are privileged to live in Space.",
+    "Imagine a vast sheet of paper on which straight Lines, Triangles, Squares, Pentagons, Hexagons and other figures, instead of remaining fixed in their places, move freely about on the surface, but without the power of rising above it or sinking below it: very much like shadows, only hard and with luminous edges.",
+    "Place a coin on a table and look down on it: you will see a circle. Now lower your eye to the edge of the table: the coin will become more and more oval, and when your eye is exactly on the edge it will have ceased to appear oval at all: it will have become, to you, a straight line. That is how we all see one another in Flatland. Triangle, square or circle, we see nothing but lines."
+   ]
+  },
+  {
+   "title": "Of the climate and houses in Flatland",
+   "hint": "The roofs and the rain of your own house keep this page.",
+   "text": [
+    "Like you, we have four points of the compass. Having no sun nor stars, we find our way by a Law of Nature: a constant attraction to the South. In temperate climates it is slight, but it suffices; and the rain, which falls at stated intervals, always comes from the North. That is why houses are built with their roofs to the North.",
+    "Our houses have no windows, for light comes to us equally indoors and out, by day and by night, at all times and in all places, whence we know not. \"What is the origin of light?\" was once the favourite question of the learned; today the asylums are full of those who tried to answer it, and the legislature taxes such inquiries heavily.",
+    "The commonest form of house is five-sided. Square and triangular houses are not allowed: their angles, sharper than a pentagon's, and the lines of inanimate objects, dimmer than those of men and women, would be a serious danger to the absent-minded wayfarer. Only powder-magazines, barracks and fortresses keep a triangular plan. The small door to the East is for women; the far larger one to the West, for men."
+   ]
+  },
+  {
+   "title": "Of the inhabitants of Flatland",
+   "hint": "In the High Street, someone with many sides likes to explain the order of the world.",
+   "text": [
+    "Our Women are Straight Lines. Our Soldiers and lowest class of Workmen are Isosceles Triangles, with a very short base and a sharp, formidable vertex. Our Middle Class consists of Equilateral Triangles. Our Professional Men and Gentlemen are Squares (to which class I belong) and Pentagons. Above them comes the Nobility, beginning with Hexagons and increasing in sides until it receives the title of Polygonal. And when the sides become so many and so small that the figure cannot be told from a circle, it enters the Circular or Priestly order, the highest of all.",
+    "It is a Law of Nature that each male child has one side more than his father: the son of a Square is a Pentagon; of a Pentagon, a Hexagon. But this law does not always hold for tradesmen, and still less for soldiers and workmen, who hardly deserve the name of human figures. In them the angle of the vertex increases —by military exploits or diligent labour— by half a degree in each generation.",
+    "Rarely, of Isosceles parents a true Equilateral is born. After examination by the Sanitary and Social Board, the child is admitted into the class of Regulars, taken from his parents and adopted by a childless Equilateral, who swears never to let him see his family again. The hope of such a birth is the serfs' consolation in their misery, and, for the Circles, a valve that defuses all sedition."
+   ]
+  },
+  {
+   "title": "Concerning the women",
+   "hint": "The Eastern door of your house, and the one who uses it, have something to tell you.",
+   "text": [
+    "If our Soldiers, so pointed, are formidable, judge how much more so are our Women. For if a Soldier is a wedge, a Woman is a needle: all point, at least at her two ends. Add the power of making herself practically invisible at will —seen end-on she is no more than a point— and you will understand that a Female, in Flatland, is a creature by no means to be trifled with.",
+    "Hence our laws. Every house shall have an entrance on the East for the exclusive use of Females. No Female shall walk in any public place without continually keeping up her Peace-cry, on pain of death. In some States they are also required to keep up a constant motion of the back part from right to left, so as to warn those behind of their presence.",
+    "Do not think them therefore wanting in affection. But, deprived of angles, they are deprived also —so we are taught— of reason, foresight and almost of memory: in a fit of passion they may cause an irreparable disaster and, half an hour later, remember neither the cause of their fury nor the fragments of their husband."
+   ]
+  },
+  {
+   "title": "Of our methods of recognising one another",
+   "hint": "A tradesman in the High Street asks to be felt as is proper.",
+   "text": [
+    "You, who see angles and behold the whole circumference of a circle, how will you understand how hard it is for us to tell the figure of our fellows? To us, they all look the same: a line.",
+    "The first method is Hearing: the voice betrays the class. But the lower classes, with vocal organs more developed than ours, easily feign the voice of a Polygon. The second, and chief among women and the lower classes, is Feeling. \"Let me ask you to feel and be felt by my friend Mr So-and-so\" is still the form of introduction among old-fashioned people. Feeling a single angle is enough to know the class.",
+    "But feeling demands caution: the one felt must keep perfectly still. A start, a sneeze, and the sharp angle wounds mortally. My own ancestor, a respectable workman of fifty-nine and a half degrees, was seized with rheumatism while being felt by a Polygon, and ran him through; the family fell back a degree and a half, and five generations had to pass before they reached sixty at last."
+   ]
+  },
+  {
+   "title": "Of recognition by sight",
+   "hint": "At the West Gate, the work is done by looking.",
+   "text": [
+    "Wherever there is Fog —and there is fog everywhere except in the torrid zones— objects three feet away appear perceptibly dimmer than those two feet eleven inches away. So, by carefully comparing the brightness of the parts of a line, we infer the figure exactly.",
+    "Let a Merchant (Triangle) and a Physician (Pentagon) approach me, each with a vertex towards me. In the Merchant I see a line whose centre is bright and whose ends fade *very rapidly*, because his sides recede quickly into the fog. In the Physician the ends fade *less rapidly*: his sides fall back more slowly. Thus does the educated eye discern.",
+    "This art, the flower of our aristocracy, is taught in the universities and takes years. Among the upper classes \"feeling\" is forbidden, and to call someone a \"feeler\" is a grave insult. The young Polygon who fails his final examination belongs no longer to the upper class nor to the lower: from these unfortunates come the ringleaders of every revolt."
+   ]
+  },
+  {
+   "title": "Concerning irregular figures",
+   "hint": "At the West Gate, look carefully at the one who is not like the others.",
+   "text": [
+    "All that has been said presupposes that every being in Flatland is a Regular figure. If our sides were unequal, our angles would be so; feeling one angle would not suffice to know the figure; the whole of social life, Feeling, Sight, dancing, intercourse, would fall into chaos.",
+    "That is why \"Irregularity of figure\" means among us as much as, or more than, a combination of moral obliquity and criminality means among you. The Irregular is watched by the police from his cradle, derided by his brothers, excluded from every office. On coming of age he presents himself for inspection: if he exceeds the fixed margin, he is destroyed; if not, he is immured in a Government office as a clerk of the seventh class.",
+    "I do not advocate the extreme measures of certain States, where the infant whose angle deviates by half a degree is summarily suppressed. The art of healing —compressions, extensions, trepannings— has achieved much. But when the figure has set and the Irregularity is incurable, I hold —I held— that the Irregular should be painlessly and mercifully consumed."
+   ]
+  },
+  {
+   "title": "Of the ancient practice of painting",
+   "hint": "At the College, the old archivist remembers the time of colours.",
+   "text": [
+    "Our life is, aesthetically, monotonous. How could it not be, when every landscape, every portrait, every flower is for us a single line, with no variety but degrees of brightness and shade? It was not always so.",
+    "Many centuries ago, a Pentagon whose name is variously reported —we shall call him Chromatistes— discovered by chance the constituents of the simpler colours. He decorated first his house, then his slaves, his father, his sons, his grandsons, and lastly himself. Wherever he went, everyone recognised him without feeling or calculating; no one bumped into him. The fashion spread like wildfire: in two generations no one was left unpainted, except the Women and the Priests.",
+    "It was the glorious childhood of Art: immoral, licentious, anarchical, unscientific… and most beautiful. But, Recognition by Sight being no longer needed, it ceased to be studied; and Soldiers and Artisans began to declare —with increasing truth— that nothing now distinguished them from the Polygons."
+   ]
+  },
+  {
+   "title": "Of the Universal Colour Bill",
+   "hint": "The archivist keeps a broadsheet from those days.",
+   "text": [
+    "Year by year the people grew bolder. At last it was demanded that all without exception, Priests and Women included, should do homage to Colour by submitting to be painted. And since these have no sides, it was proposed that the half of each Woman containing eye and mouth should be painted red, and the other half green; and the Priests likewise: the front semicircle red, the back green.",
+    "There was no little cunning in this. Seen from certain positions, a Woman so painted would appear exactly like a Priest: a line half red, half green. The women, seduced by the prospect of being treated with the deference due to a Circle, backed the Bill en masse. And the Circles, confused with them, would lose their prestige and their power.",
+    "The author of so diabolical a Bill was no Isosceles —none would have had the angle for it— but an Irregular Circle who, instead of being destroyed in childhood, had been preserved by a foolish indulgence. For three years the agitation kept the State on the brink of anarchy."
+   ]
+  },
+  {
+   "title": "Of the suppression of the Chromatic Sedition",
+   "hint": "The theatre of memory, at the College, goes to the end of the story.",
+   "text": [
+    "An army of Isosceles had already routed the Polygons, and the very homes of the Circles were divided, when an incident turned the tide. An Isosceles of the lowest sort, of barely four degrees, painted himself with the twelve colours of a Dodecagon and, disguising his voice, deceived in the Market a maiden, the orphan of a noble Polygon. The marriage consummated and the fraud discovered, the unhappy girl took her own life. The women, horrified, began to look at the Bill in another way.",
+    "Pantocyclus, the Chief Circle, then convened an extraordinary Assembly. He announced that the Circles yielded… and asked only to be heard. He spoke for almost a whole day: he reminded the Artisans that, with the classes confused, no son of theirs would ever rise to be Regular; the Women, that no wife's honour would any longer be safe. At a signal, the women backed into the soldiers; the artisans did likewise; the convicts seized the entrances. The Isosceles, believing themselves betrayed, turned on one another. In half an hour, of all that multitude not one remained: a hundred and forty thousand perished by the angles of their comrades.",
+    "The Circles lost no time: they decimated the workmen, destroyed every suspected Triangle without measurement, purged the cities for a year. Colour was abolished. Today its very name is punished; the secret of making it is known to one living being only, the Chief Circle, who bequeaths it to his successor."
+   ]
+  },
+  {
+   "title": "Concerning our priests",
+   "hint": "Enter the Temple and attend the ceremony.",
+   "text": [
+    "Our Priests are the administrators of all business, art and science; the directors of trade, war, architecture, law, morals, theology; doing nothing themselves, they are the cause of everything worth doing.",
+    "Though called Circles, no Circle is truly one: he is only a Polygon with a very large number of very small sides. It is assumed, out of courtesy, that the Chief Circle has ten thousand. To feel a Circle would be an unheard-of audacity, so that his perimeter is, strictly speaking, a mystery.",
+    "The rise of their sons is not bound to the law of one side per generation; but, the higher one climbs, the more Nature exacts her price: fertility declines. And ambitious families hand their firstborn to the Neo-Therapeutic Gymnasium, where the still-tender frame is fractured and reset to gain sides: barely one in ten survives. Their doctrine fits in one maxim: \"Attend to your Configuration\"."
+   ]
+  },
+  {
+   "title": "Of the doctrines of our priests",
+   "hint": "After the ceremony, a young Circle will agree to speak with you alone.",
+   "text": [
+    "The Circles teach that every fault comes from a defect of Configuration, not of will. Why blame the thieving Isosceles, if he cannot help being one? And yet, they conclude, as he equally cannot help being a nuisance to his neighbours, the Magistrate cannot help sentencing him to be consumed. At home I confess I depart from the doctrine: when my Hexagonal grandson pleaded that a change in temperature had been too much for his perimeter, and that the fault lay with his Configuration, I concluded that a good scolding would strengthen it.",
+    "Some three hundred years ago, the Chief Circle decreed that, Women being deficient in Reason but abounding in Emotion, they should no longer be treated as rational nor receive any education. Since then they are taught neither to read nor to count.",
+    "The result is that we men lead a bi-lingual, and almost a bi-mental, existence. With Women we speak of \"love\", \"duty\", \"right\", \"wrong\", \"pity\", \"hope\": concepts that do not exist. Among ourselves, \"love\" is \"the anticipation of benefits\" and \"duty\" is \"necessity\". I fear this double burden is too much for the young; and I humbly appeal to the highest Authorities to reconsider the regulations of female education."
+   ]
+  },
+  {
+   "title": "How I had a vision of Lineland",
+   "hint": "The second-to-last night of the year 1999 will bring a dream.",
+   "text": [
+    "It was the last day but one of the 1999th year of our era. I went to bed late, after amusing myself with my favourite pastime, Geometry, and I had a dream.",
+    "I saw before me a multitude of small straight Lines —which I naturally took for Women— interspersed with still smaller Beings, like bright points, all moving forward and back on one and the same Straight Line, and at the same speed. I addressed the largest: \"Woman, what signifies this concourse?\" \"I am no woman,\" he answered. \"I am the Monarch of the world.\"",
+    "His kingdom was a Line, and to him the Line was the whole universe. No one could leave it nor pass his neighbour: each one's horizon was a Point. They recognised one another by voice; each man has two, a bass at one end and a tenor at the other, and by the interval between them the listeners compute his length. Marriages are arranged by singing, at a distance, for neighbourhood there is eternal: each man, two wives, soprano and contralto."
+   ]
+  },
+  {
+   "title": "How I vainly tried to explain the nature of Flatland",
+   "hint": "In the dream, leave the Line and enter it again before the King.",
+   "text": [
+    "I wished to open the Monarch's eyes. I told him his kingdom was nothing but a Line, and that outside it lay a Plane. He asked me to show him the motion \"from left to right\" I spoke of. I crossed his Line: while part of me remained in it, he saw me; when I left it altogether, he exclaimed that I had vanished by magic.",
+    "I described his neighbours to him, whom I saw from outside and he only heard. Nothing moved him. \"If you were a Man of sense,\" he said, \"you would listen to reason. You ask me to believe there is another Line besides that which my senses indicate. Instead of moving, you perform a trick: you vanish and reappear.\"",
+    "I lost patience: \"Besotted being! You think yourself the perfection of existence and you are the most imperfect. You say you see, and you see nothing but a Point. I am the completion of your incomplete self: you are a Line, but I am a Line of Lines, called in my country a Square; and even I, infinitely superior to you, am of little account among the great nobles of Flatland.\" He advanced on me with his war-cry… and the breakfast bell woke me."
+   ]
+  },
+  {
+   "title": "Concerning a Stranger from Spaceland",
+   "hint": "On the last night of the millennium, your grandson will ask an impertinent question.",
+   "text": [
+    "It was the last day of the year 1999. The pattering of the rain announced the night. That afternoon I had given my youngest grandson, a Hexagon of brilliant parts, a lesson: with nine squares of one inch we formed a square of three inches a side, and so 3², or 9, represents the number of square inches.",
+    "The little fellow pondered and said: \"You have also taught me to raise numbers to the third power. I suppose 3³ must mean something in Geometry. What does it mean?\" \"Nothing at all,\" I replied, \"for Geometry has only Two Dimensions.\" I showed him how a Point moving three inches traces a Line, and a Line moving parallel to itself traces a Square. \"Then,\" he said, \"a Square moving somehow parallel to itself, I don't see how, must make something, I don't see what, three inches every way; and that will be 3³.\" \"Go to bed,\" I said, annoyed.",
+    "\"The boy is a fool,\" I muttered to myself. \"He is no fool,\" said a voice, \"and 3³ has an obvious geometrical meaning.\" My wife and I turned. There was a Figure in the room: it looked like a Woman seen sideways, but its brightness changed. My wife felt it: \"A perfect Circle!\" and withdrew in confusion. The hourglass was letting fall the last grains of the millennium."
+   ]
+  },
+  {
+   "title": "How the Stranger vainly tried to reveal to me in words the mysteries of Spaceland",
+   "hint": "Listen to the Stranger and answer his arithmetic.",
+   "text": [
+    "\"I come from Space,\" he said, \"from the land of Three Dimensions. What you call a Solid is really only a Plane. I am not a plane figure: I am a Solid. You call me a Circle, but I am not: I am many Circles in one, infinitely many, of sizes from a Point to a Circle of thirteen inches, placed one upon another. When I cut through your Plane, I make in it a section which you call a Circle.\" And he rose: I saw him shrink, become a point, vanish.",
+    "He tried Analogy. \"A Point moving produces a Line, with two terminal points. A Line moving parallel to itself produces a Square, with four. One, two, four: it is a geometrical progression. What is the next number?\" \"Eight.\" \"Exactly: the Square, moving parallel to itself, produces Something with eight terminal points: we call it a Cube.\"",
+    "\"And its sides: the Point has none; the Line, two; the Square, four. Nought, two, four: an arithmetical progression. The next?\" \"Six.\" \"Then the Cube is bounded by six sides, which are six Squares like you.\" \"Monster!\" I shrieked, \"be you juggler, enchanter, dream or devil, no more will I endure your mockeries,\" and I hurled myself upon him."
+   ]
+  },
+  {
+   "title": "How the Sphere, having in vain tried words, resorted to deeds",
+   "hint": "The Stranger will open your cupboard without opening it.",
+   "text": [
+    "It was in vain. I charged him with my hardest angle; he yielded, slipped away, shrank. \"Why will you refuse to listen to reason?\" he said. \"I had hoped to find in you, a man of sense and an accomplished mathematician, a fit apostle for the Gospel of the Three Dimensions, which I am allowed to preach only once in a thousand years.\"",
+    "\"Look: I see there your locked cupboard. I see inside two money-coffers and two account tablets. I am going to descend into that cupboard and bring you one of the tablets.\" I rushed to the cupboard: one tablet was missing. With a mocking laugh he appeared in the other corner, and the tablet lay on the floor. \"And now, from where I am, I see your inside: your stomach. I am going to touch it…\" I felt a sharp pain in my entrails.",
+    "\"There has been no great harm,\" he said. Maddened, I flung myself at him again, shouting. My wife was approaching. \"Either this must end here,\" said the Sphere, \"or you must come with me. Out of your Plane! One, two, three. It is done!\""
+   ]
+  },
+  {
+   "title": "How I came to Spaceland, and what I saw there",
+   "hint": "From on high, look at your house. Then at the Council Chamber.",
+   "text": [
+    "An unspeakable horror seized me. There was darkness; then a dizzy, sickening sensation of sight that was not like seeing: I saw a Line that was no Line; Space that was not Space; I was myself, and not myself. I cried out: \"Either this is madness or it is Hell!\" \"It is neither,\" calmly replied the voice of the Sphere; \"it is Knowledge; it is Three Dimensions. Open your eye once again and try to look steadily.\"",
+    "I looked, and beheld a new world. At my feet lay my native city, with the inside of every house and every creature open to my view. I saw my home: my sons asleep, my grandsons, the servants, my daughter; and my faithful wife, alarmed at my absence, pacing the parlour. I saw the inside of my cupboard, the two coffers and the tablets.",
+    "We rose higher, to the Hall of the General Assembly of the States. It was the first hour of the first day of the year 2000. My brother, a perfectly symmetrical Square and Chief Clerk of the High Council, was reading the minute: that in every millennium ill-intentioned persons appeared pretending to revelations from another World; that such strays should be arrested or destroyed. The Sphere descended into the middle of the hall: \"I come to proclaim that there is a land of Three Dimensions.\" At a sign from the President, the guards rushed upon him; he vanished. The policemen who had witnessed it were destroyed, and my brother, for the same crime of having seen, was sentenced to perpetual imprisonment."
+   ]
+  },
+  {
+   "title": "How, though the Sphere showed me other mysteries, I still desired more; and what came of it",
+   "hint": "When the Sphere has shown you the Cube, dare to ask for more.",
+   "text": [
+    "The Sphere instructed me in Solids: how a Cube is built of Squares; how light and shade and perspective let one see depth. I worshipped him as a master. And then, drunk with knowledge, I asked for more.",
+    "\"You who have shown me the entrails of my countrymen in the land of Two Dimensions, take me now to the land of Four, whence we shall look together upon this Space and see the inside of every Solid: your own entrails.\" \"There is no such land,\" he answered. \"The very idea of it is utterly inconceivable.\" I pressed him with his own Analogy: one, two, four, eight… must not the Cube, moving in a new direction, produce a still more divine figure, with sixteen terminal points and eight Cubes for its boundaries?",
+    "\"And is it not true,\" I went on, \"that in your country Beings of a higher order have been seen entering closed rooms, as you entered mine?\" He admitted it grudgingly; he said they were visions of the brain. I clamoured for the Fifth, the Sixth, the Seventh Dimension… The Sphere, whose countenance had been darkening, cast me from him. I fell. A crash; and I found myself again in my study, hearing my wife's Peace-cry approaching."
+   ]
+  },
+  {
+   "title": "How the Sphere encouraged me in a vision",
+   "hint": "After the fall, the dream takes you to the dimensionless abyss.",
+   "text": [
+    "That night I had a dream. The Sphere was at my side again, and his brightness no longer showed anger. He led me towards a tiny luminous point. \"Behold,\" he said, \"Pointland, the Abyss of No Dimensions.\"",
+    "\"That wretched creature is a Being like ourselves, but confined to the non-dimensional gulf. He is himself his own World, his own Universe; of anything other than himself he can form no conception; he knows not length, nor breadth, nor height; not even the number Two. He is the One and the All, being in reality Nothing. Yet mark his perfect self-contentment, and learn this lesson: that to be self-contented is to be vile and ignorant, and that to aspire is better than to be blindly and impotently happy.\"",
+    "I listened. From the little creature came a monotonous tinkling: \"Infinite beatitude of existence! It is; and there is nothing outside It.\" I shouted to it to be quiet, that it was nothing. \"Ah, the joy of Thought!\" it answered, taking my voice for its own. \"What can It not achieve by thinking?\" \"You see,\" said my Master, \"how little your words have done. Let us leave him in his ignorant omnipresence. Nothing you or I can do can rescue him from his self-satisfaction.\""
+   ]
+  },
+  {
+   "title": "How I tried to teach the theory of Three Dimensions to my grandson, and with what success",
+   "hint": "On waking, look for the only one who asked the right question.",
+   "text": [
+    "I woke rejoicing, resolved to evangelise all Flatland, beginning with my wife. At that moment I heard in the street a herald's voice: the Resolution of the Council ordering the arrest, imprisonment or execution of whoever should pervert the minds of the people by pretending to revelations from another World. I kept silent. I told my wife I had fallen through the cellar trapdoor.",
+    "My sons, Pentagons of character and standing, physicians with no mathematics, would have handed their father to the Prefect. Then I thought of my grandson, whose remark about 3³ had won the Sphere's approval. I called him; I shut the door; I took a movable square: \"We will move it, not Northward, but Upward…\"",
+    "The proclamation sounded again. The child, brought up in reverence for the Circles, burst into tears: \"Grandpapa, it was only a joke, and of course I meant nothing by it; and we didn't know anything then about the new Law; and I never said anything about the Third Dimension, not a word about 'Upward and not Northward', for that would be such nonsense. How could a thing move Upward and not Northward? What nonsense! Ha, ha, ha!\" \"It is not nonsense,\" I said, losing my temper, and I shook the square to no purpose at all. The child opened the door and fled."
+   ]
+  },
+  {
+   "title": "How I tried to diffuse the theory by other means, and of the result",
+   "hint": "The end of the story is written in the Prefect's palace.",
+   "text": [
+    "I shut myself up to compose a treatise, \"From Flatland to Thoughtland\", speaking not of a physical dimension but of a land of thought. My life grew dark. Everything I saw tempted me to treason: I could not look without comparing what I saw in Two Dimensions with what it really was. And one day, at the local Speculative Society, in the Prefect's palace, someone read a paper on why Providence had limited the Dimensions to Two. I forgot myself: I told everything.",
+    "I was arrested and brought before the Council. The President asked me two questions: whether I could indicate the direction I called \"Upward, not Northward\"; and whether I could, by diagrams or descriptions, exhibit the Figure I called a Cube. I declared I could say no more, and that I committed myself to the Truth. I was sentenced to perpetual imprisonment.",
+    "Seven years have passed and I am still a prisoner. My brother, who saw the Sphere in the Council Chamber, visits me every week, and still confesses he does not believe in it. I have not a single convert. And yet I exist in the hope that these memoirs, in some manner, I know not how, may find their way into the minds of humanity in Some Dimension, and may stir up a race of rebels who shall refuse to be confined to limited Dimensionality.",
+    "That is the hope of my brighter moments. Alas, it is not always so. There are moments when I cannot honestly say I remember the exact shape of the Cube, once seen and so often regretted; and the mysterious precept, \"Upward, not Northward\", haunts me like a soul-devouring Sphinx. There are hours of weakness when Cubes and Spheres flit away into the background of scarce-possible existences; when the Land of Three Dimensions seems almost as visionary as the Land of One or None; when even this hard wall that bars me from my freedom, these very tablets on which I am writing, and all the substantial realities of Flatland itself, appear no better than the offspring of a diseased imagination, or the baseless fabric of a dream."
+   ]
+  }
+ ],
+ "knowledge": {
+  "linea": {
+   "title": "Everything is a line",
+   "text": "From inside the plane, every figure —triangle, square or circle— looks like a segment of line. Press *{view}* to look as a Flatlander looks."
+  },
+  "norte": {
+   "title": "The North and the rain",
+   "text": "There is no sun and there are no stars. A faint attraction always pulls to the South, and the rain always comes from the North: that is how one finds one's way. Roofs point North."
+  },
+  "casas": {
+   "title": "Five-sided houses",
+   "text": "In towns the law forbids triangular or square houses: a building's sharp angles, dim and hard to see, wound the absent-minded. The Western door for men; the Eastern, narrow one, for women."
+  },
+  "clases": {
+   "title": "The scale of figures",
+   "text": "The more sides, the higher the rank: Isosceles (soldiers and workmen), Equilaterals (tradesmen), Squares and Pentagons (professional men), Hexagons and above (nobility), Circles (priests). Women, of any class, are lines."
+  },
+  "herencia": {
+   "title": "One more side each generation",
+   "text": "Each male child has one side more than his father. Among the Isosceles the law does not hold: their angle grows barely half a degree a generation until it reaches, perhaps, the Equilateral's 60°."
+  },
+  "mujeres": {
+   "title": "The Peace-cry",
+   "text": "A woman seen end-on is almost invisible, and her end is deadly. The law requires her own door, a continual cry in the street and the sway of her back end."
+  },
+  "oido": {
+   "title": "Recognition by hearing",
+   "text": "The voice betrays the class, but the Isosceles can feign it. A method hardly to be trusted."
+  },
+  "tacto": {
+   "title": "Recognition by touch",
+   "text": "Feeling a single angle reveals the figure: under 60°, Isosceles; 60°, Equilateral; 90°, Square; 108°, Pentagon; 120°, Hexagon. The one felt must keep still. Among the upper classes, feeling is coarse."
+  },
+  "vista": {
+   "title": "Recognition by sight",
+   "text": "Fog dims what is distant. If the ends of the line darken quickly, the sides recede fast: a sharp angle, a low figure. If they fade slowly, many sides. A Circle fades in a smooth curve, without bends. In the view of the plane, the *trace* under the line draws that brightness."
+  },
+  "irregulares": {
+   "title": "The Irregulars",
+   "text": "Whoever is born with unequal sides is watched, set apart and, if he exceeds the legal margin, destroyed or \"reconfigured\" at the Hospital. Here Regularity is the whole of morality."
+  },
+  "color": {
+   "title": "Forbidden Colour",
+   "text": "There was a time when everyone was painted and no one needed to feel or calculate. The Chromatic Sedition ended in slaughter. Today colour does not exist; only the Chief Circle keeps the secret."
+  },
+  "config": {
+   "title": "\"Attend to your Configuration\"",
+   "text": "The doctrine of the Circles: the figure determines everything. There is no blame and no merit, only angles. And still they punish."
+  },
+  "bilingue": {
+   "title": "Two languages",
+   "text": "With women one speaks of love, duty, pity. Among men those words mean nothing: \"love\" is \"the anticipation of benefits\". Women are not taught to read."
+  },
+  "lineal": {
+   "title": "Lineland",
+   "text": "A world of a single dimension. Its inhabitants see a point and hear voices. Whoever crosses their line appears from nowhere and vanishes: to them, magic."
+  },
+  "analogia": {
+   "title": "The argument from Analogy",
+   "text": "Point → Line → Square → ? Extremities: 1, 2, 4, 8. Sides: 0, 2, 4, 6. Each figure, moved in a new direction, begets the next."
+  },
+  "altura": {
+   "title": "Upward, not Northward",
+   "text": "There is a third direction, perpendicular to all you know. From it one sees the inside of houses and bodies. You cannot point to it."
+  },
+  "solidos": {
+   "title": "The Cube",
+   "text": "Six Squares bound it; eight points terminate it. Light, shade and perspective betray its depth."
+  },
+  "cuarta": {
+   "title": "The Fourth Dimension",
+   "text": "If the Analogy holds, the Cube moved in a new direction begets a figure of sixteen points, bounded by eight Cubes. The Sphere would not hear of it."
+  },
+  "punto": {
+   "title": "Pointland",
+   "text": "The Point is its own universe. Everything it hears, it believes it has thought. To be self-contented is to be vile and ignorant."
+  },
+  "secciones": {
+   "title": "Sections",
+   "text": "A Solid passing through the Plane is seen, from inside, as a succession of plane figures: its sections. A Cube face on leaves a Square that does not change; edge on, a rectangle that widens and narrows; vertex on, a triangle that becomes a hexagon and turns back into a triangle. Whoever sees only the sections can, with patience, guess the Solid."
+  },
+  "sombras": {
+   "title": "Shadows",
+   "text": "All a Flatlander could see of a Cube that does not pass through him is its shadow: two offset squares and four strokes stitching them. A plane figure that keeps the drawing of something that is not plane."
+  }
+ },
+ "record": {
+  "gate_false_regular": {
+   "text": "West Gate. Inspector Square declares Regular an Irregular of twenty-three degrees' deviation. The sergeant refutes him by feeling. Whether it was the fog is not known."
+  },
+  "gate_protest": {
+   "text": "West Gate. Inspector Square questions the consumption of an Irregular before witnesses: \"Isn't it enough to keep an eye on him?\"."
+  },
+  "college_color": {
+   "text": "Colour Assembly (account from the Archive). Citizen Square joins the cry of the chromatic crowd. No immediate consequences."
+  },
+  "temple_whisper": {
+   "text": "Temple. During the chant, the Square whispers a question about an Irregular's Configuration. A Pentagon in the row hears him."
+  },
+  "temple_mother": {
+   "text": "Temple. In the middle of a Regular's adoption, the Square asks aloud that the mother be allowed to visit the child."
+  },
+  "temple_appeal": {
+   "text": "Temple. The Square asks \"humbly\" that the ban on educating women be reconsidered. Noted at no one's request."
+  },
+  "hospital_miracle": {
+   "text": "Hospital of Reconfiguration. A stylus no one brought appears in a locked room. The tinker says it is his."
+  },
+  "estilete_en_poder": {
+   "text": "Search. The detainee is found with a tinker's stylus, the origin of which he cannot explain."
+  },
+  "hija_cuenta": {
+   "text": "The inspector's house. He is caught teaching a daughter to count. The wife informs the governess, and the governess whoever is concerned."
+  },
+  "gate_circle_offense": {
+   "text": "West Gate. The inspector on duty calls a Circle travelling incognito a \"Hexagon\". The Circle asked his name."
+  },
+  "mala_presentacion": {
+   "text": "High Street. The Square breaks the order of an introduction before a practitioner of the Hospital of Reconfiguration."
+  },
+  "temple_silent": {
+   "text": "Temple. During the chant of the Configuration, the Square moves his mouth without a voice. His silence is heard."
+  }
+ },
+ "people": {
+  "esposa": {
+   "name": "Your wife",
+   "lv": {
+    "-2": "She no longer asks where you are going.",
+    "-1": "She speaks to you with the courtesy of visitors.",
+    "0": "She loves you as one loves in Flatland: face on and at a distance.",
+    "1": "She waits up for you when you go out at night.",
+    "2": "She suspects you see something she doesn't, and doesn't reproach you for it."
+   }
+  },
+  "nieto": {
+   "name": "Your grandson, the Hexagon",
+   "lv": {
+    "-2": "He avoids you in the corridor.",
+    "-1": "He answers you with the schoolmaster's phrases.",
+    "0": "A clever child who doesn't yet know he is.",
+    "1": "He looks at you as at someone who knows things.",
+    "2": "He asks you again what no one lets him ask."
+   }
+  },
+  "hija": {
+   "name": "Your daughter",
+   "lv": {
+    "-2": "She has stopped asking you for anything.",
+    "-1": "She knows some things are not her place.",
+    "0": "She sways her back with a most distinguished sway.",
+    "1": "She counts to ten when her mother isn't looking.",
+    "2": "She counts to ten, and then asks what comes next."
+   }
+  },
+  "hermano": {
+   "name": "Your brother",
+   "lv": {
+    "-2": "He treads on your side when you say too much.",
+    "-1": "He asks you for prudence with his eyes.",
+    "0": "Your brother. A sensible Square, as you were.",
+    "1": "He listens to you, though he doesn't believe you.",
+    "2": "He believes you, or pretends very well."
+   }
+  },
+  "criado": {
+   "name": "The servant",
+   "lv": {
+    "-2": "He opens the door for you without a word.",
+    "-1": "\"Yes, sir. Of course, sir.\"",
+    "0": "An Isosceles of ten degrees, faithful and silent.",
+    "1": "He tells you about his boy, the one of ten and a half degrees.",
+    "2": "He'd give a degree for you, if degrees could be given."
+   }
+  },
+  "calderero": {
+   "name": "The tinker",
+   "lv": {
+    "-2": "You signed it.",
+    "-1": "You kept quiet when a voice was needed.",
+    "0": "The one on the corner. Forty years sharpening styluses.",
+    "1": "Someone spoke up for him once.",
+    "2": "He gave you back a stylus. You tried to give him back something more."
+   }
+  },
+  "archivero": {
+   "name": "The old archivist",
+   "lv": {
+    "-2": "He shuts the door of the Archive on you.",
+    "-1": "He recommends the manuals to you.",
+    "0": "An old Hexagon who keeps what no one reads.",
+    "1": "He shows you what lies behind the manuals.",
+    "2": "He has told you, quietly, that he thinks so too."
+   }
+  }
+ },
+ "margins": [
+  {
+   "id": "m_p_muescas",
+   "ch": 0,
+   "title": "The notches",
+   "text": "Seven years. At first I counted days; then my brother's visits; now I count only years, which are fewer and weigh the same."
+  },
+  {
+   "id": "m_p_puerta",
+   "ch": 0,
+   "title": "The cell door",
+   "text": "It has no lock on the inside. What for? Where would a Square go who has seen Upward?"
+  },
+  {
+   "id": "m_p_cantaro",
+   "ch": 0,
+   "title": "The water jar",
+   "text": "My water jar. I see only its rim; you see the water inside. It is the first time you look at an inside its owner cannot see. It will not be the last."
+  },
+  {
+   "id": "m_c1_puerta_este",
+   "ch": 1,
+   "title": "The Eastern door",
+   "text": "Narrow. They go in sideways; we couldn't get in even sideways. So the law wills it: that each should know by which door he is to enter his own house."
+  },
+  {
+   "id": "m_c1_reloj",
+   "ch": 1,
+   "title": "The hourglass",
+   "text": "The parlour hourglass. I turn it every night on going to bed. The sand falls from North to South, like everything in this world, and no one asks why."
+  },
+  {
+   "id": "m_c1_cuentas",
+   "ch": 1,
+   "title": "The servant's account book",
+   "text": "The household accounts, in the servant's crooked hand. In the margin, in another hand, an inspector noted his angle: \"10°, no variation\". A man, and in the margin his angle."
+  },
+  {
+   "id": "m_c2_charlatan",
+   "ch": 2,
+   "title": "The growing powders",
+   "text": "A quack was selling powders \"to grow a side\". The shopkeeper next door told me, without lowering his voice, that they were ground chalk. They sold very well among the Isosceles."
+  },
+  {
+   "id": "m_c2_banco",
+   "ch": 2,
+   "title": "The tinker's bench",
+   "text": "The stone bench where the tinker sits. Forty years of marks: the rub of one side longer than the others, always in the same place."
+  },
+  {
+   "id": "m_c2_cartel",
+   "ch": 2,
+   "title": "The Board's poster",
+   "text": "A poster of the Sanitary Board: the table of legal angles, with its margin of tolerance. Below, in small print: \"Every deviation shall be corrected for the good of the deviant\"."
+  },
+  {
+   "id": "m_c2_hospital",
+   "ch": 2,
+   "title": "The Hospital wall",
+   "text": "Through the Hospital wall comes a rhythmic thud, like a press, and something that might be a groan. Passers-by quicken their step. So did I."
+  },
+  {
+   "id": "m_c2_viajeros",
+   "ch": 2,
+   "title": "The travellers from the country",
+   "text": "Outside the city there are no houses to show the North. Travellers who get lost stand still, sometimes for hours, waiting for the rain to know which way to go."
+  },
+  {
+   "id": "m_c3_registro",
+   "ch": 3,
+   "title": "The sergeant's register",
+   "text": "The Gate register, with an Isosceles' spelling mistakes: \"Sqware. Pentagone. Wumman\". What he writes he writes well enough; what he sees, better."
+  },
+  {
+   "id": "m_c3_poligono",
+   "ch": 3,
+   "title": "The secret student",
+   "text": "A College student practises in secret at the Gate: he looks at those arriving and writes down what he thinks they are. He told me that at the College they don't let him make mistakes, and here they do."
+  },
+  {
+   "id": "m_c3_miliar",
+   "ch": 3,
+   "title": "The milestone",
+   "text": "The milestone on the village road. It marks a distance, not a direction: that is what the rain is for."
+  },
+  {
+   "id": "m_c4_pasquin",
+   "ch": 4,
+   "title": "The broadsheet",
+   "text": "On the College noticeboard, among examination notices, a broadsheet centuries old, framed like a trophy: \"Universal Colour Bill\". Beneath it, in pencil, someone has written \"if only\"."
+  },
+  {
+   "id": "m_c4_vitrina",
+   "ch": 4,
+   "title": "The empty case",
+   "text": "A glass case with a label: \"Sealed jar of pigment. Property of the Chief Circle\". It is empty. The archivist says it always has been, and that is why they guard it so closely."
+  },
+  {
+   "id": "m_c4_poema",
+   "ch": 4,
+   "title": "A poem of Colour",
+   "text": "A fragment of a poem from the age of Colour. The lines rhyme not in sounds but in hues: a red line calls to another red one. Today no one can read it aloud."
+  },
+  {
+   "id": "m_c4_examen",
+   "ch": 4,
+   "title": "Three years for this",
+   "text": "Three years of College to tell a Decagon from a Dodecagon in motion. In the age of Colour a babe in arms could have told them apart. That is why Colour was not forgiven."
+  },
+  {
+   "id": "m_c5_ujier",
+   "ch": 5,
+   "title": "The usher",
+   "text": "The Temple usher bars the way with a \"very polite\" angle: his is twelve degrees, but he tilts it so that it looks like thirty. It is quite an art."
+  },
+  {
+   "id": "m_c5_lados",
+   "ch": 5,
+   "title": "The tables of sides",
+   "text": "By the altar, the tables of sides of the Circles, from the least to the Chief. The last one says \"ten thousand\", and beneath, in small letters: \"by courtesy\"."
+  },
+  {
+   "id": "m_c5_mujeres",
+   "ch": 5,
+   "title": "The women's row",
+   "text": "The women attend the service in a side row, standing. From up here one sees what no one sees from inside: they all sway their backs in the same rhythm, like a silent choir."
+  },
+  {
+   "id": "m_c6_corto",
+   "ch": 6,
+   "title": "The shortest subject",
+   "text": "The shortest man of the Line is at its Eastern end. He has never seen his neighbour in front: only a woman, who is a point, and behind her nothing. For him the world ends in a voice."
+  },
+  {
+   "id": "m_c6_leguas",
+   "ch": 6,
+   "title": "A thousand leagues",
+   "text": "\"Even if the spouses are a thousand leagues apart\", says the King. From the sheet you can see what it means: his wives are at the two ends of his kingdom, and he in the middle, and they have never touched."
+  },
+  {
+   "id": "m_c6_sombra",
+   "ch": 6,
+   "title": "Before entering",
+   "text": "Here, a step from the Line, the Square is already half a hand from the King. And for the King there is nothing. No shadow, no voice, no trace: what does not cut his Line does not exist."
+  },
+  {
+   "id": "m_c7_reloj",
+   "ch": 7,
+   "title": "The last grains",
+   "text": "The parlour hourglass. I have turned it every night for forty years; tonight it lets fall the last grains of the millennium. I don't know why I look at it so much."
+  },
+  {
+   "id": "m_c7_pisos",
+   "ch": 7,
+   "title": "3³ in three storeys",
+   "text": "On the grandson's tablet, in secret, a 3³ drawn as three squares of three by three, one above another. \"Storeys\", he has written beside it. He couldn't draw the on top; he put them side by side."
+  },
+  {
+   "id": "m_c7_puerta",
+   "ch": 7,
+   "title": "The study doorway",
+   "text": "To reach the cupboard you have to pass this doorway, go up to the study and turn the key. The Stranger did neither: the key is still in my pocket."
+  },
+  {
+   "id": "m_c8_embarazada",
+   "ch": 8,
+   "title": "Another way of beating",
+   "text": "In a house in the East, a sleeping woman. Inside her line something beats that is not her, in another rhythm. No one in Flatland has ever seen it; nor has she."
+  },
+  {
+   "id": "m_c8_circulo",
+   "ch": 8,
+   "title": "By courtesy",
+   "text": "A Circle, alone at home, measures his sides with a compass. Fourteen. In the morning, at the Temple, he will be \"a perfect Circle\". By courtesy, they said."
+  },
+  {
+   "id": "m_c8_sala",
+   "ch": 8,
+   "title": "A thousand years on the floor",
+   "text": "The floor of the Council Chamber, seen from above: marks on the paper, one over another, every thousand years. In the same spot. It has always happened again."
+  },
+  {
+   "id": "m_c9_voz",
+   "ch": 9,
+   "title": "It",
+   "text": "On waking I heard myself say \"It\" aloud, in a voice that was not quite mine. The Point believed my voice was its own. For a moment, so did I."
+  },
+  {
+   "id": "m_c9_trampilla",
+   "ch": 9,
+   "title": "The trapdoor",
+   "text": "Here would be the cellar trapdoor, if our house had a cellar. The floor is smooth paper. I lied about a hole that does not exist, in a world where there is no down."
+  },
+  {
+   "id": "m_c9_tablero",
+   "ch": 9,
+   "title": "The grandson's board",
+   "text": "My grandson's game board. The little figures we felt together, ordered by sides: three, four, five, six. And at the end, an empty slot, as though waiting for another."
+  },
+  {
+   "id": "m_c10_banco",
+   "ch": 10,
+   "title": "The carved bench",
+   "text": "On the bench of the Speculative Society someone has carved my name with the point of an angle. I don't know who. Beneath, smaller: \"Upward\"."
+  },
+  {
+   "id": "m_c10_silla",
+   "ch": 10,
+   "title": "The empty chair",
+   "text": "The chair where my brother sits when he comes. Between visits I look at it so much I think it has changed shape."
+  },
+  {
+   "id": "m_c10_muesca",
+   "ch": 10,
+   "title": "One notch too many",
+   "text": "I count the notches on the wall every morning. Seven groups. And one more, apart, that I did not make. Someone, at some point, has counted with me."
+  }
+ ],
+ "achievements": {
+  "ACH_COIN": "The coin edgeways",
+  "ACH_COUNT": "Up to ten",
+  "ACH_STREET": "Across without a scratch",
+  "ACH_EAR": "A good ear",
+  "ACH_GATE_P": "Expert",
+  "ACH_HOME": "Home by the rain",
+  "ACH_TRIBUNAL": "College board",
+  "ACH_HYMN": "A single voice",
+  "ACH_KING": "Line of Lines",
+  "ACH_WED": "The three voices",
+  "ACH_SPHERE": "The root of three quarters",
+  "ACH_CUPBOARD": "The cupboard, from Above",
+  "ACH_TINKER": "Three good sides",
+  "ACH_TESS": "Eight cubes",
+  "ACH_SECTIONS": "What they see down there",
+  "ACH_SILENT": "The perfection of not saying",
+  "ACH_FILE": "An exemplary Square",
+  "ACH_BROTHER": "Tell me again",
+  "ACH_TOYS": "The game of angles",
+  "ACH_GATE": "College eye",
+  "ACH_CIRCLE": "Reverence",
+  "ACH_FRAUD": "Seen through",
+  "ACH_HEX": "A hexagon out of a cube",
+  "ACH_HIDDEN": "Guess the solid",
+  "ACH_MARGIN": "Nobody reads the margins",
+  "ACH_END": "Some Dimension"
+ },
+ "ledger": {
+  "cols": [
+   {
+    "id": "0d",
+    "name": "Pointland",
+    "sub": "0D"
+   },
+   {
+    "id": "1d",
+    "name": "Lineland",
+    "sub": "1D"
+   },
+   {
+    "id": "2d",
+    "name": "Flatland",
+    "sub": "2D"
+   },
+   {
+    "id": "3d",
+    "name": "Spaceland",
+    "sub": "3D"
+   },
+   {
+    "id": "4d",
+    "name": "?",
+    "sub": "4D"
+   }
+  ],
+  "rows": [
+   {
+    "id": "habitante",
+    "name": "Inhabitant"
+   },
+   {
+    "id": "ve",
+    "name": "How it sees"
+   },
+   {
+    "id": "limites",
+    "name": "Boundaries"
+   },
+   {
+    "id": "no_concibe",
+    "name": "What it cannot conceive"
+   },
+   {
+    "id": "rechazo",
+    "name": "Its phrase of rejection"
+   },
+   {
+    "id": "desde_arriba",
+    "name": "What one arriving from above looks like"
+   }
+  ],
+  "cells": {
+   "0d.habitante": "the Point",
+   "0d.ve": "nothing outside itself",
+   "0d.limites": "0",
+   "0d.no_concibe": "the Two",
+   "0d.rechazo": "\"It invents words without objects\"",
+   "1d.habitante": "the King",
+   "1d.ve": "a point",
+   "1d.limites": "2 points",
+   "1d.no_concibe": "the side",
+   "1d.rechazo": "\"That is a conjuring trick\"",
+   "2d.habitante": "the Square",
+   "2d.ve": "a line",
+   "2d.limites": "4 sides",
+   "2d.no_concibe": "Upward",
+   "2d.rechazo": "\"How can a thing move Upward and not Northward?\"",
+   "3d.habitante": "the Sphere",
+   "3d.ve": "a surface with light and shade",
+   "3d.limites": "6 faces",
+   "3d.no_concibe": "the Fourth",
+   "3d.rechazo": "\"Visions of the brain\"",
+   "4d.limites": "8 cubes"
+  }
+ },
+ "argumentos": {
+  "analogia": {
+   "title": "The Analogy",
+   "pitch": "Look: Point, Line, Square. One, two, four extremities. What number comes next? Count them with me.",
+   "reply_y1": "Eight, if you say so. Correct reasoning about an impossible thing. You told me that yourself, years ago, about something else.",
+   "reply_y4": "Eight and six. I know them by heart, brother. As I know the Council's minute, and I don't believe that either.",
+   "reply_y7": "Eight. I count them with you because you like it. And I like watching you count."
+  },
+  "secciones": {
+   "title": "Sections",
+   "pitch": "You saw her in the hall: a point, a circle that grew, that shrank. Look what happens if it rises.",
+   "reply_y1": "A circle that changes size. I saw it. That's why I'm here. Don't ask me to see what wasn't there as well.",
+   "reply_y4": "You draw circles very well, brother. You always did it better than me.",
+   "reply_y7": "A circle that changes size. You see: it's the only thing I ever saw in my life that wasn't a minute."
+  },
+  "sombras": {
+   "title": "Shadows",
+   "pitch": "This is what you would see of a Cube if it didn't pass through you: its shadow. Let me draw it on the wall.",
+   "reply_y1": "Two squares stitched together. Like the ones you used to draw on the minutes when you were bored.",
+   "reply_y4": "You've drawn it better than last year. It's still a figure of many sides, brother.",
+   "reply_y7": "Leave it on the wall. It'll keep me company when you're not here."
+  },
+  "lineal": {
+   "title": "Lineland",
+   "pitch": "I dreamed of a King who saw only a point and called me a wizard. Listen to how they measure each other there.",
+   "reply_y1": "The dream of a man who fell asleep over his tablets. I dream too, brother. Of the street.",
+   "reply_y4": "The King who couldn't see his side. And who tells you that you see yours?",
+   "reply_y7": "Sing it to me again, the King's thing. The two notes."
+  },
+  "punto": {
+   "title": "Pointland",
+   "pitch": "There is a being who believes it is the whole Universe. You speak to it and it thinks it has thought it.",
+   "reply_y1": "A being that only hears itself. I know a few. They preside over the Council.",
+   "reply_y4": "And how do you know we aren't that Point, brother? You and I, in here.",
+   "reply_y7": "It is, and there is nothing outside It. You've told me so many times I can do the voice now."
+  }
+ },
+ "epilogue": [
+  {
+   "if": "flag:hijaCuenta",
+   "text": "They say my daughter can count to ten. She has a tablet with ten notches that she hides from her mother. It is the only thing I ever taught that took root."
+  },
+  {
+   "if": "rel:criado>=1",
+   "text": "My old servant's son, the one of ten and a half degrees, spends some afternoons under the wall saying my name aloud. That is all my fame."
+  },
+  {
+   "if": "rep:ciu>=2",
+   "text": "In the High Street there are still those who greet me with a tilted angle, in secret. I don't know what I told them. Enough."
+  },
+  {
+   "if": "rep:aut<=-2",
+   "text": "The Prefect did not have to look for witnesses against me: my tablet had been full since the West Gate. Of that, at least, I am not ashamed."
+  },
+  {
+   "if": "flag:estilete_hospital",
+   "text": "They told me a stylus appeared at the Hospital in a locked room, and that the tinker said it was his and that he had missed it for forty years. No one can explain it. I can."
+  },
+  {
+   "if": "choice:irregularChoice=d",
+   "text": "The tinker left the Hospital almost regular, with the frame on. They say he mends water jars on his corner again. His three sides are still fine."
+  },
+  {
+   "if": "choice:irregularChoice!=d",
+   "text": "I think sometimes of the tinker. Of how I pronounced on his stroke with the same assurance with which the Council pronounced on mine."
+  },
+  {
+   "if": "rel:esposa>=1",
+   "text": "My wife comes once a year, when they allow it. She doesn't ask. She tells me who has married and who has died, and as she leaves she says \"peace\" very softly, just for me."
+  },
+  {
+   "if": "her>=3",
+   "text": "I do not regret having spoken. I regret the years in which I did not ask."
+  },
+  {
+   "if": "her<=-2",
+   "text": "Sometimes I think it would have been better to applaud and keep quiet, as I knew so well how to do. Then I remember the Cube, and it passes. Almost always."
+  },
+  {
+   "if": "always",
+   "text": "My grandson is seventeen now and has six sides. He has never come. They tell me he teaches Geometry, and that sometimes, when a pupil asks about 3³, he takes a while to answer."
+  }
+ ],
+ "prefacio": {
+  "title": "The Editor's Preface to the second edition (1884)",
+  "text": [
+   "*What follows is a summary, not a translation: Abbott's original text, in the public domain, will be included in full in the final version.*",
+   "In the second edition of *Flatland*, published the same year as the first, the Editor added a preface in which he answers, on behalf of the imprisoned Square, two objections from readers.",
+   "The first: that a being of two dimensions could not see a Line, since a Line without thickness would be invisible. The Editor grants that Flatlanders do in fact have a slight thickness, the same for all, and that precisely because it is equal in all they do not notice it; just as perhaps the inhabitants of Space have a fourth measure they do not notice either.",
+   "The second: the contempt with which the book speaks of the women and lower classes of Flatland. The Editor gives us to understand that the Square, after years in his cell, has changed his mind about many things he once took as natural, and that his account should be read as that of a man of his time and of his Plane.",
+   "He ends with a hope: that the reader, an inhabitant of Space, will not laugh too much at the narrowness of Flatland, for he too might be confined to a limited Dimensionality without knowing it."
+  ]
+ }
+}

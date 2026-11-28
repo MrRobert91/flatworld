@@ -6,7 +6,7 @@ const LAM := {'Capítulo I': 'lam_1', 'Capítulo II': 'lam_2', 'Capítulo III': 
 
 # la lámina del bloque (S-16) y después el rótulo sobre el mundo
 func intro(num: String, title: String, sub: String, drone: String) -> void:
-	ui.chapter_tag('%s · %s' % [num, title]); Snd.drone(drone); g.set_view('top'); g.world.eye_t = 0.0
+	ui.chapter_tag(tr(num) + ' · ' + tr(title)); Snd.drone(drone); g.set_view('top'); g.world.eye_t = 0.0
 	if LAM.has(num): await ui.lamina(LAM[num])
 	ui.fade(false, 0.5)
 	await ui.title(num, title, sub)
@@ -203,6 +203,7 @@ func ch1() -> void:
 		if hits >= 2:
 			g.rel('nieto', 1)
 			await say('nieto', '¡Dos de tres! Abuelo, tú ves con los lados.' if hits < 3 else '¡Las tres! Abuelo, tú ves con los lados.')
+			if hits >= 3: g.achieve('ACH_TOYS')
 		else: await say('nieto', 'Je. A ver si se te va a escapar un Isósceles por un Hexágono, abuelo.')
 		await say('nieto', 'Oye, ¿y por qué nuestra casa tiene cinco lados y no cuatro, como tú?')
 		var c = await choose([{t = 'Porque lo manda la ley, y con eso basta.', id = 'o'}, {t = 'Piénsalo: ¿qué pasa si tropiezas con una esquina?', id = 'm'}])
@@ -575,6 +576,7 @@ func ch3() -> void:
 		var ans = await sight_round(k, o)
 		var ok: bool = (ans is String and ans == k) or (k == 'circ' and ans is String and ans == 'bow')
 		if ok: hits += 1
+		if k == 'circ' and ans is String and ans == 'bow': g.achieve('ACH_CIRCLE')
 		marks.append(ok); ui.eye_tally(marks)
 		if k == 'circ' and ans is String and ans == 'hexa':
 			await say('circulo', '(La capa se abre: un brillo sin un solo quiebro.) «Hexágono», me ha llamado. Su nombre, perito.')
@@ -584,6 +586,7 @@ func ch3() -> void:
 			ui.close_dlg()
 	ui.eye_tally([])
 	g.flag('aciertos', hits)
+	if hits == 8: g.achieve('ACH_GATE')
 	g.set_view('top'); g.locked = false; W.fog = 13.0
 	# la nota del sargento (C3-02)
 	if hits == 8 and expert:

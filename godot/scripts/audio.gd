@@ -227,7 +227,12 @@ func tone(f: float, dur := 0.2, type := "sine", vol := 0.15, slide := 0.0, delay
 	if delay > 0.0: _queue.append([delay, s, pitch, -6.0, false])
 	else: _play_on(s, pitch, -6.0, false)
 
+# las voces (murmullos al escribirse un parlamento) tienen su propio volumen (S-17)
+func _vdb() -> float:
+	return linear_to_db(maxf(float(App.cfg.get("vol_voice", 1.0)), 0.0001))
+
 func blip(voice := "yo") -> void:
+	if float(App.cfg.get("vol_voice", 1.0)) <= 0.01: return
 	var v: Array = VOICES.get(voice, VOICES.yo)
 	tone(v[0], 0.055, v[1], 0.06 if v[1] == "sine" else 0.03, 0.0, 0.0, 0.94 + randf() * 0.14)
 	if voice == "circ" or voice == "esfera": tone(v[0] * 1.5, 0.07, "sine", 0.03)
@@ -236,7 +241,7 @@ func blip(voice := "yo") -> void:
 func talk(voice := "yo") -> void:
 	var v: Array = VOICES.get(voice, VOICES.yo)
 	var s := _synth(v[0], 0.045, v[1], 0.03 if v[1] == "sine" else 0.016, 0.0)
-	_play_on(s, 0.9 + randf() * 0.25, -9.0, false)
+	_play_on(s, 0.9 + randf() * 0.25, -9.0 + _vdb(), false)
 
 func sfx(n: String) -> void:
 	var s := _sample("s_" + n)
@@ -408,7 +413,8 @@ func _process(dt: float) -> void:
 	var target := 0.0 if _want == "none" else 1.0
 	_mv = move_toward(_mv, target, dt / (1.8 if target > _mv else 3.0))
 	if _bus_m >= 0:
-		AudioServer.set_bus_volume_db(_bus_m, linear_to_db(maxf(_mv * (1.0 - 0.55 * _duck), 0.0001)) - 3.0)
+		AudioServer.set_bus_volume_db(_bus_m, linear_to_db(maxf(_mv * (1.0 - 0.55 * _duck) * float(App.cfg.get("vol_music", 1.0)), 0.0001)) - 3.0)
+		if _bus_s >= 0: AudioServer.set_bus_volume_db(_bus_s, linear_to_db(maxf(float(App.cfg.get("vol_sfx", 1.0)), 0.0001)))
 		var lp: AudioEffectLowPassFilter = AudioServer.get_bus_effect(_bus_m, 0)
 		lp.cutoff_hz = lerpf(20000.0, 900.0, pow(_muffle, 0.7))
 	if _mood == "none":

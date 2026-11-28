@@ -1,3 +1,5 @@
 .godot/
 *.import.bak
 # las exportaciones web (la usa el Dockerfile) y Linux (ejecutable listo para descargar) se versionan
+# las versiones para Steam (tools/export.sh --steam) no se versionan
+build/steam/

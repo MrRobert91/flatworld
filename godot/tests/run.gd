@@ -23,6 +23,7 @@ func _ready() -> void:
 	print("== test_sketch"); test_sketch()
 	print("== test_lens"); test_lens()
 	print("== test_m5"); test_m5()
+	print("== test_m6"); test_m6()
 	print("%d comprobaciones, %d fallos" % [count, fails])
 	get_tree().quit(1 if fails > 0 else 0)
 
@@ -233,3 +234,20 @@ func test_m5() -> void:
 	var segs := []
 	for e in Geom3.cube(1.0).edges: segs.append(e)
 	ok(Sketch.classify(segs) == "cube_shadow", "las aristas del cubo sobre los anclajes: la sombra")
+
+# M6: cada logro del libro se puede ganar (aparece en el código) y tiene nombre en inglés; el libro en inglés
+# tiene las mismas secciones y notas; los ajustes nuevos existen
+func test_m6() -> void:
+	var es = JSON.parse_string(FileAccess.get_file_as_string("res://data/book.es.json"))
+	var en = JSON.parse_string(FileAccess.get_file_as_string("res://data/book.en.json"))
+	var code := ""
+	for dir in ["res://scripts/content/", "res://scripts/minigames/", "res://scripts/"]:
+		for f in DirAccess.get_files_at(dir):
+			if f.ends_with(".gd"): code += FileAccess.get_file_as_string(dir + f)
+	for id in es.achievements:
+		ok(("'%s'" % id) in code or ("\"%s\"" % id) in code, "logro alcanzable: " + id)
+		ok(en.achievements.has(id), "logro con nombre en inglés: " + id)
+	ok(es.achievements.size() >= 24, "al menos 24 logros (%d)" % es.achievements.size())
+	ok(en.fragments.size() == 22, "22 secciones en inglés")
+	ok(en.margins.size() == es.margins.size(), "las mismas notas al margen en inglés")
+	for k in ["hold_toggle", "invert_y", "plain_font", "vol_music", "vol_sfx", "vol_voice"]: ok(App.cfg.has(k), "ajuste: " + k)

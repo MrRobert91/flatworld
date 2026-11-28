@@ -16,6 +16,7 @@ config/icon="res://icon.png"
 
 Snd="*res://scripts/audio.gd"
 Profile="*res://scripts/sys/profile.gd"
+Platform="*res://scripts/sys/platform.gd"
 
 [display]
 

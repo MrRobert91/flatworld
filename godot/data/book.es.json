@@ -631,7 +631,7 @@
   "ACH_COUNT": "Hasta diez",
   "ACH_STREET": "Cruzar sin un rasguño",
   "ACH_EAR": "Buen oído",
-  "ACH_GATE_P": "Ojo de Colegio",
+  "ACH_GATE_P": "Perito",
   "ACH_HOME": "A casa por la lluvia",
   "ACH_TRIBUNAL": "Tribunal del Colegio",
   "ACH_HYMN": "Una sola voz",
@@ -644,7 +644,15 @@
   "ACH_SECTIONS": "Lo que ven allá abajo",
   "ACH_SILENT": "La perfección de no decir",
   "ACH_FILE": "Un Cuadrado ejemplar",
-  "ACH_BROTHER": "Cuéntamelo otra vez"
+  "ACH_BROTHER": "Cuéntamelo otra vez",
+  "ACH_TOYS": "El juego de los ángulos",
+  "ACH_GATE": "Ojo de Colegio",
+  "ACH_CIRCLE": "Reverencia",
+  "ACH_FRAUD": "Lo has calado",
+  "ACH_HEX": "Un hexágono salido de un cubo",
+  "ACH_HIDDEN": "Adivina el sólido",
+  "ACH_MARGIN": "Nadie lee los márgenes",
+  "ACH_END": "Alguna Dimensión"
  },
  "ledger": {
   "cols": [
@@ -828,7 +836,7 @@
   "text": [
    "*Lo que sigue es un resumen, no una traducción: el texto original de Abbott, de dominio público, se incluirá completo en la versión definitiva.*",
    "En la segunda edición de *Flatland*, publicada el mismo año que la primera, el Editor añadió un prefacio en el que responde, en nombre del Cuadrado preso, a dos objeciones de los lectores.",
-   "La primera: que el Cuadrado, tan duro con el Rey de Linealandia por no concebir una dimensión más, se niegue a su vez a admitir la Cuarta cuando él mismo la intuye. El Editor contesta que precisamente ahí está la lección: cada mundo tiene su frase para lo que le queda por encima, y el Cuadrado no es más sabio que sus jueces, sólo ha visto un poco más.",
+   "La primera: que un ser de dos dimensiones no podría ver una Línea, porque una Línea sin grosor sería invisible. El Editor concede que los planilandeses tienen en realidad un grosor mínimo, el mismo para todos, y que precisamente por ser igual en todos no lo advierten; del mismo modo que quizá los habitantes del Espacio tengan una cuarta medida que tampoco notan.",
    "La segunda: el desprecio con que el libro habla de las mujeres y de las clases bajas de Planilandia. El Editor deja entender que el Cuadrado, tras años de celda, ha cambiado de opinión sobre muchas cosas que antes daba por naturales, y que su relato debe leerse como el de un hombre de su tiempo y de su Plano.",
    "Termina con una esperanza: que el lector, habitante del Espacio, no se ría demasiado de la estrechez de Planilandia, porque también él podría estar confinado en una Dimensionalidad limitada sin saberlo."
   ]

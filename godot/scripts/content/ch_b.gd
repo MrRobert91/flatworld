@@ -154,6 +154,7 @@ func ch4() -> void:
 		verdict = func(r): return 'Lo has calado: un Isósceles de cuatro grados, pintado con los doce colores de un Dodecágono.' if r == 'iso' else 'Era un Isósceles de cuatro grados, pintado con los doce colores de un Dodecágono. *El color miente mejor que la voz.*'})
 	W.fog = f0; g.set_view('top'); g.view_lock = false
 	if fraud is String and fraud == 'iso':
+		g.achieve('ACH_FRAUD')
 		# el fraude con consecuencias (C4-05): la doncella te oye y se aparta… en el teatro
 		var dz := g.npc('doncella')
 		if dz != null: dz.move_to(-12.0, -14.0, 3.0)
