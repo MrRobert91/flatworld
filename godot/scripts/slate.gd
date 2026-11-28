@@ -29,4 +29,4 @@ func box(x: float, y: float, w: float, h: float) -> void:
 	draw_rect(Rect2(x * k, y * k, w * k, h * k), App.INK, false, maxf(1.0, 2.0 * k))
 
 func text(s: String, x: float, y: float, fs := 22) -> void:
-	draw_string(font, Vector2(x, y) * k, s, HORIZONTAL_ALIGNMENT_LEFT, -1, int(fs * k), App.INK)
+	draw_string(font, Vector2(x, y) * k, s, HORIZONTAL_ALIGNMENT_LEFT, -1, maxi(int(fs * k), 11), App.INK)   # nunca menos de 11 puntos

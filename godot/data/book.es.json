@@ -203,7 +203,7 @@
  "knowledge": {
   "linea": {
    "title": "Todo es una línea",
-   "text": "Desde dentro del plano, toda figura —triángulo, cuadrado o círculo— se ve como un segmento de línea. Pulsa *V* para mirar como mira un planilandés."
+   "text": "Desde dentro del plano, toda figura —triángulo, cuadrado o círculo— se ve como un segmento de línea. Pulsa *{view}* para mirar como mira un planilandés."
   },
   "norte": {
    "title": "El Norte y la lluvia",
@@ -276,6 +276,569 @@
   "punto": {
    "title": "Puntolandia",
    "text": "El Punto es su propio universo. Todo lo que oye, cree haberlo pensado él. Estar satisfecho de uno mismo es ser vil e ignorante."
+  },
+  "secciones": {
+   "title": "Las secciones",
+   "text": "Un Sólido que atraviesa el Plano se ve, desde dentro, como una sucesión de figuras planas: sus secciones. Un Cubo de cara deja un Cuadrado que no cambia; de arista, un rectángulo que se ensancha y se estrecha; de vértice, un triángulo que se hace hexágono y vuelve a triángulo. Quien sólo ve las secciones puede, con paciencia, adivinar el Sólido."
+  },
+  "sombras": {
+   "title": "Las sombras",
+   "text": "Lo único que un planilandés podría ver de un Cubo que no lo atraviesa es su sombra: dos cuadrados desplazados y cuatro rayas que los cosen. Una figura plana que guarda el dibujo de algo que no es plano."
   }
+ },
+ "record": {
+  "gate_false_regular": {
+   "who": "guardia",
+   "text": "Puerta Oeste. El perito Cuadrado declara Regular a un Irregular de veintitrés grados de desviación. El sargento lo desmiente palpando. Se ignora si fue la niebla."
+  },
+  "gate_protest": {
+   "who": "inspector",
+   "text": "Puerta Oeste. El perito Cuadrado cuestiona la consunción de un Irregular ante testigos: «¿No basta con vigilarlo?»."
+  },
+  "college_color": {
+   "who": "prefecto",
+   "text": "Asamblea del Color (relato del Archivo). El ciudadano Cuadrado se une al grito de la multitud cromática. Sin consecuencias inmediatas."
+  },
+  "temple_whisper": {
+   "who": "circulo",
+   "text": "Templo. Durante el cántico, el Cuadrado susurra una pregunta sobre la Configuración de un Irregular. Lo oye un Pentágono de la fila."
+  },
+  "temple_mother": {
+   "who": "circulo",
+   "text": "Templo. En plena adopción de un Regular, el Cuadrado pide en voz alta que la madre pueda visitar al niño."
+  },
+  "temple_appeal": {
+   "who": "novicio",
+   "text": "Templo. El Cuadrado pide «humildemente» que se reconsidere la prohibición de educar a las mujeres. Anotado a petición de nadie."
+  },
+  "hospital_miracle": {
+   "who": "medico",
+   "text": "Hospital de Reconfiguración. Aparece en una sala cerrada un estilete que nadie trajo. El calderero dice que es suyo."
+  },
+  "estilete_en_poder": {
+   "who": "prefecto",
+   "text": "Registro. Al detenido se le encuentra un estilete de calderero, del que no sabe explicar la procedencia."
+  },
+  "hija_cuenta": {
+   "who": "esposa",
+   "text": "Casa del perito. Se le sorprende enseñando a contar a una hija. La esposa lo comunica a la institutriz, y la institutriz a quien corresponde."
+  },
+  "gate_circle_offense": {
+   "who": "circulo",
+   "text": "Puerta Oeste. El perito de guardia llama «Hexágono» a un Círculo que viajaba de incógnito. El Círculo pidió su nombre."
+  },
+  "mala_presentacion": {
+   "who": "medico",
+   "text": "Calle Mayor. El Cuadrado incumple el orden de una presentación ante un facultativo del Hospital de Reconfiguración."
+  },
+  "temple_silent": {
+   "who": "circulo",
+   "text": "Templo. Durante el cántico de la Configuración, el Cuadrado mueve la boca sin voz. Se oye su silencio."
+  }
+ },
+ "people": {
+  "esposa": {
+   "name": "Tu esposa",
+   "lv": {
+    "-2": "Ya no te pregunta adónde vas.",
+    "-1": "Te habla con la cortesía de las visitas.",
+    "0": "Te quiere como se quiere en Planilandia: de frente y a distancia.",
+    "1": "Te espera despierta cuando sales de noche.",
+    "2": "Sospecha que ves algo que ella no ve, y no te lo reprocha."
+   }
+  },
+  "nieto": {
+   "name": "Tu nieto, el Hexágono",
+   "lv": {
+    "-2": "Te esquiva en el pasillo.",
+    "-1": "Te contesta con las frases del maestro.",
+    "0": "Un niño listo que aún no sabe que lo es.",
+    "1": "Te mira como a quien sabe cosas.",
+    "2": "Vuelve a preguntarte lo que nadie le deja preguntar."
+   }
+  },
+  "hija": {
+   "name": "Tu hija",
+   "lv": {
+    "-2": "Ha dejado de pedirte nada.",
+    "-1": "Sabe que hay cosas que no le corresponden.",
+    "0": "Menea la espalda con un vaivén muy distinguido.",
+    "1": "Cuenta hasta diez cuando su madre no mira.",
+    "2": "Cuenta hasta diez, y luego pregunta qué viene después."
+   }
+  },
+  "hermano": {
+   "name": "Tu hermano",
+   "lv": {
+    "-2": "Te pisa el lado cuando hablas de más.",
+    "-1": "Te pide prudencia con los ojos.",
+    "0": "Tu hermano. Un Cuadrado sensato, como tú lo eras.",
+    "1": "Te escucha, aunque no te crea.",
+    "2": "Te cree, o finge muy bien."
+   }
+  },
+  "criado": {
+   "name": "El criado",
+   "lv": {
+    "-2": "Te abre la puerta sin una palabra.",
+    "-1": "«Sí, señor. Claro, señor.»",
+    "0": "Un Isósceles de diez grados, fiel y callado.",
+    "1": "Te habla de su chico, el de los diez grados y medio.",
+    "2": "Daría un grado por ti, si los grados se dieran."
+   }
+  },
+  "calderero": {
+   "name": "El calderero",
+   "lv": {
+    "-2": "Lo firmaste tú.",
+    "-1": "Callaste cuando hacía falta una voz.",
+    "0": "El de la esquina. Cuarenta años afilando punzones.",
+    "1": "Alguien habló por él una vez.",
+    "2": "Te devolvió un estilete. Tú intentaste devolverle algo más."
+   }
+  },
+  "archivero": {
+   "name": "El viejo archivero",
+   "lv": {
+    "-2": "Te cierra la puerta del Archivo.",
+    "-1": "Te recomienda los manuales.",
+    "0": "Un Hexágono viejo que guarda lo que nadie lee.",
+    "1": "Te enseña lo que hay detrás de los manuales.",
+    "2": "Te ha dicho, en voz baja, que él también lo piensa."
+   }
+  }
+ },
+ "margins": [
+  {
+   "id": "m_p_muescas",
+   "ch": 0,
+   "title": "Las muescas",
+   "text": "Siete años. Al principio contaba días; luego, visitas de mi hermano; ahora cuento sólo años, que son menos y pesan igual."
+  },
+  {
+   "id": "m_p_puerta",
+   "ch": 0,
+   "title": "La puerta de la celda",
+   "text": "No tiene cerradura por dentro. ¿Para qué? ¿Adónde iría un Cuadrado que ha visto el Arriba?"
+  },
+  {
+   "id": "m_p_cantaro",
+   "ch": 0,
+   "title": "El cántaro",
+   "text": "Mi cántaro de agua. Yo sólo veo su borde; tú ves el agua de dentro. Es la primera vez que miras un interior que su dueño no puede ver. No será la última."
+  },
+  {
+   "id": "m_c1_puerta_este",
+   "ch": 1,
+   "title": "La puerta del Este",
+   "text": "Estrecha. Ellas entran de lado; nosotros no entraríamos ni de lado. Así lo quiere la ley: que cada cual sepa por dónde le corresponde entrar en su propia casa."
+  },
+  {
+   "id": "m_c1_reloj",
+   "ch": 1,
+   "title": "El reloj de arena",
+   "text": "El reloj de arena del salón. Lo vuelvo cada noche al acostarme. La arena cae del Norte al Sur, como todo en este mundo, y nadie se pregunta por qué."
+  },
+  {
+   "id": "m_c1_cuentas",
+   "ch": 1,
+   "title": "El libro de cuentas del criado",
+   "text": "Las cuentas de la casa, en la letra torcida del criado. Al margen, con otra letra, un inspector anotó su ángulo: «10°, sin variación». Un hombre, y al margen su ángulo."
+  },
+  {
+   "id": "m_c2_charlatan",
+   "ch": 2,
+   "title": "Los polvos para crecer",
+   "text": "Un charlatán vendía polvos «para crecer un lado». El tendero de al lado me dijo, sin bajar la voz, que eran tiza molida. Se vendían muy bien entre los Isósceles."
+  },
+  {
+   "id": "m_c2_banco",
+   "ch": 2,
+   "title": "El banco del calderero",
+   "text": "El banco de piedra donde se sienta el calderero. Cuarenta años de marcas: el roce de un lado más largo que los otros, siempre en el mismo sitio."
+  },
+  {
+   "id": "m_c2_cartel",
+   "ch": 2,
+   "title": "El cartel de la Junta",
+   "text": "Un cartel de la Junta Sanitaria: la tabla de ángulos legales, con su margen de tolerancia. Debajo, en pequeño: «Toda desviación será corregida por el bien del desviado»."
+  },
+  {
+   "id": "m_c2_hospital",
+   "ch": 2,
+   "title": "El muro del Hospital",
+   "text": "A través del muro del Hospital se oye un golpe rítmico, como de prensa, y algo que podría ser un quejido. Los transeúntes aprietan el paso. Yo también lo apretaba."
+  },
+  {
+   "id": "m_c2_viajeros",
+   "ch": 2,
+   "title": "Los viajeros del campo",
+   "text": "Fuera de la ciudad no hay casas que señalen el Norte. Los viajeros que se pierden se quedan quietos, a veces durante horas, esperando la lluvia para saber hacia dónde ir."
+  },
+  {
+   "id": "m_c3_registro",
+   "ch": 3,
+   "title": "El registro del sargento",
+   "text": "El registro de la Puerta, con las faltas de ortografía de un Isósceles: «Cuadrao. Pentagono. Muger». Lo que escribe lo escribe bien; lo que ve, mejor."
+  },
+  {
+   "id": "m_c3_poligono",
+   "ch": 3,
+   "title": "El estudiante a escondidas",
+   "text": "Un estudiante del Colegio practica a escondidas en la Puerta: mira a los que llegan y apunta lo que cree que son. Me dijo que en el Colegio no le dejan equivocarse, y aquí sí."
+  },
+  {
+   "id": "m_c3_miliar",
+   "ch": 3,
+   "title": "La piedra miliar",
+   "text": "La piedra miliar del camino de las aldeas. Marca una distancia, no una dirección: para eso está la lluvia."
+  },
+  {
+   "id": "m_c4_pasquin",
+   "ch": 4,
+   "title": "El pasquín",
+   "text": "En el tablón del Colegio, entre avisos de exámenes, un pasquín de hace siglos, enmarcado como un trofeo: «Proyecto de Ley del Color Universal». Debajo, a lápiz, alguien ha escrito «ojalá»."
+  },
+  {
+   "id": "m_c4_vitrina",
+   "ch": 4,
+   "title": "La vitrina vacía",
+   "text": "Una vitrina con un rótulo: «Tarro de pigmento sellado. Propiedad del Círculo Supremo». Está vacía. El archivero dice que siempre lo ha estado, y que por eso la vigilan tanto."
+  },
+  {
+   "id": "m_c4_poema",
+   "ch": 4,
+   "title": "Un poema del Color",
+   "text": "Un fragmento de un poema de la época del Color. Los versos no riman en sonidos sino en tonos: un verso rojo llama a otro rojo. Hoy nadie sabe leerlo en voz alta."
+  },
+  {
+   "id": "m_c4_examen",
+   "ch": 4,
+   "title": "Tres años para esto",
+   "text": "Tres años de Colegio para distinguir un Decágono de un Dodecágono en movimiento. En la época del Color lo habría distinguido un niño de pecho. Por eso el Color no se perdonó."
+  },
+  {
+   "id": "m_c5_ujier",
+   "ch": 5,
+   "title": "El ujier",
+   "text": "El ujier del Templo cierra el paso con un ángulo «muy educado»: el suyo es de doce grados, pero lo inclina de tal manera que parece de treinta. Es todo un arte."
+  },
+  {
+   "id": "m_c5_lados",
+   "ch": 5,
+   "title": "Las tablas de lados",
+   "text": "Junto al altar, las tablas de lados de los Círculos, del menor al Supremo. La última dice «diez mil», y debajo, en letra pequeña: «por cortesía»."
+  },
+  {
+   "id": "m_c5_mujeres",
+   "ch": 5,
+   "title": "La fila de las mujeres",
+   "text": "Las mujeres asisten al oficio en una fila lateral, de pie. Desde aquí arriba se ve lo que nadie ve desde dentro: todas menean la espalda al mismo compás, como un coro mudo."
+  },
+  {
+   "id": "m_c6_corto",
+   "ch": 6,
+   "title": "El súbdito más corto",
+   "text": "El varón más corto de la Línea está en su extremo oriental. Nunca ha visto a su vecino de delante: sólo a una mujer, que es un punto, y detrás de ella nada. Para él, el mundo acaba en una voz."
+  },
+  {
+   "id": "m_c6_leguas",
+   "ch": 6,
+   "title": "Mil leguas",
+   "text": "«Aunque los esposos disten mil leguas», dice el Rey. Desde la lámina se ve lo que significa: sus esposas están en los dos extremos de su reino, y él en medio, y nunca se han tocado."
+  },
+  {
+   "id": "m_c6_sombra",
+   "ch": 6,
+   "title": "Antes de entrar",
+   "text": "Aquí, a un paso de la Recta, el Cuadrado ya está a medio palmo del Rey. Y para el Rey no hay nada. Ni sombra, ni voz, ni rastro: lo que no corta su Línea no existe."
+  },
+  {
+   "id": "m_c7_reloj",
+   "ch": 7,
+   "title": "Los últimos granos",
+   "text": "El reloj de arena del salón. Lo vuelvo cada noche desde hace cuarenta años; esta noche deja caer los últimos granos del milenio. No sé por qué lo miro tanto."
+  },
+  {
+   "id": "m_c7_pisos",
+   "ch": 7,
+   "title": "3³ en tres pisos",
+   "text": "En la tablilla del nieto, a escondidas, un 3³ dibujado como tres cuadrados de tres por tres, uno encima de otro. «Pisos», ha escrito al lado. No ha podido dibujar el encima; ha puesto uno al lado del otro."
+  },
+  {
+   "id": "m_c7_puerta",
+   "ch": 7,
+   "title": "El vano del estudio",
+   "text": "Para llegar a la alacena hay que cruzar este vano, subir al estudio y girar la llave. El Forastero no hizo ni lo uno ni lo otro: la llave sigue en mi bolsillo."
+  },
+  {
+   "id": "m_c8_embarazada",
+   "ch": 8,
+   "title": "Otra manera de latir",
+   "text": "En una casa del Este, una mujer dormida. Dentro de su línea late algo que no es ella, a otro compás. Nadie en Planilandia lo ha visto nunca; ella tampoco."
+  },
+  {
+   "id": "m_c8_circulo",
+   "ch": 8,
+   "title": "Por cortesía",
+   "text": "Un Círculo, a solas en su casa, se mide los lados con un compás. Son catorce. Por la mañana, en el Templo, será «un Círculo perfecto». Por cortesía, decían."
+  },
+  {
+   "id": "m_c8_sala",
+   "ch": 8,
+   "title": "Mil años en el suelo",
+   "text": "El suelo de la Sala del Consejo, visto desde arriba: marcas en el papel, unas sobre otras, de mil en mil años. En el mismo sitio. Siempre ha vuelto a ocurrir."
+  },
+  {
+   "id": "m_c9_voz",
+   "ch": 9,
+   "title": "Ello",
+   "text": "Al despertar me oí decir «Ello» en voz alta, con una voz que no era del todo la mía. El Punto creía que mi voz era la suya. Por un momento, yo también."
+  },
+  {
+   "id": "m_c9_trampilla",
+   "ch": 9,
+   "title": "La trampilla",
+   "text": "Aquí estaría la trampilla del sótano, si nuestra casa tuviera sótano. El suelo es papel liso. Mentí sobre un agujero que no existe, en un mundo donde no hay hacia abajo."
+  },
+  {
+   "id": "m_c9_tablero",
+   "ch": 9,
+   "title": "El tablero del nieto",
+   "text": "El tablero de juego de mi nieto. Las figuritas que palpamos juntos, ordenadas por lados: tres, cuatro, cinco, seis. Y al final, un hueco vacío, como si esperara otra."
+  },
+  {
+   "id": "m_c10_banco",
+   "ch": 10,
+   "title": "El banco grabado",
+   "text": "En el banco de la Sociedad Especulativa alguien ha grabado mi nombre con la punta de un ángulo. No sé quién. Debajo, más pequeño: «hacia Arriba»."
+  },
+  {
+   "id": "m_c10_silla",
+   "ch": 10,
+   "title": "La silla vacía",
+   "text": "La silla donde se sienta mi hermano cuando viene. Entre visita y visita la miro tanto que creo que ha cambiado de forma."
+  },
+  {
+   "id": "m_c10_muesca",
+   "ch": 10,
+   "title": "Una muesca de más",
+   "text": "Cuento las muescas de la pared cada mañana. Siete grupos. Y una más, aparte, que yo no hice. Alguien, en algún momento, ha contado conmigo."
+  }
+ ],
+ "achievements": {
+  "ACH_COIN": "La moneda de canto",
+  "ACH_COUNT": "Hasta diez",
+  "ACH_STREET": "Cruzar sin un rasguño",
+  "ACH_EAR": "Buen oído",
+  "ACH_GATE_P": "Perito",
+  "ACH_HOME": "A casa por la lluvia",
+  "ACH_TRIBUNAL": "Tribunal del Colegio",
+  "ACH_HYMN": "Una sola voz",
+  "ACH_KING": "Línea de Líneas",
+  "ACH_WED": "Las tres voces",
+  "ACH_SPHERE": "La raíz de tres cuartos",
+  "ACH_CUPBOARD": "La alacena, por Arriba",
+  "ACH_TINKER": "Tres lados bien",
+  "ACH_TESS": "Ocho cubos",
+  "ACH_SECTIONS": "Lo que ven allá abajo",
+  "ACH_SILENT": "La perfección de no decir",
+  "ACH_FILE": "Un Cuadrado ejemplar",
+  "ACH_BROTHER": "Cuéntamelo otra vez",
+  "ACH_TOYS": "El juego de los ángulos",
+  "ACH_GATE": "Ojo de Colegio",
+  "ACH_CIRCLE": "Reverencia",
+  "ACH_FRAUD": "Lo has calado",
+  "ACH_HEX": "Un hexágono salido de un cubo",
+  "ACH_HIDDEN": "Adivina el sólido",
+  "ACH_MARGIN": "Nadie lee los márgenes",
+  "ACH_END": "Alguna Dimensión"
+ },
+ "ledger": {
+  "cols": [
+   {
+    "id": "0d",
+    "name": "Puntolandia",
+    "sub": "0D"
+   },
+   {
+    "id": "1d",
+    "name": "Linealandia",
+    "sub": "1D"
+   },
+   {
+    "id": "2d",
+    "name": "Planilandia",
+    "sub": "2D"
+   },
+   {
+    "id": "3d",
+    "name": "Espaciolandia",
+    "sub": "3D"
+   },
+   {
+    "id": "4d",
+    "name": "¿?",
+    "sub": "4D"
+   }
+  ],
+  "rows": [
+   {
+    "id": "habitante",
+    "name": "Habitante"
+   },
+   {
+    "id": "ve",
+    "name": "Cómo ve"
+   },
+   {
+    "id": "limites",
+    "name": "Límites"
+   },
+   {
+    "id": "no_concibe",
+    "name": "Lo que no puede concebir"
+   },
+   {
+    "id": "rechazo",
+    "name": "Su frase de rechazo"
+   },
+   {
+    "id": "desde_arriba",
+    "name": "Qué ve quien llega de arriba"
+   }
+  ],
+  "cells": {
+   "0d.habitante": "el Punto",
+   "0d.ve": "nada fuera de sí",
+   "0d.limites": "0",
+   "0d.no_concibe": "el Dos",
+   "0d.rechazo": "«Ello inventa palabras sin objeto»",
+   "0d.desde_arriba": {
+    "anim": "voice_inside"
+   },
+   "1d.habitante": "el Rey",
+   "1d.ve": "un punto",
+   "1d.limites": "2 puntos",
+   "1d.no_concibe": "el costado",
+   "1d.rechazo": "«Eso es un truco de mago»",
+   "1d.desde_arriba": {
+    "anim": "lineland_point"
+   },
+   "2d.habitante": "el Cuadrado",
+   "2d.ve": "una línea",
+   "2d.limites": "4 lados",
+   "2d.no_concibe": "el Arriba",
+   "2d.rechazo": "«¿Cómo va a moverse algo hacia Arriba y no hacia el Norte?»",
+   "2d.desde_arriba": {
+    "anim": "circle_grow"
+   },
+   "3d.habitante": "la Esfera",
+   "3d.ve": "una superficie con luz y sombra",
+   "3d.limites": "6 caras",
+   "3d.no_concibe": "la Cuarta",
+   "3d.rechazo": "«Visiones del cerebro»",
+   "3d.desde_arriba": {
+    "anim": "?"
+   },
+   "4d.habitante": "?",
+   "4d.ve": "?",
+   "4d.limites": "8 cubos",
+   "4d.no_concibe": "?",
+   "4d.rechazo": "?"
+  }
+ },
+ "argumentos": {
+  "analogia": {
+   "title": "La Analogía",
+   "pitch": "Mira: Punto, Línea, Cuadrado. Uno, dos, cuatro puntos terminales. ¿Qué número sigue? Cuéntalos conmigo.",
+   "reply_y1": "Ocho, si tú lo dices. Un razonamiento correcto sobre una cosa imposible. Me lo dijiste tú, hace años, de otra cosa.",
+   "reply_y4": "Ocho y seis. Me los sé de memoria, hermano. Como me sé el acta del Consejo, y tampoco la creo.",
+   "reply_y7": "Ocho. Lo cuento contigo porque te gusta. Y a mí me gusta verte contar."
+  },
+  "secciones": {
+   "title": "Las secciones",
+   "pitch": "Tú la viste en la sala: un punto, un círculo que crecía, que menguaba. Mira lo que pasa si se eleva.",
+   "reply_y1": "Un círculo que cambia de tamaño. Lo vi. Por eso estoy aquí. No me pidas además que vea lo que no había.",
+   "reply_y4": "Dibujas muy bien los círculos, hermano. Siempre se te dieron mejor que a mí.",
+   "reply_y7": "Un círculo que cambia de tamaño. Ya ves: es lo único que vi en mi vida que no fuera un acta."
+  },
+  "sombras": {
+   "title": "Las sombras",
+   "pitch": "Esto es lo que verías de un Cubo si no te atravesara: su sombra. Déjame dibujarla en la pared.",
+   "reply_y1": "Dos cuadrados cosidos. Como los que dibujabas en las actas cuando te aburrías.",
+   "reply_y4": "La has dibujado mejor que el año pasado. Sigue siendo una figura de muchos lados, hermano.",
+   "reply_y7": "Déjala en la pared. Me hará compañía cuando no estés."
+  },
+  "lineal": {
+   "title": "Linealandia",
+   "pitch": "Soñé con un Rey que sólo veía un punto y que me llamaba brujo. Escucha cómo se miden allí.",
+   "reply_y1": "Un sueño de un hombre que se dormía sobre las tablillas. Yo también sueño, hermano. Con la calle.",
+   "reply_y4": "El Rey que no veía el costado. ¿Y quién te dice que tú ves el tuyo?",
+   "reply_y7": "Cántamelo otra vez, lo del Rey. Las dos notas."
+  },
+  "punto": {
+   "title": "Puntolandia",
+   "pitch": "Hay un ser que cree que es el Universo entero. Le hablas y piensa que lo ha pensado él.",
+   "reply_y1": "Un ser que sólo se oye a sí mismo. Conozco a unos cuantos. Presiden el Consejo.",
+   "reply_y4": "¿Y cómo sabes que no somos nosotros ese Punto, hermano? Tú y yo, aquí dentro.",
+   "reply_y7": "Ello es, y nada hay fuera de Ello. Me lo has contado tantas veces que ya me sale la voz."
+  }
+ },
+ "epilogue": [
+  {
+   "if": "flag:hijaCuenta",
+   "text": "Dicen que mi hija sabe contar hasta diez. Tiene una tablilla con diez muescas que esconde de su madre. Es lo único que he enseñado en mi vida que ha prendido."
+  },
+  {
+   "if": "rel:criado>=1",
+   "text": "El hijo de mi antiguo criado, el de diez grados y medio, pasa algunas tardes bajo el muro y dice mi nombre en voz alta. Es toda mi fama."
+  },
+  {
+   "if": "rep:ciu>=2",
+   "text": "En la Calle Mayor todavía hay quien me saluda con el ángulo inclinado, a escondidas. No sé qué les conté. Lo bastante."
+  },
+  {
+   "if": "rep:aut<=-2",
+   "text": "El Prefecto no tuvo que buscar testigos contra mí: mi tablilla estaba llena desde lo de la Puerta Oeste. De eso, al menos, no me avergüenzo."
+  },
+  {
+   "if": "flag:estilete_hospital",
+   "text": "Me contaron que en el Hospital apareció un estilete en una sala cerrada, y que el calderero dijo que era suyo y que lo había echado de menos cuarenta años. Nadie se lo explica. Yo sí."
+  },
+  {
+   "if": "choice:irregularChoice=d",
+   "text": "El calderero salió del Hospital casi regular, con el marco puesto. Dicen que en su esquina vuelve a arreglar cántaros. Sus tres lados siguen estando bien."
+  },
+  {
+   "if": "choice:irregularChoice!=d",
+   "text": "Pienso a veces en el calderero. En que dictaminé su raya con el mismo aplomo con que el Consejo dictaminó la mía."
+  },
+  {
+   "if": "rel:esposa>=1",
+   "text": "Mi esposa viene una vez al año, cuando lo permiten. No pregunta. Me cuenta quién se ha casado y quién ha muerto, y al irse dice «paz» muy bajo, sólo para mí."
+  },
+  {
+   "if": "her>=3",
+   "text": "No me arrepiento de haber hablado. Me arrepiento de los años en que no pregunté."
+  },
+  {
+   "if": "her<=-2",
+   "text": "A veces pienso que habría sido mejor aplaudir y callar, como sabía hacer tan bien. Luego recuerdo el Cubo, y se me pasa. Casi siempre."
+  },
+  {
+   "if": "always",
+   "text": "Mi nieto tiene ya diecisiete años y seis lados. No ha venido nunca. Me dicen que da clases de Geometría, y que a veces, cuando un alumno pregunta por 3³, tarda en contestar."
+  }
+ ],
+ "prefacio": {
+  "title": "Prefacio del Editor a la segunda edición (1884)",
+  "text": [
+   "*Lo que sigue es un resumen, no una traducción: el texto original de Abbott, de dominio público, se incluirá completo en la versión definitiva.*",
+   "En la segunda edición de *Flatland*, publicada el mismo año que la primera, el Editor añadió un prefacio en el que responde, en nombre del Cuadrado preso, a dos objeciones de los lectores.",
+   "La primera: que un ser de dos dimensiones no podría ver una Línea, porque una Línea sin grosor sería invisible. El Editor concede que los planilandeses tienen en realidad un grosor mínimo, el mismo para todos, y que precisamente por ser igual en todos no lo advierten; del mismo modo que quizá los habitantes del Espacio tengan una cuarta medida que tampoco notan.",
+   "La segunda: el desprecio con que el libro habla de las mujeres y de las clases bajas de Planilandia. El Editor deja entender que el Cuadrado, tras años de celda, ha cambiado de opinión sobre muchas cosas que antes daba por naturales, y que su relato debe leerse como el de un hombre de su tiempo y de su Plano.",
+   "Termina con una esperanza: que el lector, habitante del Espacio, no se ría demasiado de la estrechez de Planilandia, porque también él podría estar confinado en una Dimensionalidad limitada sin saberlo."
+  ]
  }
 }

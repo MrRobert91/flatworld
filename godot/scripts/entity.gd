@@ -45,6 +45,12 @@ var talk := 0.0          # 1 mientras habla: late
 var shake := 0.0         # sacudida de dolor
 var dying := -1.0        # >= 0: animación de muerte en curso
 var phase := 0.0
+var cry := false         # grita «¡Paz!» cada pocos segundos, desde donde está (S-07)
+var cry_range := 14.0
+var cry_t := 0.0
+var carryable := false   # se puede tomar desde Arriba (S-13)
+var lifted := false      # fuera del Plano: sin sombra y fuera de la línea de los planilandeses
+var margin := false      # nota al margen (S-04): un brillo de tinta que sólo se ve de cerca
 
 func setup(w, d: Dictionary) -> Ent:
 	world = w; def = d
@@ -53,13 +59,20 @@ func setup(w, d: Dictionary) -> Ent:
 	x = d.get("x", 0.0); y = d.get("y", 0.0); rot = d.get("rot", 0.0); speed = d.get("speed", 2.6)
 	ai = d.get("ai", null); lum = d.get("lum", 1.0); solidity = 1 if d.get("solid", false) else 0
 	sway = d.get("sway", 1.0) if woman else 0.0
-	no_collide = d.get("noCollide", false); fixed_rot = d.get("fixedRot", false)
+	no_collide = d.get("noCollide", false); fixed_rot = d.get("fixedRot", false); carryable = d.get("carryable", false)
 	t = randf() * 10.0; phase = randf() * TAU
+	cry = d.get("cry", false); cry_range = d.get("cryRange", 14.0); cry_t = 0.5 + randf() * 2.5
 	body = MeshInstance3D.new(); add_child(body)
 	if d.get("spot", false):
-		is_spot = true; rad = 0.2; no_collide = true
+		is_spot = true; rad = 0.2; no_collide = true; margin = d.get("margin", false)
 		var mb := Geo.MB.new()
-		mb.ring(Geo.make_points({n = 4, r = 0.36}), 0.08, 0.02, null, world.pal.acc, 0.95)
+		if margin:
+			# brillo de tinta: una estrella de cuatro trazos finos
+			for k in 4:
+				var a := PI / 4.0 * k; var v := Vector2(cos(a), sin(a)) * (0.42 if k % 2 == 0 else 0.26)
+				mb.quad(-v, v, 0.045, 0.02, world.pal.acc)
+		else:
+			mb.ring(Geo.make_points({n = 4, r = 0.36}), 0.08, 0.02, null, world.pal.acc, 0.95)
 		body.mesh = mb.commit(); body.material_override = world.mat(3)
 		return self
 	local = Geo.make_points(d)
@@ -104,6 +117,13 @@ func build() -> void:
 		mb.quad(Vector2(-0.07, 0), Vector2(0.07, 0), 0.02, 0.016, Color(edge_col, 0.55))
 		mb.quad(Vector2(0, -0.07), Vector2(0, 0.07), 0.02, 0.016, Color(edge_col, 0.55))
 	mb.ring(pts, 0.06 if woman else 0.07, 0.02, sides, edge_col, 1.0)
+	# colores con patrón (C4-07): junto a cada lado pintado, una banda con el rayado de su tono
+	if sides != null and not woman and bool(App.cfg.get("patterns", true)):
+		var np2 := pts.size()
+		for i in np2:
+			var a: Vector2 = pts[i]; var b: Vector2 = pts[(i + 1) % np2]
+			var k := 0.58 if np2 < 20 else 0.8
+			mb.fan([a, b, b * k, a * k], 0.016, sides[i % sides.size()], Vector2(-1.0, 7.0))
 	if woman:
 		mb.disc(Vector2(pts[0].x, 0), 0.085, 0.03, edge_col)
 		mb.disc(Vector2(-pts[0].x, 0), 0.05, 0.03, edge_col)
@@ -133,6 +153,18 @@ func build() -> void:
 		gb.disc(Vector2(s * 0.1, 0), s * 0.2, 0.028, world.ink(Color("f0b25c"), 0.8), 10)
 		guts.mesh = gb.commit(); guts.material_override = world.mat(2)
 	guts.visible = world.show_guts
+
+# cambia la forma sin recrear la figura (las secciones del VIII): puntos del Plano relativos a (x, y)
+func set_shape(pts) -> void:
+	local = []
+	for q in pts: local.append(q)
+	if local.size() < 2: hid = true; return
+	hid = false
+	var m := 0.0
+	for q in local: m = maxf(m, (q as Vector2).length())
+	rad = maxf(m * 0.86, 0.05)
+	def.pts = local
+	build()
 
 func set_colors(arr) -> void:
 	side_colors = arr; build()
@@ -169,7 +201,15 @@ func update(dt: float) -> void:
 		visible = not hid
 		position = Vector3(x, 0, -y); rotation.y = world.time * 1.3
 		scale = Vector3.ONE * (1.0 + 0.15 * sin(world.time * 3.0))
+		if margin:
+			# sólo de cerca (6 u), con un ciclo de 2,4 s
+			var p = App.g.player if App.g != null else null
+			var near: bool = p != null and Vector2(p.x - x, p.y - y).length() < 6.0
+			visible = not hid and near
+			rotation.y = 0.0
+			scale = Vector3.ONE * (0.75 + 0.35 * pow(0.5 + 0.5 * sin(world.time * TAU / 2.4 + phase), 3.0))
 		return
+	if shadow != null: shadow.visible = not lifted and alt < 0.3
 	greet_cd = maxf(0.0, greet_cd - dt); talk = maxf(0.0, talk - dt * 2.5); shake = maxf(0.0, shake - dt * 2.6)
 	if dying >= 0.0:
 		# herida mortal: gira sobre sí, se encoge y desaparece

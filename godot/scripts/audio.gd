@@ -22,7 +22,7 @@ const INST := {
 const PERC := {heart = -5.0, timpani = -8.0, tick = -21.0, shaker = -22.0}
 const SFX_DB := {ui = -16.0, pick = -11.0, page = -14.0, frag = -6.0, know = -8.0, good = -9.0, bad = -8.0, her = -7.0, door = -8.0,
 	peace = -12.0, gavel = -4.0, sphere = -6.0, rise = -5.0, fall = -6.0, bell = -6.0, herald = -6.0, stab = -6.0, chalk = -18.0,
-	hurt = -6.0, whoosh = -12.0, slay = -5.0, title = -8.0}
+	hurt = -6.0, whoosh = -12.0, slay = -5.0, title = -8.0, lock = -8.0, quill = -12.0, compress = -9.0, chime = -10.0, hum = -24.0}
 # cuánto aprieta cada efecto a la música
 const SPIKE := {gavel = 0.45, stab = 0.55, slay = 0.7, herald = 0.2, bad = 0.12, hurt = 0.4, fall = 0.3}
 
@@ -47,7 +47,10 @@ const MOODS := {
 const CHORD := {M = [0, 4, 7], m = [0, 3, 7], M7 = [0, 4, 7, 11], m7 = [0, 3, 7, 10], m9 = [0, 3, 7, 10, 14], add9 = [0, 4, 7, 14],
 	sus2 = [0, 2, 7], sus4 = [0, 5, 7], dim = [0, 3, 6]}
 # antiguo sintetizador: tonos sueltos que piden los capítulos (con deslizamiento)
-const FALLBACK := {chalk = [[2000, 0.03, "triangle", 0.02]]}
+const FALLBACK := {chalk = [[2000, 0.03, "triangle", 0.02]],
+	chalk_break = [[2600, 0.22, "sawtooth", 0.03, 1.4], [1900, 0.18, "square", 0.02, 0.6, 0.04], [3100, 0.08, "sawtooth", 0.02, 0.8, 0.16]]}
+# Leitmotivs (S-07): [paso, semitonos sobre la tónica del ánimo]. El paso es una corchea del compás.
+const MOTIFS := {esfera = [[0, 0], [1, 7], [3, 12], [4, 7]], hermano = [[0, 3], [2, 0]], nieto = [[0, 0], [1, 4], [2, 7], [3, 11]]}
 
 var muted := false
 var _cache := {}
@@ -113,6 +116,13 @@ func _make_buses() -> void:
 		var rv := AudioEffectReverb.new(); rv.room_size = 0.45; rv.damping = 0.6; rv.wet = 0.14; rv.dry = 1.0
 		AudioServer.add_bus_effect(_bus_s, rv)
 	_bus_s = AudioServer.get_bus_index("Sfx")
+	# mono (C6-05): en Linealandia todo suena por un solo canal
+	var has_st := false
+	for i in AudioServer.get_bus_effect_count(0):
+		if AudioServer.get_bus_effect(0, i) is AudioEffectStereoEnhance: has_st = true
+	if not has_st:
+		var st := AudioEffectStereoEnhance.new(); st.pan_pullout = 1.0
+		AudioServer.add_bus_effect(0, st, 0); AudioServer.set_bus_effect_enabled(0, 0, false)
 	_rain_p = AudioStreamPlayer.new(); _rain_p.bus = "Sfx"; _rain_p.volume_db = -80; add_child(_rain_p)
 
 # lluvia: un rumor continuo que sube y baja con la intensidad del aguacero
@@ -126,8 +136,10 @@ func toggle_mute() -> bool:
 
 func _sample(name: String) -> AudioStream:
 	if _samples.has(name): return _samples[name]
-	var path := "res://assets/audio/%s.ogg" % name
-	var s: AudioStream = load(path) if ResourceLoader.exists(path) else null
+	var s: AudioStream = null
+	for ext in ["ogg", "wav"]:
+		var path := "res://assets/audio/%s.%s" % [name, ext]
+		if ResourceLoader.exists(path): s = load(path); break
 	_samples[name] = s
 	return s
 
@@ -167,8 +179,8 @@ func perc(n: String, db := 0.0, pitch := 1.0) -> void:
 	_play_on(_sample("m_" + n), pitch, PERC.get(n, -10.0) + db, true)
 
 # ---------- voces ----------
-func _synth(f: float, dur: float, type: String, vol: float, slide: float) -> AudioStreamWAV:
-	var key := "%s|%s|%s|%s|%s" % [f, dur, type, vol, slide]
+func _synth(f: float, dur: float, type: String, vol: float, slide: float, vib := 0.0) -> AudioStreamWAV:
+	var key := "%s|%s|%s|%s|%s|%s" % [f, dur, type, vol, slide, vib]
 	if _cache.has(key): return _cache[key]
 	var sr := 22050
 	var n := int((dur + 0.02) * sr)
@@ -179,6 +191,8 @@ func _synth(f: float, dur: float, type: String, vol: float, slide: float) -> Aud
 		var t := float(i) / sr
 		var fr := f
 		if slide > 0.0: fr = maxf(20.0, f * pow(slide, minf(t / dur, 1.0)))
+		# vibrato (centésimas): la voz imitada «tiembla» en las notas largas, más cuanto más dura
+		if vib > 0.0: fr *= pow(2.0, vib / 1200.0 * sin(TAU * 5.5 * t) * minf(1.0, t / 0.25))
 		ph += fr / sr
 		var p := ph - floorf(ph)
 		var s := 0.0
@@ -213,7 +227,12 @@ func tone(f: float, dur := 0.2, type := "sine", vol := 0.15, slide := 0.0, delay
 	if delay > 0.0: _queue.append([delay, s, pitch, -6.0, false])
 	else: _play_on(s, pitch, -6.0, false)
 
+# las voces (murmullos al escribirse un parlamento) tienen su propio volumen (S-17)
+func _vdb() -> float:
+	return linear_to_db(maxf(float(App.cfg.get("vol_voice", 1.0)), 0.0001))
+
 func blip(voice := "yo") -> void:
+	if float(App.cfg.get("vol_voice", 1.0)) <= 0.01: return
 	var v: Array = VOICES.get(voice, VOICES.yo)
 	tone(v[0], 0.055, v[1], 0.06 if v[1] == "sine" else 0.03, 0.0, 0.0, 0.94 + randf() * 0.14)
 	if voice == "circ" or voice == "esfera": tone(v[0] * 1.5, 0.07, "sine", 0.03)
@@ -222,7 +241,7 @@ func blip(voice := "yo") -> void:
 func talk(voice := "yo") -> void:
 	var v: Array = VOICES.get(voice, VOICES.yo)
 	var s := _synth(v[0], 0.045, v[1], 0.03 if v[1] == "sine" else 0.016, 0.0)
-	_play_on(s, 0.9 + randf() * 0.25, -9.0, false)
+	_play_on(s, 0.9 + randf() * 0.25, -9.0 + _vdb(), false)
 
 func sfx(n: String) -> void:
 	var s := _sample("s_" + n)
@@ -234,6 +253,114 @@ func sfx(n: String) -> void:
 		for t in FALLBACK.get(n, []):
 			tone(t[0], t[1], t[2], t[3], t[4] if t.size() > 4 else 0.0, t[5] if t.size() > 5 else 0.0)
 	if SPIKE.has(n): spike(SPIKE[n])
+
+# ---------- sonido posicional (S-07) ----------
+# Un grupo de 8 reproductores 3D dentro del mundo: suenan desde un punto del Plano y se oyen desde el ojo
+# del Cuadrado (AudioListener3D de World). Si cap no está vacío, se muestra un subtítulo de sonido con la
+# dirección (T-11), como mucho uno cada 1,5 s.
+const POS_N := 8
+var _pos: Array[AudioStreamPlayer3D] = []
+var _pos_world: Node = null
+var _pos_i := 0
+var _cap_t := 0.0
+
+func _pos_pool() -> bool:
+	var W = App.g.world if App.g != null else null
+	if W == null or not is_instance_valid(W): return false
+	if _pos_world != W:
+		_pos.clear(); _pos_world = W
+		for i in POS_N:
+			var a := AudioStreamPlayer3D.new(); a.bus = "Sfx"
+			a.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+			a.unit_size = 4.0; a.max_distance = 40.0; a.panning_strength = 1.0
+			W.add_child(a); _pos.append(a)
+	return true
+
+func sfx_at(n: String, x: float, y: float, db := 0.0, cap := "") -> void:
+	var s := _sample("s_" + n)
+	if s == null or not _pos_pool(): sfx(n); return
+	var a: AudioStreamPlayer3D = null
+	for k in POS_N:
+		var c := _pos[(_pos_i + k) % POS_N]
+		if not c.playing: a = c; break
+	if a == null: a = _pos[_pos_i]
+	_pos_i = (_pos_i + 1) % POS_N
+	a.stream = s; a.position = Vector3(x, 0.2, -y)
+	a.volume_db = SFX_DB.get(n, -8.0) + db + 6.0; a.pitch_scale = 0.94 + randf() * 0.12
+	a.play()
+	if cap != "" and App.ui != null and App.g != null and App.g.player != null and Time.get_ticks_msec() > _cap_t:
+		_cap_t = Time.get_ticks_msec() + 1500
+		var p := App.g.player
+		var rel := App.ang_diff(p.rot, atan2(y - p.y, x - p.x))   # > 0: a la izquierda (sentido antihorario)
+		App.ui.caption(cap, 0.0 if absf(rel) < 0.35 else (-1.0 if rel > 0.0 else 1.0))
+	if SPIKE.has(n): spike(SPIKE[n] * 0.6)
+
+# una voz que habla desde un punto del Plano: tres sílabas con la altura de su clase. vib en centésimas
+# (las voces imitadas por un Isósceles tiemblan en las sílabas largas, C2-05)
+func voice_at(voice: String, x: float, y: float, vib := 0.0, db := 0.0) -> void:
+	var v: Array = VOICES.get(voice, VOICES.yo)
+	if not _pos_pool(): return
+	var d := 0.0
+	for k in 3:
+		var dur := 0.16 if k < 2 else 0.55
+		var st := _synth(v[0] * (1.0 + 0.06 * k), dur, v[1], 0.08, 0.0, vib)
+		_queue_pos.append([d, st, Vector3(x, 0.2, -y), db]); d += dur * 0.85
+	
+var _queue_pos := []
+func _pos_step(dt: float) -> void:
+	var keep := []
+	for q in _queue_pos:
+		q[0] -= dt
+		if q[0] > 0.0: keep.append(q); continue
+		var a: AudioStreamPlayer3D = _pos[_pos_i]; _pos_i = (_pos_i + 1) % POS_N
+		a.stream = q[1]; a.position = q[2]; a.volume_db = q[3] + 4.0; a.pitch_scale = 1.0; a.play()
+	_queue_pos = keep
+
+# mono: el panorama se colapsa a un canal (v = 1) o en parte (0 < v < 1)
+var mono_v := 0.0
+func mono(on: bool) -> void:
+	mono_mix(1.0 if on else 0.0)
+
+func mono_mix(v: float) -> void:
+	mono_v = clampf(v, 0.0, 1.0)
+	for i in AudioServer.get_bus_effect_count(0):
+		var e := AudioServer.get_bus_effect(0, i)
+		if e is AudioEffectStereoEnhance:
+			(e as AudioEffectStereoEnhance).pan_pullout = 1.0 - mono_v
+			AudioServer.set_bus_effect_enabled(0, i, mono_v > 0.001)
+
+# un leitmotiv (S-07), en la tónica del ánimo que suena y cuadrado con su pulso. invert: las
+# notas bajan en lugar de subir (la Esfera, vista desde abajo); detune en semitonos
+func motif(name: String, inst := "", invert := false, detune := 0.0, db := 0.0) -> void:
+	var notes: Array = MOTIFS.get(name, [])
+	if notes.is_empty(): return
+	var M: Dictionary = MOODS.get(_mood, MOODS.home)
+	var root: float = float(M.root) + 12.0 + detune
+	var step := 30.0 / float(M.bpm)
+	var wait := maxf(0.0, step - _acc) if _mood != "none" else 0.0
+	var ins := inst if inst != "" else ("glass" if name == "esfera" else ("celesta" if name == "nieto" else "harp"))
+	for q in notes:
+		var iv: float = -float(q[1]) if invert else float(q[1])
+		note(ins, root + iv, db - 2.0, wait + float(q[0]) * step, false)
+
+# un acorde de una vez, que la música no ha tocado nunca (el primer color, C4-02)
+func chord_once(root := 60, kind := [0, 4, 7, 11, 14]) -> void:
+	for k in kind.size():
+		note("harp", root + kind[k], 2.0, k * 0.07, false)
+		note("strings", root - 12 + kind[k], -2.0, 0.0, false)
+	note("bell", root + 24, -4.0, 0.4, false)
+
+# zumbido continuo (la lámpara de la mesa del lector)
+var _hum_p: AudioStreamPlayer
+func hum(on: bool) -> void:
+	if _hum_p == null:
+		_hum_p = AudioStreamPlayer.new(); _hum_p.bus = "Sfx"; add_child(_hum_p)
+		var s := _sample("s_hum")
+		if s is AudioStreamWAV:
+			s = s.duplicate(); s.loop_mode = AudioStreamWAV.LOOP_FORWARD; s.loop_begin = 0; s.loop_end = int(s.get_length() * s.mix_rate) - 1
+		_hum_p.stream = s; _hum_p.volume_db = SFX_DB.hum
+	if on and not _hum_p.playing: _hum_p.play()
+	elif not on: _hum_p.stop()
 
 # ---------- música ----------
 # ánimo: 'flat' | 'home' | 'dream' | 'space' | 'cell' | 'temple' | 'color' | 'none'
@@ -259,6 +386,7 @@ func duck(v: float) -> void:
 	_duck = maxf(_duck, v)
 
 func _process(dt: float) -> void:
+	if not _queue_pos.is_empty() and _pos_pool(): _pos_step(dt)
 	for i in range(_queue.size() - 1, -1, -1):
 		_queue[i][0] -= dt
 		if _queue[i][0] <= 0.0:
@@ -285,7 +413,8 @@ func _process(dt: float) -> void:
 	var target := 0.0 if _want == "none" else 1.0
 	_mv = move_toward(_mv, target, dt / (1.8 if target > _mv else 3.0))
 	if _bus_m >= 0:
-		AudioServer.set_bus_volume_db(_bus_m, linear_to_db(maxf(_mv * (1.0 - 0.55 * _duck), 0.0001)) - 3.0)
+		AudioServer.set_bus_volume_db(_bus_m, linear_to_db(maxf(_mv * (1.0 - 0.55 * _duck) * float(App.cfg.get("vol_music", 1.0)), 0.0001)) - 3.0)
+		if _bus_s >= 0: AudioServer.set_bus_volume_db(_bus_s, linear_to_db(maxf(float(App.cfg.get("vol_sfx", 1.0)), 0.0001)))
 		var lp: AudioEffectLowPassFilter = AudioServer.get_bus_effect(_bus_m, 0)
 		lp.cutoff_hz = lerpf(20000.0, 900.0, pow(_muffle, 0.7))
 	if _mood == "none":

@@ -43,6 +43,8 @@ func buttons() -> Dictionary:
 	if free_mode():
 		out.up = [Vector2(s.x - 74, s.y - 158), 40.0]
 		out.down = [Vector2(s.x - 74, s.y - 64), 40.0]
+		# en vuelo, coger y soltar figuras (Carry) o una acción pedida
+		if g.carry_label != "" or g.need_act != "": out.act = [Vector2(s.x - 178, s.y - 92), 42.0]
 	else:
 		out.act = [Vector2(s.x - 74, s.y - 80), 46.0]
 		if not g.view_lock and not g.busy and not ui.dlg.visible: out.view = [Vector2(s.x - 166, s.y - 52), 30.0]
@@ -163,7 +165,7 @@ func _draw() -> void:
 				if ui.new_pages:
 					draw_circle(c + Vector2(17, -17), 6.5, App.CARD); draw_circle(c + Vector2(17, -17), 5.0, App.ACC)
 			"act":
-				var label: String = g.need_act if g.need_act != "" else (g.near_label if g.near != null else "")
+				var label: String = g.need_act if g.need_act != "" else (g.carry_label if free_mode() else (g.near_label if g.near != null else ""))
 				var live := label != ""
 				_circle(c, r, App.ACC if live else App.FAINT, on, 3.0 if live else 1.6)
 				if live:

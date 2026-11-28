@@ -8,6 +8,8 @@ const PAL := {
 	dream = {bg = Color("e3dfee"), a = Color("e8e4f2"), b = Color("d9d3ea"), line = Color("8a7fc0"), fog = Color("cfc8e2"), edge = Color("27204c"), fill = Color("f0edf8"), wall = Color("27204c"), acc = Color("7a3fa8")},
 	color = {bg = Color("f2e7d0"), a = Color("f5ebd5"), b = Color("ecdcbb"), line = Color("c79f70"), fog = Color("e2d2b0"), edge = Color("35261a"), fill = Color("fcf5e4"), wall = Color("35261a"), acc = Color("a8392a")},
 	space = {bg = Color("12315a"), a = Color("163966"), b = Color("1c4577"), line = Color("8db6e4"), fog = Color("0f2a4e"), edge = Color("f2f6ff"), fill = Color("0f2b50"), wall = Color("e2ecfb"), acc = Color("ffd27a"), dark = true},
+	# la misma lámina de noche: papel un 12 % más oscuro (C3-05)
+	flat_night = {bg = Color("cfc8b5"), a = Color("d3ccb9"), b = Color("c8c0aa"), line = Color("5f7f98"), fog = Color("c2b99f"), edge = Color("121a22"), fill = Color("ddd6c4"), wall = Color("121a22"), acc = Color("a8392a")},
 	cell = {bg = Color("d8d4c8"), a = Color("dcd8cc"), b = Color("cdc8b9"), line = Color("868f96"), fog = Color("c6c1b2"), edge = Color("1e2429"), fill = Color("e7e3d7"), wall = Color("1e2429"), acc = Color("a8392a")},
 }
 const FLAT_SH := preload("res://shaders/flat.gdshader")
@@ -71,6 +73,9 @@ var roofs := {}           # columna → [[y_bajo, y_alto], ...] : donde la lluvi
 var _greet_t := 0.0
 var _free_tgt := Vector3.ZERO
 var _free_ok := false
+var rail := {}            # raíl de cámara libre (Cine.play): {pos, look, fov}
+var orbit := {}           # órbita lenta (Cine.orbit): {center, pitch, dist, yaw}
+var listener: AudioListener3D   # el oído del Cuadrado, no la cámara (S-07)
 const COL := 0.5          # anchura de columna de lluvia
 
 func _init() -> void:
@@ -90,6 +95,19 @@ func _init() -> void:
 	trail = MeshInstance3D.new(); trail.mesh = ImmediateMesh.new(); trail.material_override = mat(0); add_child(trail)
 	rain_im = MeshInstance3D.new(); rain_im.mesh = ImmediateMesh.new(); rain_im.material_override = mat(2); add_child(rain_im)
 	fx_im = MeshInstance3D.new(); fx_im.mesh = ImmediateMesh.new(); fx_im.material_override = mat(3); add_child(fx_im)
+	listener = AudioListener3D.new(); add_child(listener)
+
+func _ready() -> void:
+	listener.make_current()
+
+# el sonido corresponde a lo que oye el Cuadrado aunque el jugador mire la lámina: la escucha va en su
+# ojo y mira hacia donde él mira (en 3D, un punto del plano está en (x, alt, -y))
+func _place_listener(p) -> void:
+	if p == null:
+		listener.global_transform = cam.global_transform; return
+	var pos := Vector3(p.x, maxf(0.2, p.alt), -p.y)
+	var dir := Vector3(cos(p.rot), 0.0, -sin(p.rot))
+	listener.look_at_from_position(pos, pos + dir, Vector3.UP)
 
 # material plano compartido por capa (prioridad de dibujo)
 func mat(prio: int) -> ShaderMaterial:
@@ -150,6 +168,7 @@ func rebuild() -> void:
 	var segs := []   # [a, b, door]
 	var fills := Geo.MB.new(); var cons := Geo.MB.new()
 	for w in map.get("walls", []): segs.append([Vector2(w[0], w[1]), Vector2(w[2], w[3]), false])
+	_trees()
 	for B in map.get("buildings", []):
 		var a0 := deg_to_rad(B.get("rot", 0.0)); var c := cos(a0); var s := sin(a0)
 		var pts := []
@@ -198,7 +217,19 @@ func rebuild() -> void:
 		if sgm[2]: mb.quad(sgm[0], sgm[1], 0.06, 0.015, Color(wc, 0.6))
 		else: mb.quad(sgm[0], sgm[1], 0.16, 0.015, wc)
 	var wm := MeshInstance3D.new(); wm.mesh = mb.commit(); wm.material_override = mat(-2); static_g.add_child(wm)
+	for t in map.get("trees", []): walls.append([t[0], t[1] - t[2] / 2.0, t[0], t[1] + t[2] / 2.0, 0.85])
 	_build_roofs()
+
+# árboles (§2, C2-07): un trazo vertical más oscuro que los muros y sin tejado, con dos ramas cortas
+func _trees() -> void:
+	if not map.has("trees"): return
+	var mb := Geo.MB.new()
+	for t in map.trees:
+		var c := Vector2(t[0], t[1]); var h: float = t[2] / 2.0
+		mb.quad(c - Vector2(0, h), c + Vector2(0, h), 0.2, 0.016, pal.edge)
+		for k in [-1.0, 1.0]:
+			mb.quad(c + Vector2(0, h * 0.2 * k), c + Vector2(0.45 * k, h * 0.55), 0.07, 0.016, Color(pal.edge, 0.8))
+	var m := MeshInstance3D.new(); m.mesh = mb.commit(); m.material_override = mat(-2); static_g.add_child(m)
 
 # Dónde no llueve: la lluvia viene del Norte y rompe contra el tejado (el lado norte) de cada casa
 # y contra los muros sueltos. Se guarda, por columnas, el tramo [sur, norte] que queda a cubierto.
@@ -495,14 +526,16 @@ func _update_rain(dt: float, p) -> void:
 	var im: ImmediateMesh = rain_im.mesh
 	im.clear_surfaces()
 	var want := int(rain_cur * 230.0)
-	if want <= 0 or eye_t > 0.6:
+	if want <= 0:
 		drops.clear(); return
-	# rectángulo visible (con margen)
+	# rectángulo visible (con margen); en el ojo, alrededor del Cuadrado: la lluvia se ve en la línea (S-06)
 	var vs := get_viewport().get_visible_rect().size
 	var cx := cam_x; var cy := cam_y; var hh := zoom_cur * 0.45 + 3.0
-	if cam_mode == "free" and p != null: cx = p.x; cy = p.y; hh = 30.0
+	var in_eye := eye_t > 0.6 and p != null
+	if (cam_mode == "free" or in_eye) and p != null: cx = p.x; cy = p.y; hh = 30.0 if not in_eye else 16.0
 	var hw := hh * clampf(vs.x / maxf(vs.y, 1.0), 0.6, 2.4)
 	if cam_mode == "free": hw = 34.0
+	if in_eye: hw = 16.0; want = int(rain_cur * 160.0)
 	while drops.size() > want: drops.pop_back()
 	while drops.size() < want:
 		drops.append([cx + (randf() * 2.0 - 1.0) * hw, cy + (randf() * 2.0 - 1.0) * hh, 6.0 + randf() * 4.5, 0.7 + randf() * 0.9])
@@ -531,7 +564,7 @@ func _update_rain(dt: float, p) -> void:
 					var top: float = e.y + sqrt(r * r - dx * dx) * 0.9
 					if y <= top and y0 >= e.y - r: hit = true; hy = top; break
 		if hit:
-			if hy <= y0 + 0.3: fx_add("splash", x, hy, 0.28)
+			if hy <= y0 + 0.3 and not in_eye: fx_add("splash", x, hy, 0.28)
 		if hit or y < cy - hh or absf(x - cx) > hw:
 			# nueva gota: arriba de la vista o, si cae a cubierto, en otro sitio
 			d[0] = cx + (randf() * 2.0 - 1.0) * hw
@@ -541,9 +574,20 @@ func _update_rain(dt: float, p) -> void:
 				d[0] = cx + (randf() * 2.0 - 1.0) * hw; tries += 1
 			if _covered(d[0], d[1]): d[1] = cy + hh + 40.0
 			continue
-		_line(im, Vector2(x, y), Vector2(x, y + d[3]), 0.045, ink, 0.03)
+		if not in_eye: _line(im, Vector2(x, y), Vector2(x, y + d[3]), 0.045, ink, 0.03)
 	_line(im, Vector2.ZERO, Vector2.ZERO, 0.0, Color(0, 0, 0, 0))
 	im.surface_end()
+
+# el Grito de Paz de cada mujer que lo lleva activo, desde donde está, cada 2,8–3,6 s
+func _cries(dt: float, p) -> void:
+	if p == null or App.g.auto: return
+	for e in ents.values():
+		if not e.cry or e.hid: continue
+		e.cry_t -= dt
+		if e.cry_t > 0.0: continue
+		e.cry_t = 2.8 + randf() * 0.8
+		var d := Vector2(e.x - p.x, e.y - p.y).length()
+		if d < e.cry_range: Snd.sfx_at("peace", e.x, e.y, -2.0 * d / e.cry_range, "Grito de Paz" if d < 10.0 else "")
 
 # los paseantes que se cruzan se detienen un instante y se saludan
 func _greetings(dt: float) -> void:
@@ -587,6 +631,7 @@ static func pos_of(o) -> Vector2:
 
 func update(dt: float, player) -> void:
 	time += dt
+	_place_listener(player)
 	rain_cur = lerpf(rain_cur, rain, minf(1.0, dt * 0.8))
 	Snd.rain(rain_cur * (1.0 - 0.6 * eye_t))
 	var gm: ShaderMaterial = ground.material_override
@@ -599,6 +644,7 @@ func update(dt: float, player) -> void:
 		e.update(dt)
 	separate()
 	_greetings(dt)
+	_cries(dt, player)
 	for s in spots.values(): s.update(dt)
 	for id in marks:
 		var m: MeshInstance3D = marks[id]; var o = obj(id)
@@ -658,6 +704,7 @@ func update_cam(dt: float, p) -> void:
 		f = f.lerp(talk_cur, 0.5 * talk_w); zmul = 1.0 - 0.13 * talk_w
 	shake = maxf(0.0, shake - dt * 2.2)
 	kick = maxf(0.0, kick - dt * 1.6)
+	if bool(App.cfg.get("reduce_motion", false)): shake = 0.0; kick = 0.0
 	zmul *= 1.0 - 0.07 * sin(kick * PI) * kick
 	if cam_mode != _last_mode:
 		if cam_mode == "free": _free_intro = 0.0
@@ -666,6 +713,20 @@ func update_cam(dt: float, p) -> void:
 	cam_x = lerpf(cam_x, f.x + shift_cur + lead.x, k); cam_y = lerpf(cam_y, f.y + shift_y_cur + lead.y, k)
 	zoom_cur = lerpf(zoom_cur, zoom * zmul + speed_zoom, minf(1.0, dt * 2.0))
 	var gm: ShaderMaterial = ground.material_override
+	# órbita del lector (P-03): la única inclinación permitida en el Plano además de la vista del ojo
+	if not orbit.is_empty():
+		var c: Vector2 = orbit.center; var op: float = orbit.pitch; var od: float = orbit.dist; var oy: float = orbit.yaw
+		var ot := Vector3(c.x, 0.0, -c.y)
+		var opos := ot + Vector3(sin(oy) * cos(op) * od, sin(op) * od, cos(oy) * cos(op) * od)
+		cam.fov = 42; cam.near = 0.02
+		cam.look_at_from_position(opos, ot, Vector3.UP if op < 1.55 else Vector3(sin(oy), 0, cos(oy)) * -1.0)
+		gm.set_shader_parameter("u_fade", 0.0)
+		return
+	if not rail.is_empty():
+		cam.fov = rail.fov; cam.near = 0.2
+		cam.look_at_from_position(rail.pos, rail.look, rail.get("up", Vector3.UP))
+		gm.set_shader_parameter("u_fade", 0.0)
+		return
 	if cam_mode == "free" and p != null:
 		var cp := cos(free.pitch as float)
 		var tgt := Vector3(p.x, p.alt, -p.y)
@@ -674,7 +735,7 @@ func update_cam(dt: float, p) -> void:
 		if not _free_ok: _free_tgt = tgt; _free_ok = true
 		_free_tgt = _free_tgt.lerp(tgt, minf(1.0, dt * 5.0)); tgt = _free_tgt + Vector3(sx, 0, sy)
 		# llegada al Espacio: la cámara baja desde muy alto girando alrededor de la figura
-		_free_intro = minf(1.0, _free_intro + dt / 3.2)
+		_free_intro = minf(1.0, _free_intro + dt / (4.8 if bool(App.cfg.get("reduce_motion", false)) else 3.2))
 		var fi := 1.0 - App.ease(_free_intro)
 		var yaw: float = free.yaw + fi * 1.9
 		var pitch: float = lerpf(free.pitch, 1.42, fi)

@@ -12,6 +12,12 @@ var img: Image
 var tex: ImageTexture
 var fov := 1.75
 var trace := 0.0
+var desat := 0.0         # la línea en gris (C4-03)
+# lentes (S-06): line | point (el ojo del Rey: un punto) | flood (el ojo del Punto: todo un color)
+var lens := "line"
+var squeeze := 0.0
+var grow := 0.0
+var hue := 0.0           # giro de tono de la lente flood (C9-01), en vueltas
 var _cpu := []           # segmentos relativos al ojo, para consultas puntuales: [ax, ay, bx, by, id]
 var _facing := 0.0
 
@@ -79,6 +85,42 @@ func cast(W: World, exclude, ox: float, oy: float, facing: float, fog: float) ->
 			data[row2 + o] = near; data[row2 + o + 1] = 1.0
 			_cpu.append([a.x - ox, a.y - oy, b.x - ox, b.y - oy, e.id])
 			k += 1
+	# el ojo del Rey (lente point): en la Recta todo se ve de punta, y un segmento de punta no ocupa nada
+	# en la línea. Cada habitante se ve por su extremo más cercano: un punto que brilla más cuanto más cerca
+	if lens == "point":
+		for e in W.ents.values():
+			if k >= N: break
+			if e == exclude or e.hid or not e.woman: continue
+			var best := Vector2.ZERO; var bd := 1e9
+			for q in e.world_pts():
+				var dq := Vector2(q.x - ox, q.y - oy)
+				if dq.dot(Vector2(cf, sf)) > 0.05 and dq.length() < bd: bd = dq.length(); best = dq
+			if bd > max_d: continue
+			var px := -sf * 0.05; var py := cf * 0.05
+			_put(k, best.x - px, best.y - py, best.x + px, best.y + py, edge, e.lum, bd, 1.0); k += 1
+	# notas al margen (S-04): una chispa de lápiz rojo, perpendicular a la mirada
+	var acc: Color = W.pal.acc
+	for s in W.spots.values():
+		if k >= N: break
+		if not s.margin or s.hid: continue
+		var dx: float = s.x - ox; var dy: float = s.y - oy
+		var dd := sqrt(dx * dx + dy * dy)
+		if dd > 6.0 or dd < 0.05 or dx * cf + dy * sf < 0.0: continue
+		var px := -dy / dd * 0.04; var py := dx / dd * 0.04
+		_put(k, dx - px, dy - py, dx + px, dy + py, acc, 0.7, dd, 0.0); k += 1
+	# lluvia (S-06): cada gota es un trazo corto en la dirección de su caída (hacia el Sur) y otro aún
+	# más corto de través. Como todas caen al Sur, su centelleo se desliza por la línea; mirando al
+	# Norte se queda quieto y se aviva (las gotas vienen hacia ti).
+	var drops: Array = W.drops if W.eye_t > 0.6 else []
+	var rr := fog * 3.0; var nd := 0
+	for d in drops:
+		if k >= N - 1 or nd >= 40: break
+		var dx: float = d[0] - ox; var dy: float = d[1] - oy
+		if dx * cf + dy * sf < 0.1 or dx * dx + dy * dy > rr * rr: continue
+		var dl := sqrt(dx * dx + dy * dy)
+		_put(k, dx, dy, dx, dy + 0.12, edge, 0.35, dl, 0.0); k += 1
+		_put(k, dx - 0.03, dy + 0.04, dx + 0.03, dy + 0.04, edge, 0.35, dl, 0.0); k += 1
+		nd += 1
 	img.set_data(N, 3, false, Image.FORMAT_RGBAF, data.to_byte_array())
 	tex.update(img)
 	cast_mat.set_shader_parameter("count", k)
@@ -89,6 +131,14 @@ func cast(W: World, exclude, ox: float, oy: float, facing: float, fog: float) ->
 	view_mat.set_shader_parameter("ink_col", World._v3(W.pal.edge))
 	view_mat.set_shader_parameter("acc_col", World._v3(W.pal.acc))
 	view_mat.set_shader_parameter("u_dark", 1.0 if dark else 0.0)
+	view_mat.set_shader_parameter("u_desat", desat)
+	view_mat.set_shader_parameter("u_patterns", 1.0 if bool(App.cfg.get("patterns", true)) else 0.0)
+
+func _put(k: int, ax: float, ay: float, bx: float, by: float, c: Color, lum: float, near: float, fig: float) -> void:
+	var o := k * 4; var row := N * 4; var row2 := N * 8
+	data[o] = ax; data[o + 1] = ay; data[o + 2] = bx; data[o + 3] = by
+	data[row + o] = c.r; data[row + o + 1] = c.g; data[row + o + 2] = c.b; data[row + o + 3] = lum
+	data[row2 + o] = near; data[row2 + o + 1] = fig
 
 # ¿qué figura toca un rayo lanzado con desvío u (-1..1 del campo visual)?
 func _ray(u: float) -> String:
@@ -113,12 +163,14 @@ func sees(id: String) -> bool:
 	return false
 
 # t: 0 = tira en el HUD (rect), 1 = pantalla completa
-func layout(t: float, size: Vector2, time: float, strip_visible: bool, rect: Rect2) -> void:
+# full: el rectángulo de la vista a pantalla completa (todo, o lo que dejan libre los paneles de abajo)
+func layout(t: float, size: Vector2, time: float, strip_visible: bool, rect: Rect2, full := Rect2()) -> void:
 	var e := t * t * (3.0 - 2.0 * t)
-	view.size = rect.size.lerp(size, e)
-	view.position = rect.position.lerp(Vector2.ZERO, e)
+	if full.size == Vector2.ZERO: full = Rect2(Vector2.ZERO, size)
+	view.size = rect.size.lerp(full.size, e)
+	view.position = rect.position.lerp(full.position, e)
 	# grosor de la línea: fino pero legible (unos 26 puntos en pantalla completa)
-	var full_half := clampf(13.0 / size.y, 0.022, 0.05)
+	var full_half := clampf(13.0 / full.size.y, 0.022, 0.08)
 	view_mat.set_shader_parameter("u_strip", 1.0 - e)
 	view_mat.set_shader_parameter("u_half", lerpf(0.30, full_half, e))
 	view_mat.set_shader_parameter("u_bg", 1.0)
@@ -126,6 +178,24 @@ func layout(t: float, size: Vector2, time: float, strip_visible: bool, rect: Rec
 	view_mat.set_shader_parameter("u_time", time)
 	view_mat.set_shader_parameter("u_trace", trace)
 	view_mat.set_shader_parameter("u_px", view.get_viewport().get_window().content_scale_factor if view.is_inside_tree() else 1.0)
+	view_mat.set_shader_parameter("u_size", view.size)
+
+# transición entre lentes: la línea se encoge en 1,2 s; el punto crece hasta la pantalla en 1,2 s
+func step(dt: float) -> void:
+	var sp := dt / (1.8 if bool(App.cfg.get("reduce_motion", false)) else 1.2)
+	var want_sq := 0.0 if lens == "line" else 1.0
+	var want_gr := 1.0 if lens == "flood" else 0.0
+	# primero se deshace el crecimiento; después se encoge o se abre la línea; por último crece el punto
+	if grow != want_gr and (want_gr < grow or squeeze >= 0.999): grow = move_toward(grow, want_gr, sp)
+	else: squeeze = move_toward(squeeze, want_sq, sp)
+	view_mat.set_shader_parameter("u_squeeze", App.ease(squeeze))
+	view_mat.set_shader_parameter("u_grow", App.ease(grow))
+	view_mat.set_shader_parameter("u_hue", hue)
+
+func set_lens(l: String, instant := false) -> void:
+	lens = l
+	if instant:
+		squeeze = 0.0 if l == "line" else 1.0; grow = 1.0 if l == "flood" else 0.0
 
 # rumbo en pantalla (0..1) de un punto del mundo; <0 o >1 si queda fuera del campo
 func bearing(ox: float, oy: float, facing: float, x: float, y: float) -> float:
