@@ -28,7 +28,7 @@ func _draw() -> void:
 	draw_rect(Rect2(0, 0, s.x, h), App.INK)
 	draw_rect(Rect2(0, s.y - h, s.x, h), App.INK)
 	if not skippable or t < 1.0 or ui == null: return
-	var txt := "%s %s  %s" % [ui.T("mantén"), Glyphs.name_of("advance") if not ui.touch else "", ui.T("para saltar")]
+	var txt := (ui.T("mantén el dedo para saltar") if ui.touch else "%s %s  %s" % [ui.T("mantén"), Glyphs.name_of("advance"), ui.T("para saltar")]).to_upper()
 	var fs := 12
 	var w := ui.caps.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 	var pos := Vector2(s.x - w - 46, s.y - h / 2.0 + 4)

@@ -163,12 +163,14 @@ func sees(id: String) -> bool:
 	return false
 
 # t: 0 = tira en el HUD (rect), 1 = pantalla completa
-func layout(t: float, size: Vector2, time: float, strip_visible: bool, rect: Rect2) -> void:
+# full: el rectángulo de la vista a pantalla completa (todo, o lo que dejan libre los paneles de abajo)
+func layout(t: float, size: Vector2, time: float, strip_visible: bool, rect: Rect2, full := Rect2()) -> void:
 	var e := t * t * (3.0 - 2.0 * t)
-	view.size = rect.size.lerp(size, e)
-	view.position = rect.position.lerp(Vector2.ZERO, e)
+	if full.size == Vector2.ZERO: full = Rect2(Vector2.ZERO, size)
+	view.size = rect.size.lerp(full.size, e)
+	view.position = rect.position.lerp(full.position, e)
 	# grosor de la línea: fino pero legible (unos 26 puntos en pantalla completa)
-	var full_half := clampf(13.0 / size.y, 0.022, 0.05)
+	var full_half := clampf(13.0 / full.size.y, 0.022, 0.08)
 	view_mat.set_shader_parameter("u_strip", 1.0 - e)
 	view_mat.set_shader_parameter("u_half", lerpf(0.30, full_half, e))
 	view_mat.set_shader_parameter("u_bg", 1.0)

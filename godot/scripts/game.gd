@@ -35,6 +35,7 @@ var near_label := ""
 var vel := Vector2.ZERO
 var moved := 0.0
 var on_line := false
+var carry_label := ""   # en vuelo (Carry): «Coger» o «Soltar», para el botón de acción táctil
 var need_act := "":      # un minijuego pide el botón de acción (con esta etiqueta) aunque haya escena
 	set(v): need_act = v; _latch = false
 var _latch := false      # «pulsar en vez de mantener» (T-11): el botón de acción queda echado hasta otra pulsación
@@ -574,7 +575,7 @@ func _process(delta: float) -> void:
 		var fx: float = src.local[0].x * 0.9 * src.sc
 		eye.cast(W, src, src.x + cos(src.rot) * fx, src.y + sin(src.rot) * fx, src.rot, W.fog)
 		eye.step(dt)
-		eye.layout(e, ui.size, W.time, strip, ui.strip_rect)
+		eye.layout(e, ui.size, W.time, strip, ui.strip_rect, ui.eye_full_rect(dt))
 	hud(p, e, strip, free)
 
 func move_player(dt: float, p: Ent) -> void:

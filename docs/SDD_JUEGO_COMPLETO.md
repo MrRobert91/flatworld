@@ -788,6 +788,31 @@ Notas al margen: 6 más (Ello, la trampilla, el tablero del nieto, el banco grab
 | Steam Deck | Sin probar | Sin hardware. La interfaz escala por puntos; ver la captura a 1280×800. |
 | Pendiente | — | Fuente de iconos para los glifos del mando (siguen siendo de texto); texto íntegro del Prefacio de 1884; prueba externa con 5 personas; subir los logros y la tienda a Steamworks. |
 
+### 9.10 Pasada de pulido (interfaz, móvil y tamaño de letra)
+
+Revisión con capturas a 1280×720, 1280×800 (Deck), 844×390 y 667×375 (móvil apaisado) y 390×844 (vertical), con el tamaño de interfaz normal y «muy grande» (×1,3). Para reproducirlas: `--resolution WxH -- --touch --dpr=1 --scale=1.3 --shots=dir`, y `--open=pause|settings[:página]|ms|know|tab|pos|log` abre un panel.
+
+| Problema | Arreglo |
+|---|---|
+| Menú principal: con letra grande en apaisado se salía por la derecha y por abajo; «Continuar — capítulo» se cortaba | El título se mide y encoge para caber en su columna; en apaisado, sonido, ajustes y pie van bajo el título; la altura de los botones se ajusta al alto disponible; «Continuar» lleva el capítulo debajo, en cursiva |
+| Pausa y ajustes necesitaban desplazarse en apaisado | Dos columnas en pantallas bajas y anchas |
+| Láminas por encima de la pausa y el inventario, y saltadas por el toque del botón de menú | Las capas de historia quedan bajo los paneles modales; con un panel abierto, la lámina espera |
+| Inventario en vertical o con letra grande: «Cerrar» fuera de pantalla y el texto sin ajustarse al ancho | Pestañas en filas que se reparten; «×» siempre a la vista |
+| Tabla de analogías: cabeceras partidas a media palabra | Por debajo de 640 puntos, una ficha por mundo |
+| Panel del veredicto (examen de Vista) del alto de la pantalla, tapando la línea | Los textos enriquecidos conocen su anchura antes de mostrarse; con la vista del plano, el panel nunca tapa la línea |
+| Panel de respuestas sobre la línea del ojo en apaisado | La vista del plano a pantalla completa se ciñe al hueco libre sobre el muelle de paneles |
+| Pizarra, diálogo y respuestas solapados | En apaisado, pizarra a la izquierda y muelle a la derecha; en vertical, la pizarra cabe entre el HUD y el muelle, y si no hay sitio el parlamento ya leído se pliega mientras se elige |
+| Pizarra diminuta en apaisado sin diálogo | Su tamaño sigue al hueco disponible, con transición suave |
+| Leyenda de la lámina cortada en apaisado | Dibujo y leyenda en dos columnas; aviso de «continuar» |
+| Rótulos de pizarra ilegibles en pantallas pequeñas | Nunca menos de 11 puntos |
+| **En Espaciolandia, con pantalla táctil, no había botón de acción: no se podía coger ni soltar** | Botón «Coger/Soltar» en vuelo cuando hay una figura al alcance o una llevada (`Game.carry_label`) |
+| Atrás (Esc, B) no cerraba documentos ni subía en los submenús; en ajustes cerraba todo | Cierra el documento; sube un nivel en el menú principal y en los ajustes |
+| Volumen por saltos de 25 % | Barras deslizantes (ratón, dedo o mando) |
+| Avisos en versalitas con mayúsculas desiguales | En mayúsculas |
+| Sin respuesta visual al pulsar | Los botones y las tarjetas se hunden y rebotan (salvo «reducir movimiento») |
+
+Regresión: 386/0 pruebas; recorridos automáticos normal, hereje, ortodoxo, inglés (0 sin traducir) y demo; bot de los 11 capítulos en vertical ×1,3, apaisado y en inglés sin errores; 1420/1420 textos traducidos.
+
 ---
 
 ## 10. Riesgos

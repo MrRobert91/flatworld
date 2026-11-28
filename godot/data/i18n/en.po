@@ -4407,59 +4407,59 @@ msgstr "Recognition by Sight"
 msgid "Reconocimiento por el Tacto"
 msgstr "Recognition by Touch"
 
-#: scripts/game.gd:100
+#: scripts/game.gd:101
 msgid "Manuscrito · sección %d de 22"
 msgstr "Manuscript · section %d of 22"
 
-#: scripts/game.gd:105
+#: scripts/game.gd:106
 msgid "Nuevo saber"
 msgstr "New knowledge"
 
-#: scripts/game.gd:148
+#: scripts/game.gd:149
 msgid "Día %d."
 msgstr "Day %d."
 
-#: scripts/game.gd:171
+#: scripts/game.gd:172
 msgid "Logro"
 msgstr "Achievement"
 
-#: scripts/game.gd:221
+#: scripts/game.gd:222
 msgid "Sonido"
 msgstr "Sound"
 
-#: scripts/game.gd:221
+#: scripts/game.gd:222
 msgid "silenciado"
 msgstr "muted"
 
-#: scripts/game.gd:221
+#: scripts/game.gd:222
 msgid "activado"
 msgstr "on"
 
-#: scripts/game.gd:374
+#: scripts/game.gd:375
 msgid "Tú"
 msgstr "You"
 
-#: scripts/game.gd:479
+#: scripts/game.gd:480
 msgid "Hablar"
 msgstr "Talk"
 
-#: scripts/game.gd:639
+#: scripts/game.gd:640
 msgid "{look} mirar  ·  {move} volar  ·  {rise} / {sink} subir y bajar  ·  {journal} inventario"
 msgstr "{look} look  ·  {move} fly  ·  {rise} / {sink} rise and sink  ·  {journal} inventory"
 
-#: scripts/game.gd:639
+#: scripts/game.gd:640
 msgid "{view} vista  ·  {journal} inventario  ·  {history} historial  ·  {pause} menú"
 msgstr "{view} view  ·  {journal} inventory  ·  {history} history  ·  {pause} menu"
 
-#: scripts/game.gd:641
+#: scripts/game.gd:642
 msgid "VISTA DEL PLANO  —  palanca: girar y avanzar  ·  ojo: volver a la lámina"
 msgstr "VIEW OF THE PLANE  —  joystick: turn and advance  ·  eye: back to the sheet"
 
-#: scripts/game.gd:642
+#: scripts/game.gd:643
 msgid "VISTA DEL PLANO  —  stick: girar y avanzar  ·  {view} volver a la lámina"
 msgstr "VIEW OF THE PLANE  —  stick: turn and advance  ·  {view} back to the sheet"
 
-#: scripts/game.gd:643
+#: scripts/game.gd:644
 msgid "VISTA DEL PLANO  —  {move_left}/{move_right} girar  ·  {move_up}/{move_down} avanzar  ·  {view} volver a la lámina"
 msgstr "VIEW OF THE PLANE  —  {move_left}/{move_right} turn  ·  {move_up}/{move_down} advance  ·  {view} back to the sheet"
 
@@ -4596,8 +4596,8 @@ msgid "X · El juicio"
 msgstr "X · The trial"
 
 #: scripts/main.gd:83
-msgid "Continuar — "
-msgstr "Continue — "
+msgid "Continuar"
+msgstr "Continue"
 
 #: scripts/main.gd:84
 msgid "Nueva partida"
@@ -4646,6 +4646,14 @@ msgstr "the cell wall"
 #: scripts/minigames/brother.gd:73
 msgid "Dibuja la sombra del Cubo"
 msgstr "Draw the Cube's shadow"
+
+#: scripts/minigames/carry.gd:41
+msgid "Soltar"
+msgstr "Drop"
+
+#: scripts/minigames/carry.gd:44
+msgid "Coger"
+msgstr "Take"
 
 #: scripts/minigames/cross_street.gd:35
 msgid "una mujer"
@@ -5199,135 +5207,135 @@ msgstr "Up"
 msgid "Down"
 msgstr "Down"
 
-#: scripts/ui.gd:1250
+#: scripts/ui.gd:1398
 msgid "Parte I · Este mundo"
 msgstr "Part I · This world"
 
-#: scripts/ui.gd:1250
+#: scripts/ui.gd:1398
 msgid "Parte II · Otros mundos"
 msgstr "Part II · Other worlds"
 
-#: scripts/ui.gd:1252
+#: scripts/ui.gd:1400
 msgid "Esta sección aún no ha sido escrita. "
 msgstr "This section has not yet been written. "
 
-#: scripts/ui.gd:1253
+#: scripts/ui.gd:1401
 msgid "%d de 22 secciones recuperadas"
 msgstr "%d of 22 sections recovered"
 
-#: scripts/ui.gd:1255
+#: scripts/ui.gd:1403
 msgid "Parte I — Este mundo"
 msgstr "Part I — This world"
 
-#: scripts/ui.gd:1256
+#: scripts/ui.gd:1404
 msgid "Parte II — Otros mundos"
 msgstr "Part II — Other worlds"
 
-#: scripts/ui.gd:1262
+#: scripts/ui.gd:1410
 msgid "Notas al margen"
 msgstr "Notes in the margin"
 
-#: scripts/ui.gd:1263
+#: scripts/ui.gd:1411
 msgid "Nota al margen"
 msgstr "Note in the margin"
 
-#: scripts/ui.gd:1271
+#: scripts/ui.gd:1419
 msgid "Saber"
 msgstr "Knowledge"
 
-#: scripts/ui.gd:1272
+#: scripts/ui.gd:1420
 msgid "Aún ignoras esto."
 msgstr "You don't know this yet."
 
-#: scripts/ui.gd:1273
+#: scripts/ui.gd:1421
 msgid "Lo que sabes del mundo"
 msgstr "What you know of the world"
 
-#: scripts/ui.gd:1288
+#: scripts/ui.gd:1436
 msgid "Tu figura"
 msgstr "Your figure"
 
-#: scripts/ui.gd:1290
+#: scripts/ui.gd:1438
 msgid "Un [b]Cuadrado[/b]: cuatro lados iguales, cuatro ángulos rectos. Clase profesional. Tus hijos son Pentágonos; tus nietos, Hexágonos."
 msgstr "A [b]Square[/b]: four equal sides, four right angles. Professional class. Your sons are Pentagons; your grandsons, Hexagons."
 
-#: scripts/ui.gd:1290
+#: scripts/ui.gd:1438
 msgid "Mujeres (líneas) · Isósceles · Equiláteros · "
 msgstr "Women (lines) · Isosceles · Equilaterals · "
 
-#: scripts/ui.gd:1290
+#: scripts/ui.gd:1438
 msgid "Cuadrados"
 msgstr "Squares"
 
-#: scripts/ui.gd:1290
+#: scripts/ui.gd:1438
 msgid "Pentágonos · Hexágonos… · Círculos"
 msgstr "Pentagons · Hexagons… · Circles"
 
-#: scripts/ui.gd:1294
+#: scripts/ui.gd:1442
 msgid "Lo que llevas"
 msgstr "What you carry"
 
-#: scripts/ui.gd:1295
+#: scripts/ui.gd:1443
 msgid "El estilete del calderero"
 msgstr "The tinker's stylus"
 
-#: scripts/ui.gd:1298
+#: scripts/ui.gd:1446
 msgid "PERSONAS"
 msgstr "PEOPLE"
 
-#: scripts/ui.gd:1299
+#: scripts/ui.gd:1447
 msgid "Quién te recuerda, y cómo"
 msgstr "Who remembers you, and how"
 
-#: scripts/ui.gd:1311
+#: scripts/ui.gd:1459
 msgid "La tabla de analogías"
 msgstr "The table of analogies"
 
-#: scripts/ui.gd:1313
+#: scripts/ui.gd:1461
 msgid "Lo que cada mundo ve, y lo que no puede ver. Las casillas se escriben solas, en el momento en que lo vives."
 msgstr "What each world sees, and what it cannot see. The cells write themselves, at the moment you live it."
 
-#: scripts/ui.gd:1313
+#: scripts/ui.gd:1461
 msgid "%d casillas de 29"
 msgstr "%d of 29 cells"
 
-#: scripts/ui.gd:1316
+#: scripts/ui.gd:1464
 msgid "ANALOGÍAS"
 msgstr "ANALOGIES"
 
-#: scripts/ui.gd:1350
+#: scripts/ui.gd:1530
 msgid "Lo último que se dijo"
 msgstr "The last things said"
 
-#: scripts/ui.gd:1351
+#: scripts/ui.gd:1531
 msgid "%d intervenciones"
 msgstr "%d lines"
 
-#: scripts/ui.gd:1352
+#: scripts/ui.gd:1532
 msgid "HISTORIAL"
 msgstr "HISTORY"
 
-#: scripts/ui.gd:1354
+#: scripts/ui.gd:1534
 msgid "Aún no ha hablado nadie."
 msgstr "No one has spoken yet."
 
-#: scripts/ui.gd:1400
+#: scripts/ui.gd:1604
 msgid "Arrastra a la izquierda para moverte · toca para continuar"
 msgstr "Drag on the left to move · tap to continue"
 
-#: scripts/ui.gd:1401
+#: scripts/ui.gd:1605
 msgid "stick izquierdo · {act} interactuar y continuar · {view} vista · {journal} inventario"
 msgstr "left stick · {act} interact and continue · {view} view · {journal} inventory"
 
-#: scripts/ui.gd:1402
+#: scripts/ui.gd:1606
 msgid "{move} / flechas · {act} interactuar · {advance} continuar · {view} vista · {journal} inventario"
 msgstr "{move} / arrows · {act} interact · {advance} continue · {view} view · {journal} inventory"
 
-#: scripts/ui.gd:1403
+#: scripts/ui.gd:1607
 msgid "Una aventura narrativa. Se recomienda sonido."
 msgstr "A narrative adventure. Sound recommended."
 
-#: scripts/ui.gd:1427
+#: scripts/ui.gd:1635
 msgid "¿SEGURO? SE GUARDA POR CAPÍTULOS"
 msgstr "SURE? PROGRESS IS SAVED BY CHAPTER"
 
@@ -5347,83 +5355,83 @@ msgstr "Wonder"
 msgid "Recelo"
 msgstr "Misgiving"
 
-#: scripts/ui.gd:324
+#: scripts/ui.gd:356
 msgid "VISTA DEL PLANO"
 msgstr "VIEW OF THE PLANE"
 
-#: scripts/ui.gd:358
+#: scripts/ui.gd:390
 msgid "desliza para ver más respuestas"
 msgstr "swipe to see more answers"
 
-#: scripts/ui.gd:389
+#: scripts/ui.gd:422
 msgid "Manuscrito"
 msgstr "Manuscript"
 
-#: scripts/ui.gd:389
+#: scripts/ui.gd:422
 msgid "Saberes"
 msgstr "Knowledge"
 
-#: scripts/ui.gd:389
+#: scripts/ui.gd:422
 msgid "Analogías"
 msgstr "Analogies"
 
-#: scripts/ui.gd:389
+#: scripts/ui.gd:422
 msgid "Personas"
 msgstr "People"
 
-#: scripts/ui.gd:389
+#: scripts/ui.gd:422
 msgid "Historial"
 msgstr "History"
 
-#: scripts/ui.gd:402
+#: scripts/ui.gd:437
 msgid "Cerrar"
 msgstr "Close"
 
-#: scripts/ui.gd:421
+#: scripts/ui.gd:457
 msgid "EDWIN A. ABBOTT  ·  1884"
 msgstr "EDWIN A. ABBOTT  ·  1884"
 
-#: scripts/ui.gd:423
+#: scripts/ui.gd:459
 msgid "PLANILANDIA"
 msgstr "FLATLAND"
 
-#: scripts/ui.gd:425
+#: scripts/ui.gd:461
 msgid "Un romance de muchas dimensiones"
 msgstr "A romance of many dimensions"
 
-#: scripts/ui.gd:444
+#: scripts/ui.gd:481
 msgid "Sonido: "
 msgstr "Sound: "
 
-#: scripts/ui.gd:444
+#: scripts/ui.gd:481
 msgid "no"
 msgstr "no"
 
-#: scripts/ui.gd:444
+#: scripts/ui.gd:481
 msgid "sí"
 msgstr "yes"
 
-#: scripts/ui.gd:448
+#: scripts/ui.gd:485
 msgid "Ajustes"
 msgstr "Settings"
 
-#: scripts/ui.gd:602
+#: scripts/ui.gd:720
 msgid "PERITO"
 msgstr "EXPERT"
 
-#: scripts/ui.gd:841
+#: scripts/ui.gd:959
 msgid "toca para continuar  ›"
 msgstr "tap to continue  ›"
 
-#: scripts/ui.gd:841
+#: scripts/ui.gd:959
 msgid "continuar"
 msgstr "continue"
 
-#: scripts/ui.gd:842
+#: scripts/ui.gd:960
 msgid "mantén"
 msgstr "hold"
 
-#: scripts/ui.gd:842
+#: scripts/ui.gd:960
 msgid "saltar"
 msgstr "skip"
 
@@ -5472,201 +5480,205 @@ msgid "Vista"
 msgstr "View"
 
 #: scripts/ui/letterbox.gd:31
+msgid "mantén el dedo para saltar"
+msgstr "hold your finger to skip"
+
+#: scripts/ui/letterbox.gd:31
 msgid "para saltar"
 msgstr "to skip"
 
-#: scripts/ui/settings_panel.gd:10
-msgid "rápida"
-msgstr "fast"
-
-#: scripts/ui/settings_panel.gd:10
-msgid "instantánea"
-msgstr "instant"
-
-#: scripts/ui/settings_panel.gd:109
-msgid "SONIDO"
-msgstr "SOUND"
-
-#: scripts/ui/settings_panel.gd:110
-msgid "Música:"
-msgstr "Music:"
-
-#: scripts/ui/settings_panel.gd:110
-msgid "Efectos:"
-msgstr "Effects:"
-
-#: scripts/ui/settings_panel.gd:110
-msgid "Voces:"
-msgstr "Voices:"
-
-#: scripts/ui/settings_panel.gd:113
-msgid "Español"
-msgstr "Español"
-
-#: scripts/ui/settings_panel.gd:113
-msgid "English"
-msgstr "English"
-
-#: scripts/ui/settings_panel.gd:115
-msgid "IDIOMA"
-msgstr "LANGUAGE"
-
-#: scripts/ui/settings_panel.gd:122
-msgid "El cambio de idioma vuelve al menú principal."
-msgstr "Changing the language returns to the main menu."
-
-#: scripts/ui/settings_panel.gd:127
-msgid "TECLAS"
-msgstr "KEYS"
-
-#: scripts/ui/settings_panel.gd:13
-msgid "relajadas (segunda oportunidad)"
-msgstr "relaxed (second chance)"
-
-#: scripts/ui/settings_panel.gd:13
-msgid "de perito (sin traza)"
-msgstr "expert (no trace)"
-
-#: scripts/ui/settings_panel.gd:131
-msgid "Restablecer las teclas"
-msgstr "Reset keys"
-
-#: scripts/ui/settings_panel.gd:137
-msgid "pulsa una tecla…  (Esc cancela)"
-msgstr "press a key…  (Esc cancels)"
-
-#: scripts/ui/settings_panel.gd:40
-msgid "lenta"
-msgstr "slow"
-
-#: scripts/ui/settings_panel.gd:40
-msgid "normal"
-msgstr "normal"
-
-#: scripts/ui/settings_panel.gd:40
-msgid "normales"
-msgstr "normal"
-
-#: scripts/ui/settings_panel.gd:40
-msgid "grande"
-msgstr "large"
-
-#: scripts/ui/settings_panel.gd:40
-msgid "muy grande"
-msgstr "very large"
-
-#: scripts/ui/settings_panel.gd:40
-msgid "pequeño"
-msgstr "small"
-
-#: scripts/ui/settings_panel.gd:40
-msgid "bronce"
-msgstr "bronze"
-
-#: scripts/ui/settings_panel.gd:40
-msgid "plata"
-msgstr "silver"
-
-#: scripts/ui/settings_panel.gd:40
-msgid "oro"
-msgstr "gold"
-
-#: scripts/ui/settings_panel.gd:46
-msgid "AJUSTES"
-msgstr "SETTINGS"
-
-#: scripts/ui/settings_panel.gd:47
-msgid "Pantalla y texto"
-msgstr "Display and text"
-
-#: scripts/ui/settings_panel.gd:48
-msgid "Juego"
-msgstr "Game"
-
-#: scripts/ui/settings_panel.gd:49
-msgid "Accesibilidad"
-msgstr "Accessibility"
-
-#: scripts/ui/settings_panel.gd:50
-msgid "Controles"
-msgstr "Controls"
-
-#: scripts/ui/settings_panel.gd:52
-msgid "Idioma: "
-msgstr "Language: "
-
-#: scripts/ui/settings_panel.gd:61
-msgid "PANTALLA Y TEXTO"
-msgstr "DISPLAY AND TEXT"
-
-#: scripts/ui/settings_panel.gd:63
-msgid "Tamaño de interfaz: "
-msgstr "Interface size: "
-
-#: scripts/ui/settings_panel.gd:64
-msgid "Pantalla completa"
-msgstr "Fullscreen"
-
-#: scripts/ui/settings_panel.gd:67
-msgid "Velocidad del texto: "
-msgstr "Text speed: "
-
-#: scripts/ui/settings_panel.gd:68
-msgid "Avance automático: "
-msgstr "Auto-advance: "
-
-#: scripts/ui/settings_panel.gd:69
-msgid "Letra clara: "
-msgstr "Plain font: "
-
-#: scripts/ui/settings_panel.gd:73
-msgid "JUEGO"
-msgstr "GAME"
-
-#: scripts/ui/settings_panel.gd:76
-msgid "Deducciones: "
-msgstr "Deductions: "
-
-#: scripts/ui/settings_panel.gd:77
-msgid "Acciones largas: "
-msgstr "Long actions: "
-
-#: scripts/ui/settings_panel.gd:77
-msgid "pulsar una vez"
-msgstr "press once"
-
-#: scripts/ui/settings_panel.gd:77
-msgid "mantener pulsado"
-msgstr "hold down"
-
-#: scripts/ui/settings_panel.gd:81
-msgid "ACCESIBILIDAD"
-msgstr "ACCESSIBILITY"
-
-#: scripts/ui/settings_panel.gd:83
-msgid "Colores con patrón: "
-msgstr "Colours with patterns: "
-
-#: scripts/ui/settings_panel.gd:88
-msgid "Subtítulos de sonido: "
-msgstr "Sound captions: "
-
-#: scripts/ui/settings_panel.gd:89
+#: scripts/ui/settings_panel.gd:100
 msgid "Reducir movimiento: "
 msgstr "Reduce motion: "
 
-#: scripts/ui/settings_panel.gd:93
+#: scripts/ui/settings_panel.gd:104
 msgid "CONTROLES"
 msgstr "CONTROLS"
 
-#: scripts/ui/settings_panel.gd:96
+#: scripts/ui/settings_panel.gd:107
 msgid "Mirada con el stick: "
 msgstr "Stick look speed: "
 
-#: scripts/ui/settings_panel.gd:97
+#: scripts/ui/settings_panel.gd:108
 msgid "Invertir el eje vertical: "
 msgstr "Invert vertical axis: "
 
-#: scripts/ui/settings_panel.gd:98
+#: scripts/ui/settings_panel.gd:109
 msgid "Teclas"
 msgstr "Keys"
+
+#: scripts/ui/settings_panel.gd:11
+msgid "rápida"
+msgstr "fast"
+
+#: scripts/ui/settings_panel.gd:11
+msgid "instantánea"
+msgstr "instant"
+
+#: scripts/ui/settings_panel.gd:14
+msgid "relajadas (segunda oportunidad)"
+msgstr "relaxed (second chance)"
+
+#: scripts/ui/settings_panel.gd:14
+msgid "de perito (sin traza)"
+msgstr "expert (no trace)"
+
+#: scripts/ui/settings_panel.gd:150
+msgid "SONIDO"
+msgstr "SOUND"
+
+#: scripts/ui/settings_panel.gd:151
+msgid "Música:"
+msgstr "Music:"
+
+#: scripts/ui/settings_panel.gd:151
+msgid "Efectos:"
+msgstr "Effects:"
+
+#: scripts/ui/settings_panel.gd:151
+msgid "Voces:"
+msgstr "Voices:"
+
+#: scripts/ui/settings_panel.gd:154
+msgid "Español"
+msgstr "Español"
+
+#: scripts/ui/settings_panel.gd:154
+msgid "English"
+msgstr "English"
+
+#: scripts/ui/settings_panel.gd:156
+msgid "IDIOMA"
+msgstr "LANGUAGE"
+
+#: scripts/ui/settings_panel.gd:163
+msgid "El cambio de idioma vuelve al menú principal."
+msgstr "Changing the language returns to the main menu."
+
+#: scripts/ui/settings_panel.gd:168
+msgid "TECLAS"
+msgstr "KEYS"
+
+#: scripts/ui/settings_panel.gd:172
+msgid "Restablecer las teclas"
+msgstr "Reset keys"
+
+#: scripts/ui/settings_panel.gd:178
+msgid "pulsa una tecla…  (Esc cancela)"
+msgstr "press a key…  (Esc cancels)"
+
+#: scripts/ui/settings_panel.gd:50
+msgid "lenta"
+msgstr "slow"
+
+#: scripts/ui/settings_panel.gd:50
+msgid "normal"
+msgstr "normal"
+
+#: scripts/ui/settings_panel.gd:50
+msgid "normales"
+msgstr "normal"
+
+#: scripts/ui/settings_panel.gd:50
+msgid "grande"
+msgstr "large"
+
+#: scripts/ui/settings_panel.gd:50
+msgid "muy grande"
+msgstr "very large"
+
+#: scripts/ui/settings_panel.gd:50
+msgid "pequeño"
+msgstr "small"
+
+#: scripts/ui/settings_panel.gd:50
+msgid "bronce"
+msgstr "bronze"
+
+#: scripts/ui/settings_panel.gd:50
+msgid "plata"
+msgstr "silver"
+
+#: scripts/ui/settings_panel.gd:50
+msgid "oro"
+msgstr "gold"
+
+#: scripts/ui/settings_panel.gd:56
+msgid "AJUSTES"
+msgstr "SETTINGS"
+
+#: scripts/ui/settings_panel.gd:57
+msgid "Pantalla y texto"
+msgstr "Display and text"
+
+#: scripts/ui/settings_panel.gd:58
+msgid "Juego"
+msgstr "Game"
+
+#: scripts/ui/settings_panel.gd:59
+msgid "Accesibilidad"
+msgstr "Accessibility"
+
+#: scripts/ui/settings_panel.gd:60
+msgid "Controles"
+msgstr "Controls"
+
+#: scripts/ui/settings_panel.gd:62
+msgid "Idioma: "
+msgstr "Language: "
+
+#: scripts/ui/settings_panel.gd:71
+msgid "PANTALLA Y TEXTO"
+msgstr "DISPLAY AND TEXT"
+
+#: scripts/ui/settings_panel.gd:73
+msgid "Tamaño de interfaz: "
+msgstr "Interface size: "
+
+#: scripts/ui/settings_panel.gd:76
+msgid "Pantalla completa: "
+msgstr "Fullscreen: "
+
+#: scripts/ui/settings_panel.gd:78
+msgid "Velocidad del texto: "
+msgstr "Text speed: "
+
+#: scripts/ui/settings_panel.gd:79
+msgid "Avance automático: "
+msgstr "Auto-advance: "
+
+#: scripts/ui/settings_panel.gd:80
+msgid "Letra clara: "
+msgstr "Plain font: "
+
+#: scripts/ui/settings_panel.gd:84
+msgid "JUEGO"
+msgstr "GAME"
+
+#: scripts/ui/settings_panel.gd:87
+msgid "Deducciones: "
+msgstr "Deductions: "
+
+#: scripts/ui/settings_panel.gd:88
+msgid "Acciones largas: "
+msgstr "Long actions: "
+
+#: scripts/ui/settings_panel.gd:88
+msgid "pulsar una vez"
+msgstr "press once"
+
+#: scripts/ui/settings_panel.gd:88
+msgid "mantener pulsado"
+msgstr "hold down"
+
+#: scripts/ui/settings_panel.gd:92
+msgid "ACCESIBILIDAD"
+msgstr "ACCESSIBILITY"
+
+#: scripts/ui/settings_panel.gd:94
+msgid "Colores con patrón: "
+msgstr "Colours with patterns: "
+
+#: scripts/ui/settings_panel.gd:99
+msgid "Subtítulos de sonido: "
+msgstr "Sound captions: "

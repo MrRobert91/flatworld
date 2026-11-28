@@ -59,12 +59,14 @@ static func rumble(weak: float, strong: float, sec: float) -> void:
 
 # ---------- ajustes ----------
 static func load_cfg() -> void:
-	if not FileAccess.file_exists(CFG): return
-	var f := FileAccess.open(CFG, FileAccess.READ)
-	if f == null: return
-	var s = JSON.parse_string(f.get_as_text())
-	if s is Dictionary:
-		for k in s: cfg[k] = s[k]
+	var f := FileAccess.open(CFG, FileAccess.READ) if FileAccess.file_exists(CFG) else null
+	if f != null:
+		var s = JSON.parse_string(f.get_as_text())
+		if s is Dictionary:
+			for k in s: cfg[k] = s[k]
+	# pruebas de disposición: --scale=1.3 --plainfont
+	if args.has("scale"): cfg.scale = float(args.scale)
+	if args.has("plainfont"): cfg.plain_font = true
 
 static func save_cfg() -> void:
 	var f := FileAccess.open(CFG, FileAccess.WRITE)

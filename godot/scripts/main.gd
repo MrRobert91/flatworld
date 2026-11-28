@@ -80,7 +80,7 @@ func _menu_main() -> void:
 	var S: Dictionary = g.state
 	var items := []
 	if S.chapter > 0 or not S.frags.is_empty():
-		items.append([ui.T("Continuar — ") + ui.T(chapters[mini(S.chapter, chapters.size() - 1)][0]), func(_b): _start(S.chapter)])
+		items.append(["Continuar" + "\n" + ui.T(chapters[mini(S.chapter, chapters.size() - 1)][0]), func(_b): _start(S.chapter)])
 	items.append(["Nueva partida", func(_b): _menu_slots(true)])
 	var used := Profile.list_slots().filter(func(x): return not x.empty)
 	if used.size() > 1 or (used.size() == 1 and used[0].n != g.slot): items.append(["Cargar partida", func(_b): _menu_slots(false)])
@@ -299,7 +299,14 @@ func _process(dt: float) -> void:
 	if App.args.has("cinetest") and g.running and g.player != null and Time.get_ticks_msec() > 4000 and not has_meta("cine"):
 		set_meta("cine", true); _cinetest()
 	if App.args.has("open") and g.running and not ui.journal_open and Time.get_ticks_msec() > 5000 and not has_meta("opened"):
-		set_meta("opened", true); ui.toggle_journal(App.args.open)
+		set_meta("opened", true)
+		# --open=pause|settings|<pestaña del inventario>: capturas de los paneles
+		if App.args.open == "pause": g.on_menu.call()
+		elif String(App.args.open).begins_with("settings"):
+			ui.open_settings()
+			var pg := String(App.args.open).trim_prefix("settings").trim_prefix(":")
+			if pg != "": ui.settings.call("_" + pg)
+		else: ui.toggle_journal(App.args.open)
 	if App.args.has("shots"):
 		_shot_t -= dt / maxf(Engine.time_scale, 0.01)
 		if _shot_t <= 0.0:

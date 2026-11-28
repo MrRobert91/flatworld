@@ -36,6 +36,13 @@ static func enable(c: Ch, on_drop := Callable()) -> Callable:
 			st.held = null; st.fall.append([e, e.alt]); Snd.sfx('fall')
 		st.was = act
 		e = st.held
+		# el botón de acción táctil sólo aparece cuando hay algo que coger o soltar
+		var lbl := ''
+		if e != null: lbl = c.ui.T('Soltar')
+		elif p.alt < ALT:
+			for o in W.ents.values():
+				if o.carryable and not o.hid and not o.lifted and Vector2(o.x - p.x, o.y - p.y).length() < REACH: lbl = c.ui.T('Coger'); break
+		g.carry_label = lbl
 		if e != null:
 			e.x = lerpf(e.x, p.x, minf(1.0, dt * 6.0)); e.y = lerpf(e.y, p.y, minf(1.0, dt * 6.0))
 			e.alt = lerpf(e.alt, maxf(0.3, p.alt - 1.2), minf(1.0, dt * 5.0))
@@ -53,7 +60,7 @@ static func enable(c: Ch, on_drop := Callable()) -> Callable:
 				W.fx_add('puff', o.x, o.y, 0.5, 0.5); Snd.sfx('pick')
 				if on_drop.is_valid(): on_drop.call(o))
 	return func():
-		stop.call(); plumb.queue_free()
+		stop.call(); plumb.queue_free(); g.carry_label = ''
 		if st.held != null: st.held.lifted = false; st.held.alt = 0.0
 
 # espera a que la figura `id` quede soltada donde pide `goal(e) -> bool`

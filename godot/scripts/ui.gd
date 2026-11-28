@@ -84,14 +84,17 @@ var j_tabs := {}
 var j_list: VBoxContainer
 var j_body: VBoxContainer
 var j_split: BoxContainer
+var j_close: Button
 var j_ls: ScrollContainer
 var menu: Control
 var menu_split: BoxContainer
 var menu_title: Label
 var menu_btns: VBoxContainer
 var menu_foot: Label
+var menu_sub: Label
+var menu_opts: Control
 var pause: Control
-var pause_btns: VBoxContainer
+var pause_btns: GridContainer
 
 # estado
 var dlg_open := false
@@ -116,6 +119,7 @@ var _opt_lock := []
 var _block_tw: Tween
 var _re := RegEx.new()
 var _menu_args := []
+var _menu_back := Callable()
 var _typing := false      # el bloque se va escribiendo
 var _type_n := 0.0
 var _type_total := 0
@@ -192,6 +196,12 @@ func _ready() -> void:
 
 func _input(ev: InputEvent) -> void:
 	Glyphs.observe(ev)
+	# «atrás» (Esc, B del mando) cierra el documento abierto y sube un nivel en los submenús del menú principal
+	if ev.is_action_pressed("ui_cancel") and not ev.is_echo() and not pause_open and not settings_open and not journal_open:
+		if doc_box != null:
+			Snd.sfx("ui"); doc_closed.emit(); get_viewport().set_input_as_handled()
+		elif menu_open and _menu_back.is_valid() and (lam_box == null or not lam_box.visible):
+			Snd.sfx("ui"); _menu_back.call(null); get_viewport().set_input_as_handled()
 
 # cambia el dispositivo: los textos con glifos se rehacen y el foco sólo se ve con mando
 func _on_device() -> void:
@@ -277,7 +287,24 @@ func _btn(text: String, kind := "ghost", fsize := 17, min_h := 48.0) -> Button:
 	var fo: StyleBoxFlat = h.duplicate(); fo.draw_center = false; fo.border_color = App.ACC; fo.set_border_width_all(2)
 	b.add_theme_stylebox_override("focus", fo)
 	b.focus_entered.connect(func(): if Glyphs.pad(): Snd.sfx("ui"))
+	press_fx(b)
+	b.button_down.connect(func(): press_down(b))
+	b.button_up.connect(func(): press_up(b))
 	return b
+
+# al pulsar, el control se hunde un poco y rebota al soltar (salvo con «reducir movimiento»)
+func press_fx(c: Control) -> void:
+	c.resized.connect(func(): c.pivot_offset = c.size / 2.0)
+
+func press_down(c: Control) -> void:
+	if bool(App.cfg.get("reduce_motion", false)) or not c.is_inside_tree(): return
+	c.pivot_offset = c.size / 2.0
+	c.create_tween().tween_property(c, "scale", Vector2(0.96, 0.96), 0.05)
+
+func press_up(c: Control) -> void:
+	if not c.is_inside_tree(): return
+	if c.scale == Vector2.ONE: return
+	c.create_tween().tween_property(c, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 # barra de desplazamiento fina, a tinta
 func _ink_scrollbar(sb: ScrollBar) -> void:
@@ -299,6 +326,11 @@ func apply_fonts() -> void:
 	var plain := bool(App.cfg.get("plain_font", false))
 	serif.base_font = ThemeDB.fallback_font if plain else F_SERIF
 	serif_it.base_font = ThemeDB.fallback_font if plain else F_SERIF_IT
+
+# las capas a pantalla completa de la historia (láminas, documentos) quedan bajo el inventario, la pausa y los ajustes
+func _under_modals(n: Control) -> void:
+	# desde el menú (galería) van sobre él; en la partida, bajo el inventario
+	move_child(n, (pause if menu_open else journal).get_index())
 
 func modal() -> bool:
 	return journal_open or menu_open or pause_open or settings_open
@@ -371,7 +403,8 @@ func _build_slate() -> void:
 	slate_box.add_theme_stylebox_override("panel", _card(Color("fbf7ea"), 12, 10)); slate_box.visible = false; add_child(slate_box)
 	var v := VBoxContainer.new(); v.mouse_filter = Control.MOUSE_FILTER_IGNORE; slate_box.add_child(v)
 	slate_board = SlateBoard.new(); slate_board.font = serif_it; slate_board.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_child(slate_board)
-	slate_cap = _lbl("", caps, 12, App.SOFT); slate_cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(slate_cap)
+	slate_cap = _lbl("", caps, 12, App.SOFT); slate_cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	slate_cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(slate_cap)   # el rótulo nunca ensancha la pizarra
 
 func _build_title() -> void:
 	title_box = Control.new(); title_box.mouse_filter = Control.MOUSE_FILTER_IGNORE; _full(title_box); title_box.visible = false; add_child(title_box)
@@ -395,11 +428,14 @@ func _build_journal() -> void:
 	for k in ["margin_left", "margin_right"]: m.add_theme_constant_override(k, 20)
 	m.add_theme_constant_override("margin_top", 10); m.add_theme_constant_override("margin_bottom", 10)
 	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 6); m.add_child(v)
-	var head := HBoxContainer.new(); head.add_theme_constant_override("separation", 4); v.add_child(head)
+	var head := HBoxContainer.new(); head.add_theme_constant_override("separation", 8); v.add_child(head)
+	# las pestañas pasan a una segunda fila si no caben; «Cerrar» queda siempre a la vista, a la derecha
+	var tabs := HFlowContainer.new(); tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tabs.add_theme_constant_override("h_separation", 2); tabs.add_theme_constant_override("v_separation", 2); head.add_child(tabs)
 	for t in JTABS:
-		var b := _btn(T(t[1]), "flat", 16, 46); b.pressed.connect(j_tab.bind(t[0])); head.add_child(b); j_tabs[t[0]] = b
-	var sp := Control.new(); sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL; head.add_child(sp)
-	var cl := _btn(T("Cerrar"), "ghost", 15, 44); cl.pressed.connect(func(): toggle_journal()); head.add_child(cl)
+		var b := _btn(T(t[1]), "flat", 16, 46); b.pressed.connect(func(): Snd.sfx("page"); j_tab(t[0])); tabs.add_child(b); j_tabs[t[0]] = b
+	j_close = _btn(T("Cerrar"), "ghost", 15, 44); j_close.pressed.connect(func(): toggle_journal()); head.add_child(j_close)
+	j_close.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	var rule := ColorRect.new(); rule.color = App.INK; rule.custom_minimum_size.y = 2; v.add_child(rule)
 	j_split = BoxContainer.new(); j_split.size_flags_vertical = Control.SIZE_EXPAND_FILL; j_split.add_theme_constant_override("separation", 24); v.add_child(j_split)
 	j_ls = ScrollContainer.new(); j_ls.custom_minimum_size = Vector2(290, 150); j_ls.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; j_split.add_child(j_ls)
@@ -422,7 +458,8 @@ func _build_menu() -> void:
 	var ft := FontVariation.new(); ft.base_font = F_FELL; ft.spacing_glyph = 6
 	menu_title = _lbl(T("PLANILANDIA"), ft, 96, App.INK); menu_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(menu_title)
 	var rule := Rule.new(); rule.custom_minimum_size = Vector2(240, 14); rule.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v.add_child(rule)
-	var sub := _lbl("Un romance de muchas dimensiones", serif_it, 24, App.ACC); sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(sub)
+	menu_sub = _lbl("Un romance de muchas dimensiones", serif_it, 24, App.ACC); menu_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	menu_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(menu_sub)
 	var v2 := VBoxContainer.new(); v2.add_theme_constant_override("separation", 10); v2.alignment = BoxContainer.ALIGNMENT_CENTER; menu_split.add_child(v2)
 	menu_btns = VBoxContainer.new(); menu_btns.add_theme_constant_override("separation", 8); menu_btns.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; v2.add_child(menu_btns)
 	menu_foot = _lbl("", serif_it, 15, App.SOFT); menu_foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -436,16 +473,16 @@ func _build_pause() -> void:
 	var card := PanelContainer.new(); card.add_theme_stylebox_override("panel", _card(App.CARD, 22, 16)); c.add_child(card)
 	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 8); card.add_child(v)
 	var t := _lbl("PAUSA", caps, 15, App.ACC); t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(t)
-	pause_btns = VBoxContainer.new(); pause_btns.add_theme_constant_override("separation", 8); v.add_child(pause_btns)
+	pause_btns = GridContainer.new(); pause_btns.add_theme_constant_override("h_separation", 8); pause_btns.add_theme_constant_override("v_separation", 8); v.add_child(pause_btns)
 
 # botones de ajustes compartidos por el menú y la pausa: sonido a mano y el resto en el panel de ajustes
-func _settings_btns(into: Container, min_h: float) -> void:
-	var bm := _btn("", "ghost", 14, min_h)
-	var upd_m := func(): bm.text = T("Sonido: ") + (T("no") if Snd.muted else T("sí"))
+func _settings_btns(into: Container, min_h: float, big := false) -> void:
+	var bm := _btn("", "ghost", 15 if big else 14, min_h)
+	var upd_m := func(): bm.text = (T("Sonido: ") + (T("no") if Snd.muted else T("sí"))).to_upper() if big else T("Sonido: ") + (T("no") if Snd.muted else T("sí"))
 	upd_m.call()
 	bm.pressed.connect(func(): Snd.toggle_mute(); upd_m.call())
 	into.add_child(bm)
-	var bs := _btn(T("Ajustes"), "ghost", 14, min_h)
+	var bs := _btn(T("Ajustes").to_upper() if big else T("Ajustes"), "ghost", 15 if big else 14, min_h)
 	bs.pressed.connect(func(): Snd.sfx("ui"); open_settings())
 	into.add_child(bs)
 
@@ -486,30 +523,94 @@ func _layout() -> void:
 	# la palanca sólo ocupa los lados cuando se puede andar; en una conversación el bloque usa el ancho
 	if touch and not port and not dlg_open and not picking: side = 168.0
 	var w := clampf(size.x - side * 2.0, 280.0, 780.0)
-	dlg.custom_minimum_size.x = w; pick.custom_minimum_size.x = minf(size.x - 24.0, 860.0)
+	var pw := minf(size.x - 24.0, 860.0)
+	var ml := 12.0
+	# pizarra en un móvil apaisado: a la izquierda; diálogo y respuestas, a su derecha
+	if _slate_side():
+		ml = 24.0 + _slate_w + 24.0
+		w = size.x - ml - 12.0; pw = w
+	dlg.custom_minimum_size.x = w; pick.custom_minimum_size.x = pw
 	var fs := 21 if compact or narrow else 23
 	for k in ["normal_font_size", "italics_font_size"]: dlg_text.add_theme_font_size_override(k, fs)
-	dock_margin.add_theme_constant_override("margin_left", 12); dock_margin.add_theme_constant_override("margin_right", 12)
+	dock_margin.add_theme_constant_override("margin_left", int(ml)); dock_margin.add_theme_constant_override("margin_right", 12)
 	_dock_bottom()
 	info.custom_minimum_size.x = minf(size.x - 40.0, 600.0)
+	# los textos enriquecidos conocen su anchura de antemano: si no, al mostrarse calculan su altura con anchura cero
+	info_text.custom_minimum_size.x = info.custom_minimum_size.x - 44.0
+	pick_text.custom_minimum_size.x = pick.custom_minimum_size.x - 40.0
 	note_l.custom_minimum_size.x = minf(size.x - 60.0, 720.0)
 	t_title.custom_minimum_size.x = minf(size.x - 40.0, 1000.0); t_sub.custom_minimum_size.x = minf(size.x - 60.0, 680.0)
 	t_title.add_theme_font_size_override("font_size", int(clampf(minf(size.x * 0.07, size.y * 0.16), 34, 76)))
 	# la pizarra deja sitio debajo para el cuadro de diálogo (en pantallas bajas se encoge)
-	var sbw := minf(minf(640.0, size.x - 60.0), (size.y - 250.0) * 640.0 / 420.0)
-	sbw = maxf(sbw, 260.0)
-	slate_board.custom_minimum_size = Vector2(sbw, sbw * 420.0 / 640.0)
-	if draw_b != null: draw_b.custom_minimum_size = slate_board.custom_minimum_size
+	_slate_w = _slate_want(); _slate_size(_slate_w)
 	j_split.vertical = port or size.x < 700
+	var jn := size.x < 640
+	j_close.text = "×" if jn else T("Cerrar")
+	j_close.add_theme_font_override("font", F_FELL if jn else caps); j_close.add_theme_font_size_override("font_size", 30 if jn else 15)
+	j_close.custom_minimum_size = Vector2(48, 44) if jn else Vector2(0, 44)
+	for k in j_tabs: j_tabs[k].add_theme_font_size_override("font_size", 14 if jn else 16)
 	j_ls.custom_minimum_size = Vector2(size.x - 40, minf(190, size.y * 0.3)) if j_split.vertical else Vector2(clampf(size.x * 0.32, 230, 320), 120)
 	# menú: en un móvil apaisado, título a la izquierda y botones a la derecha
-	var wide_menu := compact and not port and size.x > 620
+	var wide_menu := _wide_menu()
 	menu_split.vertical = not wide_menu
-	var tfs := clampf(size.x * (0.058 if wide_menu else 0.085), 38, 112)
-	menu_title.add_theme_font_size_override("font_size", int(minf(tfs, size.y * 0.2)))
-	menu_foot.custom_minimum_size.x = minf(size.x - 40, 420)
+	# el título cabe siempre en su columna: se mide y se encoge
+	var col_w := (size.x - _menu_bw() - 26.0 - 44.0) if wide_menu else (size.x - 28.0)
+	var tfs := clampf(size.x * (0.058 if wide_menu else 0.085), 30, 112)
+	tfs = minf(tfs, size.y * (0.2 if wide_menu else 0.12))
+	var tw0 := menu_title.get_theme_font("font").get_string_size(menu_title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 100).x
+	if tw0 > 0.0: tfs = minf(tfs, 100.0 * (col_w - 8.0) / tw0)
+	menu_title.add_theme_font_size_override("font_size", int(maxf(tfs, 22.0)))
+	menu_sub.custom_minimum_size.x = minf(col_w, 520.0)
+	menu_sub.add_theme_font_size_override("font_size", 20 if compact else 24)
+	menu_foot.custom_minimum_size.x = minf(col_w, 420.0) if wide_menu else minf(_menu_bw() + 40.0, size.x - 40.0)
 	if menu_open and not _menu_args.is_empty(): show_menu.callv(_menu_args)
 	pad.queue_redraw()
+
+func _two_cols() -> bool:
+	return not port and size.x > 560 and size.y < 520
+
+# la vista del plano a pantalla completa ocupa lo que dejan libre los paneles de abajo (respuestas,
+# diálogo): la línea queda siempre en el centro del hueco y nunca debajo de un panel
+var _eye_h := -1.0
+func eye_full_rect(dt: float) -> Rect2:
+	var bottom := _dock_top() - 6.0
+	# la línea no baja de la mitad de la pantalla si cabe de sobra, y el hueco nunca es menor de 110 puntos
+	var want := clampf(bottom, minf(size.y, 110.0), size.y)
+	if want > size.y * 0.5 + 60.0: want = size.y
+	if _eye_h < 0.0: _eye_h = want
+	_eye_h = lerpf(_eye_h, want, 1.0 - exp(-dt * 8.0))
+	return Rect2(0, 0, size.x, _eye_h)
+
+# la pizarra es tan grande como permite el hueco: deja sitio abajo sólo si hay diálogo o respuestas
+var _slate_w := 400.0
+var _squeezed := false
+func _slate_side() -> bool:
+	return slate_box != null and slate_box.visible and not port and size.y < 560.0 and size.x >= 640.0
+
+func _slate_want() -> float:
+	var top := _top_y() if hud.visible else 12.0
+	if _slate_side(): return clampf(minf(size.x * 0.5 - 36.0, (size.y - top - 60.0) * 640.0 / 420.0), 220.0, 640.0)
+	# cabe entre el HUD y lo más alto del muelle de abajo (diálogo, respuestas), con el rótulo
+	var room := _dock_top() - top - 10.0 - 46.0
+	if not (dlg.visible or picking): room = size.y - top - 96.0
+	var w := minf(minf(720.0, size.x - 40.0), room * 640.0 / 420.0)
+	return maxf(w, 200.0)
+
+func _dock_top() -> float:
+	var y := size.y
+	for c in dock.get_children():
+		if c is Control and c.visible and c.size.y > 1.0: y = minf(y, c.global_position.y)
+	return y
+
+func _slate_size(w: float) -> void:
+	slate_board.custom_minimum_size = Vector2(w, w * 420.0 / 640.0)
+	if draw_b != null: draw_b.custom_minimum_size = slate_board.custom_minimum_size
+
+func _wide_menu() -> bool:
+	return not port and size.x > 600 and size.y < 560
+
+func _menu_bw() -> float:
+	return clampf(size.x * 0.42, 240.0, 360.0) if _wide_menu() else clampf(size.x - 40.0, 240.0, 340.0)
 
 func _dock_bottom() -> void:
 	var b := 12.0
@@ -543,14 +644,31 @@ func _process(dt: float) -> void:
 	if objective_l.visible != obj_on: objective_l.visible = obj_on; hud_card.reset_size()
 	var ty := maxf(strip_rect.end.y, hud_card.position.y + hud_card.size.y if hud.visible else 0.0) + 10
 	if info.visible:
-		info.reset_size(); info.position = Vector2((size.x - info.size.x) / 2.0, ty); ty += info.size.y + 8
+		info.reset_size(); info.position = Vector2((size.x - info.size.x) / 2.0, ty)
+		# con la vista del plano a pantalla completa, la línea va en el centro: el panel nunca la tapa
+		var mid := (_eye_h if _eye_h > 0.0 else size.y) * 0.5
+		if App.g != null and App.g.world != null and App.g.world.eye_t > 0.5 and info.position.y + info.size.y > mid - 34.0:
+			info.position.y = mid + 40.0
+		else: ty += info.size.y + 8
 	if note_box.visible:
 		note_box.reset_size(); note_box.position = Vector2((size.x - note_box.size.x) / 2.0, ty)
 	if slate_box.visible:
+		var sw := _slate_want()
+		if absf(sw - _slate_w) > 0.5:
+			_slate_w = lerpf(_slate_w, sw, 1.0 - exp(-dt * 10.0)); _slate_size(_slate_w)
 		slate_box.reset_size()
-		var sy := (size.y - slate_box.size.y) * 0.3
-		if dlg.visible or picking: sy = minf(sy, size.y - 215.0 - slate_box.size.y)
-		slate_box.position = Vector2((size.x - slate_box.size.x) / 2.0, maxf(6.0, sy))
+		var top := _top_y() if hud.visible else 6.0
+		# sin sitio para pizarra, diálogo y respuestas a la vez: el parlamento (ya leído) se pliega mientras se elige
+		if picking and dlg.visible and dlg_text.visible and not _slate_side() and _dock_top() - top < 200.0:
+			dlg_text.visible = false; _squeezed = true
+		if _slate_side():
+			slate_box.position = Vector2(12.0, maxf(top, top + (size.y - top - slate_box.size.y) * 0.5))
+			if int(dock_margin.get_theme_constant("margin_left")) != int(24.0 + _slate_w + 24.0): _layout()
+		else:
+			var sy := maxf((size.y - slate_box.size.y) * 0.3, top)
+			if dlg.visible or picking: sy = clampf(top + (_dock_top() - 8.0 - top - slate_box.size.y) * 0.5, top, maxf(top, _dock_top() - 8.0 - slate_box.size.y))
+			slate_box.position = Vector2((size.x - slate_box.size.x) / 2.0, maxf(6.0, sy))
+	elif int(dock_margin.get_theme_constant("margin_left")) != 12: _layout()
 	if prompt_box.visible:
 		prompt_box.reset_size(); prompt_box.position = Vector2((size.x - prompt_box.size.x) / 2.0, size.y * 0.80 - prompt_box.size.y)
 	keys_box.reset_size(); keys_box.position = Vector2(size.x - keys_box.size.x - 14, size.y - keys_box.size.y - 12)
@@ -840,7 +958,8 @@ func close_dlg() -> void:
 func _more(on: bool) -> void:
 	var how := T("toca para continuar  ›") if touch else ("%s  ›  %s" % [Glyphs.name_of("advance").to_lower(), T("continuar")])
 	if _cur_seen and not touch: how = "%s %s · %s   %s" % [T("mantén"), Glyphs.name_of("skip_hold").to_lower(), T("saltar"), how]
-	dlg_more.text = how + _page_info
+	# en versalitas, todo en mayúsculas: las minúsculas de esta letra (la «p») se ven desiguales
+	dlg_more.text = (how + _page_info).to_upper()
 	dlg_more.visible = on
 
 # ---------- páginas ----------
@@ -1082,6 +1201,7 @@ func panel(title_text: String, text: String, options: Array):
 	_layout()
 	var p: int = await picked
 	picking = false; pick.visible = false; _n_opts = 0; _sel = -1
+	if _squeezed: _squeezed = false; dlg_text.visible = true
 	Snd.sfx("pick"); _layout()
 	return options[p].get("id", p)
 
@@ -1103,16 +1223,22 @@ var lam_data := {}
 var lam_box: Control
 var lam_board: SlateBoard
 var lam_cap: Label
+var lam_split: BoxContainer
+var lam_hint: Label
 signal doc_closed
 
 func _lam_build() -> void:
 	lam_box = Control.new(); _full(lam_box); lam_box.visible = false; add_child(lam_box)
 	var veil := ColorRect.new(); veil.color = Color(App.PAPER, 0.97); _full(veil); lam_box.add_child(veil)
 	var c := CenterContainer.new(); _full(c); c.mouse_filter = Control.MOUSE_FILTER_IGNORE; lam_box.add_child(c)
-	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 10); c.add_child(v)
-	lam_board = SlateBoard.new(); lam_board.font = serif_it; lam_board.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_child(lam_board)
+	lam_split = BoxContainer.new(); lam_split.add_theme_constant_override("separation", 14); lam_split.alignment = BoxContainer.ALIGNMENT_CENTER; c.add_child(lam_split)
+	lam_board = SlateBoard.new(); lam_board.font = serif_it; lam_board.mouse_filter = Control.MOUSE_FILTER_IGNORE; lam_split.add_child(lam_board)
+	lam_board.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	lam_cap = _lbl("", serif_it, 21, App.INK); lam_cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lam_cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(lam_cap)
+	lam_cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; lam_cap.size_flags_vertical = Control.SIZE_SHRINK_CENTER; lam_split.add_child(lam_cap)
+	lam_hint = _lbl("", caps, 13, App.ACC); lam_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	lam_hint.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT); lam_hint.grow_horizontal = Control.GROW_DIRECTION_BEGIN; lam_hint.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	lam_hint.offset_right = -18; lam_hint.offset_bottom = -12; lam_box.add_child(lam_hint)
 
 static func _lam_draw(b: SlateBoard, t: float, L: Dictionary) -> void:
 	for s in L.strokes:
@@ -1131,7 +1257,7 @@ static func _lam_draw(b: SlateBoard, t: float, L: Dictionary) -> void:
 		if out.size() >= 2: b.draw_polyline(out, col, maxf(1.0, float(s.w) * b.k), true)
 		elif pts.size() == 1: b.draw_circle(pts[0], float(s.w) * b.k, col)
 	for l in L.get("labels", []):
-		if t >= float(l.t): b.draw_string(b.font, Vector2(l.x, l.y) * b.k, TranslationServer.translate(l.text), HORIZONTAL_ALIGNMENT_LEFT, -1, int(float(l.get("s", 18)) * b.k), App.INK)
+		if t >= float(l.t): b.draw_string(b.font, Vector2(l.x, l.y) * b.k, TranslationServer.translate(l.text), HORIZONTAL_ALIGNMENT_LEFT, -1, maxi(int(float(l.get("s", 18)) * b.k), 11), App.INK)
 
 func lamina(id: String) -> void:
 	Profile.unlock_gallery(id)
@@ -1142,15 +1268,31 @@ func lamina(id: String) -> void:
 	if not lam_data.has(id): return
 	var L: Dictionary = lam_data[id]
 	if lam_box == null: _lam_build()
-	var sbw := minf(minf(640.0, size.x - 60.0), (size.y - 160.0) * 640.0 / 420.0)
+	# en una pantalla baja y ancha, el dibujo a la izquierda y la leyenda a su lado
+	var side := not port and size.y < 560.0
+	lam_split.vertical = not side
+	var sbw: float
+	if side:
+		sbw = minf(size.x * 0.56, (size.y - 56.0) * 640.0 / 420.0)
+		lam_cap.custom_minimum_size.x = clampf(size.x - sbw - 80.0, 160.0, 420.0)
+		lam_cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	else:
+		sbw = minf(minf(640.0, size.x - 40.0), (size.y - 230.0) * 640.0 / 420.0)
+		lam_cap.custom_minimum_size.x = minf(maxf(sbw, size.x * 0.8), 640.0)
+		lam_cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lam_cap.add_theme_font_size_override("font_size", 19 if compact else 21)
 	lam_board.custom_minimum_size = Vector2(sbw, sbw * 420.0 / 640.0)
-	lam_cap.custom_minimum_size.x = sbw; lam_cap.text = T(L.caption)
-	move_child(lam_box, get_child_count() - 1); lam_box.visible = true
+	lam_cap.text = T(L.caption)
+	lam_hint.text = (T("toca para continuar  ›") if touch else ("%s  ›  %s" % [Glyphs.name_of("advance").to_lower(), T("continuar")])).to_upper()
+	lam_hint.modulate.a = 0.0
+	_under_modals(lam_box); lam_box.visible = true
 	var st := {t = 0.0, n = 0, hold = 1.4}
 	var dur: float = float(L.dur)
 	while true:
 		await get_tree().process_frame
 		var dt := get_process_delta_time()
+		# con la pausa o el inventario abiertos la lámina espera (y sus toques no la saltan)
+		if journal_open or pause_open or settings_open: continue
 		var skip := Input.is_action_just_pressed("advance") or Input.is_action_just_pressed("act") or Input.is_action_pressed("skip_hold") or Input.is_action_just_pressed("ui_accept") or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 		if st.t >= 1.0:
 			st.hold -= dt
@@ -1162,6 +1304,7 @@ func lamina(id: String) -> void:
 			for s in L.strokes: if st.t >= float(s.t0): started += 1
 			if started > st.n: st.n = started; Snd.sfx("chalk")
 		lam_board.paint(func(b, t): _lam_draw(b, t, L), st.t)
+		lam_hint.modulate.a = minf(1.0, lam_hint.modulate.a + dt * 2.0) if st.t > 0.15 else 0.0
 	lam_box.visible = false
 
 # un documento para leer (galería, prefacio): título, párrafos y «Volver»
@@ -1169,7 +1312,7 @@ var doc_box: Control
 func show_doc(title_text: String, paras: Array) -> void:
 	if auto: return
 	if doc_box != null: doc_box.queue_free()
-	doc_box = Control.new(); _full(doc_box); add_child(doc_box)
+	doc_box = Control.new(); _full(doc_box); add_child(doc_box); _under_modals(doc_box)
 	var veil := ColorRect.new(); veil.color = Color(App.PAPER, 0.96); _full(veil); doc_box.add_child(veil)
 	var sc := ScrollContainer.new(); _full(sc); sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; doc_box.add_child(sc)
 	var c := CenterContainer.new(); c.size_flags_horizontal = Control.SIZE_EXPAND_FILL; sc.add_child(c)
@@ -1240,8 +1383,13 @@ func j_tab(tab: String) -> void:
 		var on: bool = k == tab
 		for c in ["font_color", "font_hover_color", "font_focus_color"]: j_tabs[k].add_theme_color_override(c, App.INK if on else App.SOFT)
 		var sb := StyleBoxFlat.new(); sb.bg_color = Color(App.ACC, 0.10 if on else 0.0); sb.border_color = App.ACC; sb.border_width_bottom = 3 if on else 0
-		sb.content_margin_left = 14; sb.content_margin_right = 14
+		var jm := 10 if size.x < 640 else 14
+		sb.content_margin_left = jm; sb.content_margin_right = jm
 		j_tabs[k].add_theme_stylebox_override("normal", sb)
+		var hv: StyleBoxFlat = sb.duplicate(); hv.bg_color = Color(App.ACC, 0.16 if on else 0.07)
+		j_tabs[k].add_theme_stylebox_override("hover", hv); j_tabs[k].add_theme_stylebox_override("pressed", hv)
+		var fo: StyleBoxFlat = hv.duplicate(); fo.draw_center = false; fo.set_border_width_all(2)
+		j_tabs[k].add_theme_stylebox_override("focus", fo)
 	_j_clear(j_list); _j_clear(j_body)
 	if tab == "ms":
 		var F: Array = App.g.book.fragments
@@ -1314,14 +1462,17 @@ func _j_ledger(S: Dictionary) -> void:
 	j_list.add_child(r)
 	if L.is_empty(): return
 	j_body.add_child(_lbl(T("ANALOGÍAS"), caps, 12, App.ACC))
+	# sitio para la tabla: si no caben cinco columnas legibles, cada mundo va en su propia ficha
+	var avail := size.x - 56.0 - (0.0 if j_split.vertical else j_ls.custom_minimum_size.x + 24.0)
+	if avail < 640.0: _j_ledger_cards(L, got); return
 	var grid := GridContainer.new(); grid.columns = 1 + (L.cols as Array).size()
 	grid.add_theme_constant_override("h_separation", 10); grid.add_theme_constant_override("v_separation", 8)
 	j_body.add_child(grid)
-	var cw := clampf((size.x - (80.0 if j_split.vertical else 420.0)) / 6.4, 64.0, 150.0)
+	var cw := clampf(avail / 6.2, 96.0, 150.0)
 	grid.add_child(Control.new())
 	for c in L.cols:
 		var h := VBoxContainer.new(); h.add_theme_constant_override("separation", -2)
-		var n := _lbl(T(c.name), caps, 12, App.INK); n.custom_minimum_size.x = cw; n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; h.add_child(n)
+		var n := _lbl(T(c.name), caps, 12, App.INK); n.custom_minimum_size.x = cw; n.autowrap_mode = TextServer.AUTOWRAP_WORD; h.add_child(n)
 		h.add_child(_lbl(c.sub, serif_it, 14, App.SOFT)); grid.add_child(h)
 	var delay := 0.0
 	for row in L.rows:
@@ -1344,6 +1495,35 @@ func _j_ledger(S: Dictionary) -> void:
 					var tw := create_tween(); tw.tween_interval(delay); tw.tween_callback(func(): Snd.sfx("chalk"))
 					tw.tween_property(l, "visible_ratio", 1.0, 0.8); delay += 0.5
 			if fresh: got[id] = 2
+
+# la tabla, en fichas: una por mundo, con sus filas debajo (pantallas estrechas)
+func _j_ledger_cards(L: Dictionary, got: Dictionary) -> void:
+	var delay := 0.0
+	for c in L.cols:
+		var card := PanelContainer.new(); card.add_theme_stylebox_override("panel", _card(Color(App.CARD, 0.7), 14, 10, 1, 0)); j_body.add_child(card)
+		var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 4); card.add_child(v)
+		var hh := HBoxContainer.new(); hh.add_theme_constant_override("separation", 10); v.add_child(hh)
+		hh.add_child(_lbl(T(c.name).to_upper(), caps, 14, App.INK)); hh.add_child(_lbl(c.sub, serif_it, 16, App.SOFT))
+		for row in L.rows:
+			var id: String = c.id + "." + row.id
+			var val = L.cells.get(id, null)
+			if val == null: continue
+			var have := got.has(id)
+			var fresh := have and int(got[id]) == 1
+			var r := HBoxContainer.new(); r.add_theme_constant_override("separation", 10); v.add_child(r)
+			var rn := _lbl(T(row.name), serif_it, 15, App.SOFT); rn.custom_minimum_size.x = 108; rn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; r.add_child(rn)
+			var cell: Control
+			if val is Dictionary and have:
+				var an := LedgerAnim.new(); an.kind = val.anim; an.custom_minimum_size = Vector2(96, 56); cell = an
+			else:
+				var l := _lbl(T(str(val)) if have else "· · ·", serif if have else serif_it, 17, App.INK if have else App.FAINT)
+				l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; l.size_flags_horizontal = Control.SIZE_EXPAND_FILL; cell = l
+			r.add_child(cell)
+			if fresh:
+				cell.modulate.a = 0.0
+				var tw := create_tween(); tw.tween_interval(delay); tw.tween_callback(func(): Snd.sfx("chalk"))
+				tw.tween_property(cell, "modulate:a", 1.0, 0.6); delay += 0.4
+				got[id] = 2
 
 # historial (T-09): las últimas intervenciones, con el nombre y el color de quien habló
 func _j_history() -> void:
@@ -1371,19 +1551,33 @@ func _j_history() -> void:
 # ---------- menú ----------
 func show_menu(items: Array, chapters: Array, max_ch: int, on_chapter: Callable) -> void:
 	_menu_args = [items, chapters, max_ch, on_chapter]
+	_menu_back = Callable()
+	if not items.is_empty() and items[-1][0] == "Volver": _menu_back = items[-1][1]
 	menu.visible = true; menu_open = true; hud.visible = false
 	var chs_open := false
 	for c in menu_btns.get_children():
 		if c is GridContainer: chs_open = c.visible
 		menu_btns.remove_child(c); c.queue_free()
-	var bw := clampf(size.x - 40, 240, 340)
-	var bh := 44.0 if compact else 50.0
-	var chs := GridContainer.new(); chs.columns = 1 if size.x < 560 else 2; chs.visible = chs_open
+	var bw := _menu_bw()
+	# la altura de los botones se ajusta para que todo el menú quepa sin desplazarse
+	var room := size.y - 40.0 - (0.0 if _wide_menu() else 230.0)
+	var bh := clampf((room - 56.0) / maxf(items.size(), 1.0) - 8.0, 40.0, 44.0 if compact else 50.0)
+	var chs := GridContainer.new(); chs.columns = 1 if size.x < 560 or _wide_menu() else 2; chs.visible = chs_open
 	chs.add_theme_constant_override("h_separation", 6); chs.add_theme_constant_override("v_separation", 4)
 	for k in items.size():
 		var it = items[k]
-		var b := _btn(T(it[0] as String).to_upper(), "primary" if k == 0 else "ghost", 16, bh)
+		# «Título\nsubtítulo»: el subtítulo va en cursiva debajo (p. ej. el capítulo de «Continuar»)
+		var parts := (it[0] as String).split("\n")
+		var b := _btn(T(parts[0]).to_upper(), "primary" if k == 0 else "ghost", 16, bh)
 		b.custom_minimum_size.x = bw; b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; b.clip_text = true
+		if parts.size() > 1:
+			b.custom_minimum_size.y = bh + 18.0
+			for st in ["normal", "hover", "pressed", "focus", "disabled"]:
+				var sb: StyleBox = b.get_theme_stylebox(st).duplicate(); sb.content_margin_bottom = 26; b.add_theme_stylebox_override(st, sb)
+			var sl := _lbl(T(parts[1]), serif_it, 15, App.CARD if k == 0 else App.SOFT); sl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			sl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; sl.clip_text = true
+			sl.set_anchors_preset(Control.PRESET_BOTTOM_WIDE); sl.offset_left = 12; sl.offset_right = -12; sl.offset_top = -27; sl.offset_bottom = -7
+			b.add_child(sl)
 		if it[1] is String and it[1] == "chapters": b.pressed.connect(func(): Snd.sfx("pick"); chs.visible = not chs.visible)
 		else: b.pressed.connect(func(): Snd.sfx("pick"); it[1].call(b))
 		menu_btns.add_child(b)
@@ -1393,14 +1587,25 @@ func show_menu(items: Array, chapters: Array, max_ch: int, on_chapter: Callable)
 	for i in chapters.size():
 		var b := _btn(T(chapters[i]), "flat", 14, 40); b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.disabled = i > max_ch; b.pressed.connect(func(): Snd.sfx("pick"); on_chapter.call(i)); chs.add_child(b)
-	var opts := HFlowContainer.new(); opts.alignment = FlowContainer.ALIGNMENT_CENTER; opts.custom_minimum_size.x = bw
+	if menu_opts != null: menu_opts.get_parent().remove_child(menu_opts); menu_opts.queue_free()
+	var opts := HFlowContainer.new(); opts.alignment = FlowContainer.ALIGNMENT_CENTER; opts.custom_minimum_size.x = minf(bw, 320.0)
 	opts.add_theme_constant_override("h_separation", 6); opts.add_theme_constant_override("v_separation", 6)
 	if items.size() > 0 and not (items[0].size() > 2 and items[0][2] == "sub"): _settings_btns(opts, 40)
-	menu_btns.add_child(opts)
+	menu_opts = opts
+	# en un móvil apaisado, sonido y ajustes (y el pie) van bajo el título: la columna de botones cabe entera
+	var left: Node = menu_split.get_child(0)
+	if _wide_menu():
+		var sp := Control.new(); sp.custom_minimum_size.y = 14; opts.add_child(sp); opts.move_child(sp, 0); sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		left.add_child(opts); opts.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		if menu_foot.get_parent() != left: menu_foot.reparent(left)
+	else:
+		menu_btns.add_child(opts)
+		if menu_foot.get_parent() == left: menu_foot.reparent(menu_btns.get_parent())
 	var foot := T("Arrastra a la izquierda para moverte · toca para continuar") if touch else (
 		T("stick izquierdo · {act} interactuar y continuar · {view} vista · {journal} inventario") if Glyphs.pad() else
 		T("{move} / flechas · {act} interactuar · {advance} continuar · {view} vista · {journal} inventario"))
-	menu_foot.text = T("Una aventura narrativa. Se recomienda sonido.") + "\n" + foot
+	menu_foot.text = T("Una aventura narrativa. Se recomienda sonido.") + ("" if compact else "\n" + foot)
+	menu_foot.visible = items.is_empty() or not (items[0].size() > 2 and items[0][2] == "sub")
 	focus_first()
 
 func hide_menu() -> void:
@@ -1413,14 +1618,17 @@ func toggle_pause(on_quit := Callable()) -> void:
 	Snd.sfx("ui")
 	if not pause_open: return
 	for c in pause_btns.get_children(): pause_btns.remove_child(c); c.queue_free()
-	var bw := clampf(size.x - 80, 220, 320); var bh := 42.0 if compact else 48.0
+	# en una pantalla baja y ancha, dos columnas: así no hace falta desplazarse
+	pause_btns.columns = 2 if _two_cols() else 1
+	var bw := clampf((size.x - 110.0) / 2.0, 200.0, 300.0) if pause_btns.columns == 2 else clampf(size.x - 80, 220, 320)
+	var bh := 42.0 if compact else 48.0
 	var add := func(text: String, kind: String, cb: Callable) -> Button:
 		var b := _btn(T(text).to_upper(), kind, 15, bh); b.custom_minimum_size.x = bw; b.pressed.connect(cb); pause_btns.add_child(b)
 		return b
 	add.call("Continuar", "primary", func(): toggle_pause())
 	add.call("Manuscrito y saberes", "ghost", func(): toggle_pause(); toggle_journal())
 	add.call("Historial", "ghost", func(): toggle_pause(); toggle_journal("log"))
-	_settings_btns(pause_btns, bh)
+	_settings_btns(pause_btns, bh, true)
 	var sure := {on = false}
 	var q: Button = add.call("Salir al menú", "ghost", func(): pass)
 	q.pressed.connect(func():
@@ -1503,7 +1711,7 @@ class OptCard extends PanelContainer:
 			var l := ui._lbl(ui.T(str(o.label)), ui.serif, 18, App.INK); l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(l)
 			var s := ui._lbl(ui.T(str(o.get("sub", str(i + 1)))), ui.caps, 11, App.SOFT); s.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; v.add_child(s)
 		mouse_entered.connect(func(): _hover = true; queue_redraw())
-		mouse_exited.connect(func(): _hover = false; queue_redraw())
+		mouse_exited.connect(func(): _hover = false; _ui.press_up(self); queue_redraw())
 	func _draw() -> void:
 		var on := _hover or (_ui != null and _ui._sel == _i)
 		if o.has("swatch"):
@@ -1522,8 +1730,11 @@ class OptCard extends PanelContainer:
 			draw_string(_ui.caps, Vector2(size.x / 2.0 - 4, size.y - 4), str(o.get("sub", "")), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, App.SOFT)
 		if on: draw_rect(Rect2(Vector2.ZERO, size), App.ACC, false, 3.0)
 	func _gui_input(ev: InputEvent) -> void:
-		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and Rect2(Vector2.ZERO, size).has_point(ev.position):
-			accept_event(); chosen.emit()
+		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
+			if ev.pressed: _ui.press_down(self)
+			else:
+				_ui.press_up(self)
+				if Rect2(Vector2.ZERO, size).has_point(ev.position): accept_event(); chosen.emit()
 	# tres viñetas (lo que se ve al pasar) o un sólido de perfil
 	func _sil(kind: String) -> void:
 		var ink := App.INK; var acc := App.ACC; var w := 1.8
