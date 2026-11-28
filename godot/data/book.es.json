@@ -588,6 +588,42 @@
    "ch": 8,
    "title": "Mil años en el suelo",
    "text": "El suelo de la Sala del Consejo, visto desde arriba: marcas en el papel, unas sobre otras, de mil en mil años. En el mismo sitio. Siempre ha vuelto a ocurrir."
+  },
+  {
+   "id": "m_c9_voz",
+   "ch": 9,
+   "title": "Ello",
+   "text": "Al despertar me oí decir «Ello» en voz alta, con una voz que no era del todo la mía. El Punto creía que mi voz era la suya. Por un momento, yo también."
+  },
+  {
+   "id": "m_c9_trampilla",
+   "ch": 9,
+   "title": "La trampilla",
+   "text": "Aquí estaría la trampilla del sótano, si nuestra casa tuviera sótano. El suelo es papel liso. Mentí sobre un agujero que no existe, en un mundo donde no hay hacia abajo."
+  },
+  {
+   "id": "m_c9_tablero",
+   "ch": 9,
+   "title": "El tablero del nieto",
+   "text": "El tablero de juego de mi nieto. Las figuritas que palpamos juntos, ordenadas por lados: tres, cuatro, cinco, seis. Y al final, un hueco vacío, como si esperara otra."
+  },
+  {
+   "id": "m_c10_banco",
+   "ch": 10,
+   "title": "El banco grabado",
+   "text": "En el banco de la Sociedad Especulativa alguien ha grabado mi nombre con la punta de un ángulo. No sé quién. Debajo, más pequeño: «hacia Arriba»."
+  },
+  {
+   "id": "m_c10_silla",
+   "ch": 10,
+   "title": "La silla vacía",
+   "text": "La silla donde se sienta mi hermano cuando viene. Entre visita y visita la miro tanto que creo que ha cambiado de forma."
+  },
+  {
+   "id": "m_c10_muesca",
+   "ch": 10,
+   "title": "Una muesca de más",
+   "text": "Cuento las muescas de la pared cada mañana. Siete grupos. Y una más, aparte, que yo no hice. Alguien, en algún momento, ha contado conmigo."
   }
  ],
  "achievements": {
@@ -605,7 +641,10 @@
   "ACH_CUPBOARD": "La alacena, por Arriba",
   "ACH_TINKER": "Tres lados bien",
   "ACH_TESS": "Ocho cubos",
-  "ACH_SECTIONS": "Lo que ven allá abajo"
+  "ACH_SECTIONS": "Lo que ven allá abajo",
+  "ACH_SILENT": "La perfección de no decir",
+  "ACH_FILE": "Un Cuadrado ejemplar",
+  "ACH_BROTHER": "Cuéntamelo otra vez"
  },
  "ledger": {
   "cols": [
@@ -700,5 +739,98 @@
    "4d.no_concibe": "?",
    "4d.rechazo": "?"
   }
+ },
+ "argumentos": {
+  "analogia": {
+   "title": "La Analogía",
+   "pitch": "Mira: Punto, Línea, Cuadrado. Uno, dos, cuatro puntos terminales. ¿Qué número sigue? Cuéntalos conmigo.",
+   "reply_y1": "Ocho, si tú lo dices. Un razonamiento correcto sobre una cosa imposible. Me lo dijiste tú, hace años, de otra cosa.",
+   "reply_y4": "Ocho y seis. Me los sé de memoria, hermano. Como me sé el acta del Consejo, y tampoco la creo.",
+   "reply_y7": "Ocho. Lo cuento contigo porque te gusta. Y a mí me gusta verte contar."
+  },
+  "secciones": {
+   "title": "Las secciones",
+   "pitch": "Tú la viste en la sala: un punto, un círculo que crecía, que menguaba. Mira lo que pasa si se eleva.",
+   "reply_y1": "Un círculo que cambia de tamaño. Lo vi. Por eso estoy aquí. No me pidas además que vea lo que no había.",
+   "reply_y4": "Dibujas muy bien los círculos, hermano. Siempre se te dieron mejor que a mí.",
+   "reply_y7": "Un círculo que cambia de tamaño. Ya ves: es lo único que vi en mi vida que no fuera un acta."
+  },
+  "sombras": {
+   "title": "Las sombras",
+   "pitch": "Esto es lo que verías de un Cubo si no te atravesara: su sombra. Déjame dibujarla en la pared.",
+   "reply_y1": "Dos cuadrados cosidos. Como los que dibujabas en las actas cuando te aburrías.",
+   "reply_y4": "La has dibujado mejor que el año pasado. Sigue siendo una figura de muchos lados, hermano.",
+   "reply_y7": "Déjala en la pared. Me hará compañía cuando no estés."
+  },
+  "lineal": {
+   "title": "Linealandia",
+   "pitch": "Soñé con un Rey que sólo veía un punto y que me llamaba brujo. Escucha cómo se miden allí.",
+   "reply_y1": "Un sueño de un hombre que se dormía sobre las tablillas. Yo también sueño, hermano. Con la calle.",
+   "reply_y4": "El Rey que no veía el costado. ¿Y quién te dice que tú ves el tuyo?",
+   "reply_y7": "Cántamelo otra vez, lo del Rey. Las dos notas."
+  },
+  "punto": {
+   "title": "Puntolandia",
+   "pitch": "Hay un ser que cree que es el Universo entero. Le hablas y piensa que lo ha pensado él.",
+   "reply_y1": "Un ser que sólo se oye a sí mismo. Conozco a unos cuantos. Presiden el Consejo.",
+   "reply_y4": "¿Y cómo sabes que no somos nosotros ese Punto, hermano? Tú y yo, aquí dentro.",
+   "reply_y7": "Ello es, y nada hay fuera de Ello. Me lo has contado tantas veces que ya me sale la voz."
+  }
+ },
+ "epilogue": [
+  {
+   "if": "flag:hijaCuenta",
+   "text": "Dicen que mi hija sabe contar hasta diez. Tiene una tablilla con diez muescas que esconde de su madre. Es lo único que he enseñado en mi vida que ha prendido."
+  },
+  {
+   "if": "rel:criado>=1",
+   "text": "El hijo de mi antiguo criado, el de diez grados y medio, pasa algunas tardes bajo el muro y dice mi nombre en voz alta. Es toda mi fama."
+  },
+  {
+   "if": "rep:ciu>=2",
+   "text": "En la Calle Mayor todavía hay quien me saluda con el ángulo inclinado, a escondidas. No sé qué les conté. Lo bastante."
+  },
+  {
+   "if": "rep:aut<=-2",
+   "text": "El Prefecto no tuvo que buscar testigos contra mí: mi tablilla estaba llena desde lo de la Puerta Oeste. De eso, al menos, no me avergüenzo."
+  },
+  {
+   "if": "flag:estilete_hospital",
+   "text": "Me contaron que en el Hospital apareció un estilete en una sala cerrada, y que el calderero dijo que era suyo y que lo había echado de menos cuarenta años. Nadie se lo explica. Yo sí."
+  },
+  {
+   "if": "choice:irregularChoice=d",
+   "text": "El calderero salió del Hospital casi regular, con el marco puesto. Dicen que en su esquina vuelve a arreglar cántaros. Sus tres lados siguen estando bien."
+  },
+  {
+   "if": "choice:irregularChoice!=d",
+   "text": "Pienso a veces en el calderero. En que dictaminé su raya con el mismo aplomo con que el Consejo dictaminó la mía."
+  },
+  {
+   "if": "rel:esposa>=1",
+   "text": "Mi esposa viene una vez al año, cuando lo permiten. No pregunta. Me cuenta quién se ha casado y quién ha muerto, y al irse dice «paz» muy bajo, sólo para mí."
+  },
+  {
+   "if": "her>=3",
+   "text": "No me arrepiento de haber hablado. Me arrepiento de los años en que no pregunté."
+  },
+  {
+   "if": "her<=-2",
+   "text": "A veces pienso que habría sido mejor aplaudir y callar, como sabía hacer tan bien. Luego recuerdo el Cubo, y se me pasa. Casi siempre."
+  },
+  {
+   "if": "always",
+   "text": "Mi nieto tiene ya diecisiete años y seis lados. No ha venido nunca. Me dicen que da clases de Geometría, y que a veces, cuando un alumno pregunta por 3³, tarda en contestar."
+  }
+ ],
+ "prefacio": {
+  "title": "Prefacio del Editor a la segunda edición (1884)",
+  "text": [
+   "*Lo que sigue es un resumen, no una traducción: el texto original de Abbott, de dominio público, se incluirá completo en la versión definitiva.*",
+   "En la segunda edición de *Flatland*, publicada el mismo año que la primera, el Editor añadió un prefacio en el que responde, en nombre del Cuadrado preso, a dos objeciones de los lectores.",
+   "La primera: que el Cuadrado, tan duro con el Rey de Linealandia por no concebir una dimensión más, se niegue a su vez a admitir la Cuarta cuando él mismo la intuye. El Editor contesta que precisamente ahí está la lección: cada mundo tiene su frase para lo que le queda por encima, y el Cuadrado no es más sabio que sus jueces, sólo ha visto un poco más.",
+   "La segunda: el desprecio con que el libro habla de las mujeres y de las clases bajas de Planilandia. El Editor deja entender que el Cuadrado, tras años de celda, ha cambiado de opinión sobre muchas cosas que antes daba por naturales, y que su relato debe leerse como el de un hombre de su tiempo y de su Plano.",
+   "Termina con una esperanza: que el lector, habitante del Espacio, no se ría demasiado de la estrechez de Planilandia, porque también él podría estar confinado en una Dimensionalidad limitada sin saberlo."
+  ]
  }
 }

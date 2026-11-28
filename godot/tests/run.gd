@@ -22,6 +22,7 @@ func _ready() -> void:
 	print("== test_geom3"); test_geom3()
 	print("== test_sketch"); test_sketch()
 	print("== test_lens"); test_lens()
+	print("== test_m5"); test_m5()
 	print("%d comprobaciones, %d fallos" % [count, fails])
 	get_tree().quit(1 if fails > 0 else 0)
 
@@ -213,3 +214,22 @@ func test_lens() -> void:
 	e.set_lens("line", true)
 	ok(e.squeeze == 0.0 and e.grow == 0.0, "línea")
 	e.view.free(); e.free()
+
+# M5: láminas, argumentos del hermano y cierre del manuscrito
+func test_m5() -> void:
+	var L = JSON.parse_string(FileAccess.get_file_as_string("res://data/laminas.json"))
+	ok(L is Dictionary and L.size() == 11, "once láminas")
+	for id in L:
+		ok(L[id].has("caption") and L[id].strokes.size() > 0, "lámina con trazos: " + id)
+		for s in L[id].strokes: ok(float(s.t0) < float(s.t1) and s.pts.size() >= 1, "trazo válido en " + id)
+	var book = JSON.parse_string(FileAccess.get_file_as_string("res://data/book.es.json"))
+	for k in ["analogia", "secciones", "sombras", "lineal", "punto"]:
+		var A: Dictionary = book.argumentos.get(k, {})
+		ok(A.has("reply_y1") and A.has("reply_y4") and A.has("reply_y7"), "tres respuestas del hermano: " + k)
+	ok(book.epilogue.size() >= 8 and book.epilogue[-1]["if"] == "always", "el cierre acaba con la línea del nieto")
+	ok(book.has("prefacio") and book.prefacio.text.size() >= 3, "prefacio del editor")
+	var anc := Brother.shadow_anchors(null)
+	ok(anc.size() >= 8 + 8, "anclajes de la sombra (%d)" % anc.size())
+	var segs := []
+	for e in Geom3.cube(1.0).edges: segs.append(e)
+	ok(Sketch.classify(segs) == "cube_shadow", "las aristas del cubo sobre los anclajes: la sombra")

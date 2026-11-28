@@ -92,6 +92,15 @@ def scan():
                         after = line[m.end():].lstrip()
                         if FMT.search(s) and after.startswith("%") and not re.search(r"(\btr|\bT|I18n\.t)\(\s*$", before):
                             issues.append(f"{rel}:{n}: texto con formato sin tr(): {s[:60]!r}")
+    # las láminas (S-16): leyendas y rótulos
+    lp = os.path.join(ROOT, "data", "laminas.json")
+    if os.path.exists(lp):
+        import json
+        with open(lp, encoding="utf-8") as f:
+            for k, v in json.load(f).items():
+                found.setdefault(v["caption"], []).append(f"data/laminas.json:{k}")
+                for l in v.get("labels", []):
+                    found.setdefault(l["text"], []).append(f"data/laminas.json:{k}")
     return found, issues
 
 

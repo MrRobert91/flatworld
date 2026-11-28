@@ -118,3 +118,62 @@ func opening() -> void:
 	W.rail = {}
 	clear(W)
 	ui.hud.visible = true
+
+# C10-08 · el cierre: la cámara sale del papel y se eleva sobre la mesa; la dedicatoria aparece línea a
+# línea y, durante dos segundos, sobre la mesa cae una sombra que no corresponde a nada de la habitación:
+# la de un teseracto.
+const DEDICATION := ['A los habitantes del ESPACIO EN GENERAL', 'y a H. C. EN PARTICULAR', 'dedica esta obra', 'un humilde nativo de Planilandia,',
+	'con la esperanza de que,', 'así como él fue iniciado en los misterios', 'de TRES Dimensiones,', 'habiendo conocido antes SÓLO DOS,',
+	'también los ciudadanos de esa región celestial', 'aspiren más y más alto', 'a los secretos de CUATRO, CINCO o incluso SEIS Dimensiones.']
+
+func closing() -> void:
+	if g.auto: return
+	var W := g.world
+	g.set_map(a.cell()); g.spawn_player(0, -1, PI / 2)
+	g.show_strip = false; g.view_lock = true; g.set_view('top'); W.eye_t = 0.0
+	W.zoom = W.base_zoom; W.zoom_cur = W.zoom
+	build(W)
+	ui.hud.visible = false
+	Snd.drone('none'); Snd.hum(true)
+	var s := lamina_cam(W, Vector2(0, -1))
+	var keys := [
+		{t = 0.0, pos = s.pos, look = s.look, fov = s.fov, up = s.up, ease = 'linear'},
+		{t = 6.0, pos = Vector3(6, 40, 22), look = Vector3(0, 0, -1), fov = 34.0, up = Vector3(0, 0, -1)},
+		{t = 13.0, pos = Vector3(30, 52, 62), look = Vector3(-8, 0, 0), fov = 38.0, up = Vector3(0, 0, -1)},
+		{t = 20.0, pos = Vector3(70, 75, 120), look = Vector3(-20, 0, 0), fov = 42.0, up = Vector3(0, 0, -1), hold = true},
+	]
+	ui.fade(false, 1.2)
+	# la dedicatoria, sobre la madera, línea a línea
+	var lines := []
+	for i in DEDICATION.size():
+		var l := _text(tr(DEDICATION[i]), Vector3(-38, 0.2, 26 + i * 3.4), 0.034, Color('f3ead2'), i % 2 == 1, 0.0)
+		l.modulate.a = 0.0; lines.append(l)
+	g.tween(18.0, func(t):
+		for i in lines.size(): lines[i].modulate.a = clampf(t * lines.size() * 1.1 - i, 0.0, 1.0))
+	await Cine.play(W, keys, true)
+	# la sombra del teseracto: dos cubos cosidos por sus vértices, sobre la mesa, del 0 al 35 % y al 0 %
+	var V := []; var E := []
+	for i in 16: V.append([1.0 if i & 1 else -1.0, 1.0 if i & 2 else -1.0, 1.0 if i & 4 else -1.0, 1.0 if i & 8 else -1.0])
+	for i in 16:
+		for bit in 4:
+			if not (i & (1 << bit)): E.append(Vector2i(i, i | (1 << bit)))
+	var P3 := PackedVector3Array()
+	var ca := cos(0.6); var sa := sin(0.6)
+	for v in V:
+		var x: float = v[0] * ca - v[3] * sa; var w: float = v[0] * sa + v[3] * ca
+		var k := 2.6 / (3.2 - w)
+		P3.append(Vector3(x, v[1], v[2]) * k * 9.0)
+	var poly := {verts = P3, edges = E}
+	var xf := Transform3D(Basis(Vector3.UP, 0.4) * Basis(Vector3.RIGHT, 0.5), Vector3(-10, 60, 10))
+	var segs := Geom3.shadow(poly, xf, Vector4(-30, 140, 40, 1.0))
+	var im := ImmediateMesh.new(); var mi := MeshInstance3D.new(); mi.mesh = im; mi.material_override = W.mat(3); desk.add_child(mi)
+	Snd.tone(110, 3.0, 'sine', 0.05)
+	await g.tween(2.0, func(t):
+		var al := 0.35 * sin(PI * t)
+		im.clear_surfaces(); im.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
+		for sg in segs: W._line(im, sg[0], sg[1], 0.6, Color(0, 0, 0, al), 0.05)
+		im.surface_end())
+	Snd.hum(false)
+	await ui.fade(true, 1.4)
+	W.rail = {}
+	clear(W)

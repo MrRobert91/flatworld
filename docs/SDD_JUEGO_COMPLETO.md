@@ -746,6 +746,32 @@ Capítulo VIII, con la geometría 3D, el transporte desde Arriba y tres minijueg
 
 `--try=` admite `ascent`, `sections`, `shadow`, `carry` y `tess`.
 
+### 9.8 Estado: M5 implementado
+
+Capítulos IX y X, el cierre en la mesa del lector, las láminas y la galería:
+
+| Id | Estado | Notas |
+|---|---|---|
+| S-16 Láminas | Hecho, con cambio | `tools/make_laminas.py` genera `data/laminas.json` (11 láminas: trazos con `t0`/`t1`, grosor, color y rótulos), en lugar de calcarlas de los grabados con un conversor SVG. `ui.lamina(id)`: a pantalla completa, trazo a trazo con rasgueo de pluma; se salta con continuar, {act}, mantener o un toque. `ChA.intro` la muestra antes del rótulo (y el VIII y el IX, que no usan `intro`). La del Prólogo (la moneda) no se muestra al empezar para no romper el descenso sin corte de la mesa (P-01): sólo entra en la galería. El extractor de textos lee también las leyendas. |
+| Galería | Hecho | En el menú principal en cuanto hay algo: láminas vistas, notas al margen recogidas y, tras el final, el Prefacio del Editor. `ui.show_doc(título, párrafos)`. El Prefacio es, por ahora, un **resumen** marcado como tal; el texto original (dominio público) queda pendiente para no citarlo de memoria. |
+| S-15 Cierre | Hecho | `ChFrame.closing()`: la cámara sale del papel de la celda y sube en 20 s por la mesa; la dedicatoria aparece en la madera línea a línea; después, 2 s de la sombra de un teseracto (proyección 4D→3D de `ch8` y `Geom3.shadow`) del 0 al 35 % y al 0 %. |
+| C9-01 Ojo del Punto | Hecho | A menos de 6 u del Punto: `lenses = ['flood']`, `strip_in_space`, una figura `punto_e` para que el ojo lo vea. La lente `flood` satura con poca tinta (`ai × 8`) y gira el tono (`Eye.hue` → `u_hue`) con cada entrada; la primera, «¡Ah, Ello se ha movido en Ello!». Casillas `0d.*`. |
+| C9-02 Hablarle al Punto | Hecho | Las tres respuestas, todas; «(Callar.)» aparece tras la primera. La Esfera se ríe (su motivo, en campana, dos veces). `ACH_SILENT`. |
+| C9-03 La lección | Hecho | Antes del «hacia Arriba»: el círculo que crece y mengua con el stick, y la sombra del Cubo en `DrawBoard` (`Brother.draw_shadow`). Las respuestas del nieto cambian si `rel nieto ≥ 1`. |
+| C9-04 La risa | Hecho | Con `rel nieto ≥ 1`: el nieto mira la puerta, la lámina enfoca al heraldo al otro lado del muro, 2 s; su motivo suena invertido y desafinado. El narrador añade «No me traicionaba. Me protegía». Casilla `2d.rechazo`. |
+| C9-05 Los once meses | Hecho, con cambio | Tres planos sin diálogo: dibujar el Cubo en modo `reject`, el Cubo recordado en la pizarra cada vez más borroso (en lugar de la malla 3D), y el título del tratado letra a letra. |
+| C9 · heraldo | Hecho | Si se dejó el estilete en el Hospital (C8-03), el heraldo pregona el milagro. |
+| C10-01 El tratado | Hecho | Panel con los saberes conocidos entre Analogía, Secciones, Sombras, Linealandia y Puntolandia; 2 (3 si `rel archivero ≥ 1`). `state.argumentos`. |
+| C10-02 Contenerse | Hecho | `minigames/restraint.gd` (M-14): la barra sube a 0,3, 0,5 y 2,0/s y se frena manteniendo {act}; la tercera se rompe siempre. |
+| C10-03 El expediente | Hecho | Lo leen sus autores (las cinco de más peso); vacío: «Nada. Un Cuadrado ejemplar…» y `ACH_FILE`. |
+| C10-04 Dibuja el Cubo | Hecho | `Brother.draw_shadow`: anclajes en los 8 vértices de la sombra elegida en el VIII (`flags.shadow_xf`, o una por defecto) y 16 más, con la sombra como guía tenue; `Sketch.classify` decide la respuesta (sombra, hexágono, cuadrado u otra cosa). |
+| C10-05 Testigos | Hecho | Si el sargento te apuntó 7 u 8 aciertos, baja la cabeza tras la sentencia. Si llevas el estilete al ser arrestado, anotación `estilete_en_poder`. |
+| C10-06 Tres visitas | Hecho | Años 1, 4 y 7 (`cell(años)` pinta las muescas de cada año). `minigames/brother.gd` (M-15): analogía (fichas), secciones (`SpherePredict`, una ronda), sombras (`DrawBoard`), Linealandia (`VoiceLength`) y Puntolandia (sólo palabras); respuestas en `book.argumentos[id].reply_y1/y4/y7`. En el año 7 el hermano, más viejo, pide que se lo cuentes otra vez. `ACH_BROTHER` (nuevo). |
+| C10-07 Cierre | Hecho | `book.epilogue`: condiciones `flag:`, `rel:`, `rep:`, `her`, `choice:` y `always`, evaluadas en orden; la del nieto, siempre. |
+| C10-08 / 09 | Hecho | La mesa del lector al revés, los títulos, y después `Profile.unlock_gallery('prefacio')` y `Profile.unlock_mode('college')`. El modo Colegio en sí queda para M6. |
+
+Notas al margen: 6 más (Ello, la trampilla, el tablero del nieto, el banco grabado, la silla vacía, una muesca de más). `--try=` admite `lamina`, `restraint`, `brother`, `closing` y `treatise`.
+
 ---
 
 ## 10. Riesgos

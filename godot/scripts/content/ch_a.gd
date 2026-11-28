@@ -1,8 +1,13 @@
 # Prólogo y capítulos I–III: la celda, la casa, la calle, la Puerta Oeste.
 class_name ChA extends Ch
 
+const LAM := {'Capítulo I': 'lam_1', 'Capítulo II': 'lam_2', 'Capítulo III': 'lam_3', 'Capítulo IV': 'lam_4', 'Capítulo V': 'lam_5',
+	'Capítulo VI': 'lam_6', 'Capítulo VII': 'lam_7', 'Capítulo VIII': 'lam_8', 'Capítulo IX': 'lam_9', 'Capítulo X': 'lam_10'}
+
+# la lámina del bloque (S-16) y después el rótulo sobre el mundo
 func intro(num: String, title: String, sub: String, drone: String) -> void:
 	ui.chapter_tag('%s · %s' % [num, title]); Snd.drone(drone); g.set_view('top'); g.world.eye_t = 0.0
+	if LAM.has(num): await ui.lamina(LAM[num])
 	ui.fade(false, 0.5)
 	await ui.title(num, title, sub)
 
@@ -11,15 +16,16 @@ func outro() -> void:
 	await ui.fade(true)
 	ui.close_dlg()
 
-func cell() -> Dictionary:
-	# siete grupos de muescas en la pared Norte (P-02): siete años
+func cell(years := 7) -> Dictionary:
+	# siete grupos de muescas en la pared Norte (P-02): siete años (menos en las visitas del X, C10-06)
 	var labels := []
-	for k in 7: labels.append({t = 'IIII', x = -3.05 + k * 0.82, y = 3.25, s = 0.42, a = 0.55})
+	for k in years: labels.append({t = 'IIII', x = -3.05 + k * 0.82, y = 3.25, s = 0.42, a = 0.55})
 	return {bounds = {x0 = -14, y0 = -14, x1 = 14, y1 = 14}, fog = 9.0, palette = 'cell', zoom = 30.0,
 		buildings = [{id = 'cell', x = 0, y = 0, R = 5.2, n = 4, rot = 45, sealed = false}], labels = labels}
 
 # ============ PRÓLOGO ============
 func prologue() -> void:
+	Profile.unlock_gallery('lam_0')   # la moneda: el Prólogo empieza en la mesa del lector, sin corte (P-01)
 	g.set_map(cell()); g.spawn_player(0, -1, PI / 2)
 	g.show_strip = false; g.view_lock = true; g.set_view('eye'); g.world.eye_t = 1.0; g.hide_eye_hint = true
 	ui.chapter_tag('Prólogo · La celda'); Snd.drone('cell')

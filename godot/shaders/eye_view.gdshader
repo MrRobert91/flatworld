@@ -12,6 +12,12 @@ uniform float u_desat = 0.0;      // la línea en gris (C4-03: lo que se ganó c
 // lentes (S-06): la línea se encoge hacia el centro (u_squeeze 0→1) hasta ser un punto (el ojo del Rey);
 // el punto crece (u_grow 0→1) hasta llenar la pantalla con el color medio (el ojo del Punto)
 uniform float u_squeeze = 0.0; uniform float u_grow = 0.0; uniform vec2 u_size = vec2(1280.0, 720.0);
+uniform float u_hue = 0.0;        // el Punto «piensa»: cada entrada del jugador gira un poco el tono (C9-01)
+vec3 hue_rot(vec3 c, float a) {
+	const vec3 k = vec3(0.57735);
+	float ca = cos(a);
+	return c * ca + cross(k, c) * sin(a) + k * dot(k, c) * (1.0 - ca);
+}
 uniform vec3 bg_col = vec3(0.925, 0.894, 0.812);
 uniform vec3 ink_col = vec3(0.09, 0.13, 0.17);
 uniform vec3 acc_col = vec3(0.66, 0.22, 0.16);
@@ -90,14 +96,14 @@ void fragment() {
 			avg += texture(t_data, vec2(x, rc)).rgb * ik; ai += ik;
 		}
 		avg = ai > 0.001 ? avg / ai : bg_col; ai /= 32.0;
-		vec3 pc = mix(c0, avg, u_grow); float pi = mix(I0, ai * 1.6, u_grow);
+		vec3 pc = mix(c0, avg, u_grow); float pi = mix(I0, min(ai * 8.0, 1.0), u_grow);
 		float pink = pi > 0.003 ? 0.18 + 0.82 * pow(min(pi, 1.0), 0.8) : 0.0;
 		vec2 px = (UV - 0.5) * u_size;
 		float R = mix(7.0 * u_px, length(u_size) * 0.6, u_grow * u_grow);
 		float disk = 1.0 - smoothstep(R - 1.2, R + 1.2, length(px));
 		float ring = (1.0 - smoothstep(0.0, 1.4, abs(length(px) - R - 5.0 * u_px))) * (1.0 - u_grow);
 		float beat = 1.0 + 0.06 * sin(u_time * 0.8 * 6.2832) * u_grow;
-		vec3 dc = mix(bg_col, pc, pink) * beat;
+		vec3 dc = hue_rot(mix(bg_col, pc, pink), u_hue * 6.2832) * beat;
 		float on = smoothstep(0.5, 0.9, u_squeeze);
 		c = mix(c, dc, disk * on);
 		c = mix(c, ink_col, ring * 0.14 * on);

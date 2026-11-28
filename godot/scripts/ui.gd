@@ -1083,6 +1083,93 @@ func slate(show: bool, cap := "") -> SlateBoard:
 	slate_board.visible = true; slate_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return slate_board
 
+# ---------- láminas de Abbott (S-16) ----------
+# Una figura del libro trazada a pluma en tiempo real, a pantalla completa. Se salta con {advance}, {act},
+# mantener {skip_hold} o un toque. Al verla, queda en la galería.
+var lam_data := {}
+var lam_box: Control
+var lam_board: SlateBoard
+var lam_cap: Label
+signal doc_closed
+
+func _lam_build() -> void:
+	lam_box = Control.new(); _full(lam_box); lam_box.visible = false; add_child(lam_box)
+	var veil := ColorRect.new(); veil.color = Color(App.PAPER, 0.97); _full(veil); lam_box.add_child(veil)
+	var c := CenterContainer.new(); _full(c); c.mouse_filter = Control.MOUSE_FILTER_IGNORE; lam_box.add_child(c)
+	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 10); c.add_child(v)
+	lam_board = SlateBoard.new(); lam_board.font = serif_it; lam_board.mouse_filter = Control.MOUSE_FILTER_IGNORE; v.add_child(lam_board)
+	lam_cap = _lbl("", serif_it, 21, App.INK); lam_cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lam_cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; v.add_child(lam_cap)
+
+static func _lam_draw(b: SlateBoard, t: float, L: Dictionary) -> void:
+	for s in L.strokes:
+		var u := clampf((t - float(s.t0)) / maxf(float(s.t1) - float(s.t0), 0.001), 0.0, 1.0)
+		if u <= 0.0: continue
+		var pts := PackedVector2Array()
+		for q in s.pts: pts.append(Vector2(q[0], q[1]) * b.k)
+		var total := 0.0
+		for i in pts.size() - 1: total += pts[i].distance_to(pts[i + 1])
+		var want := total * u; var out := PackedVector2Array([pts[0]])
+		for i in pts.size() - 1:
+			var d := pts[i].distance_to(pts[i + 1])
+			if want >= d: out.append(pts[i + 1]); want -= d
+			else: out.append(pts[i].lerp(pts[i + 1], want / maxf(d, 0.001))); break
+		var col := Color(s.col) if s.has("col") else App.INK
+		if out.size() >= 2: b.draw_polyline(out, col, maxf(1.0, float(s.w) * b.k), true)
+		elif pts.size() == 1: b.draw_circle(pts[0], float(s.w) * b.k, col)
+	for l in L.get("labels", []):
+		if t >= float(l.t): b.draw_string(b.font, Vector2(l.x, l.y) * b.k, TranslationServer.translate(l.text), HORIZONTAL_ALIGNMENT_LEFT, -1, int(float(l.get("s", 18)) * b.k), App.INK)
+
+func lamina(id: String) -> void:
+	Profile.unlock_gallery(id)
+	if auto: return
+	if lam_data.is_empty():
+		var j = JSON.parse_string(FileAccess.get_file_as_string("res://data/laminas.json"))
+		lam_data = j if j is Dictionary else {}
+	if not lam_data.has(id): return
+	var L: Dictionary = lam_data[id]
+	if lam_box == null: _lam_build()
+	var sbw := minf(minf(640.0, size.x - 60.0), (size.y - 160.0) * 640.0 / 420.0)
+	lam_board.custom_minimum_size = Vector2(sbw, sbw * 420.0 / 640.0)
+	lam_cap.custom_minimum_size.x = sbw; lam_cap.text = T(L.caption)
+	move_child(lam_box, get_child_count() - 1); lam_box.visible = true
+	var st := {t = 0.0, n = 0, hold = 1.4}
+	var dur: float = float(L.dur)
+	while true:
+		await get_tree().process_frame
+		var dt := get_process_delta_time()
+		var skip := Input.is_action_just_pressed("advance") or Input.is_action_just_pressed("act") or Input.is_action_pressed("skip_hold") or Input.is_action_just_pressed("ui_accept") or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
+		if st.t >= 1.0:
+			st.hold -= dt
+			if st.hold <= 0.0 or (skip and st.hold < 1.2): break
+		else:
+			st.t = 1.0 if skip and st.t > 0.05 else minf(1.0, st.t + dt / dur)
+			# pluma: un rasgueo cada vez que empieza un trazo
+			var started := 0
+			for s in L.strokes: if st.t >= float(s.t0): started += 1
+			if started > st.n: st.n = started; Snd.sfx("chalk")
+		lam_board.paint(func(b, t): _lam_draw(b, t, L), st.t)
+	lam_box.visible = false
+
+# un documento para leer (galería, prefacio): título, párrafos y «Volver»
+var doc_box: Control
+func show_doc(title_text: String, paras: Array) -> void:
+	if auto: return
+	if doc_box != null: doc_box.queue_free()
+	doc_box = Control.new(); _full(doc_box); add_child(doc_box)
+	var veil := ColorRect.new(); veil.color = Color(App.PAPER, 0.96); _full(veil); doc_box.add_child(veil)
+	var sc := ScrollContainer.new(); _full(sc); sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; doc_box.add_child(sc)
+	var c := CenterContainer.new(); c.size_flags_horizontal = Control.SIZE_EXPAND_FILL; sc.add_child(c)
+	var card := PanelContainer.new(); card.add_theme_stylebox_override("panel", _card(App.CARD, 26, 18)); c.add_child(card)
+	var v := VBoxContainer.new(); v.add_theme_constant_override("separation", 10); card.add_child(v)
+	var h := _lbl(T(title_text), F_FELL, 30, App.INK); h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; h.custom_minimum_size.x = minf(size.x - 100, 680); v.add_child(h)
+	for p in paras:
+		var r := _rich(20, App.INK); r.text = fmt(T(p)); r.custom_minimum_size.x = minf(size.x - 100, 680); v.add_child(r)
+	var b := _btn(T("Volver"), "primary", 15, 46); b.pressed.connect(func(): Snd.sfx("ui"); doc_closed.emit()); v.add_child(b)
+	b.grab_focus()
+	await doc_closed
+	doc_box.queue_free(); doc_box = null
+
 # la pizarra en la que dibuja el jugador (S-11): ocupa el sitio de la de tiza
 var draw_b: DrawBoard
 func draw_board(show: bool, cap := "") -> DrawBoard:

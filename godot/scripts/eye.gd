@@ -17,6 +17,7 @@ var desat := 0.0         # la línea en gris (C4-03)
 var lens := "line"
 var squeeze := 0.0
 var grow := 0.0
+var hue := 0.0           # giro de tono de la lente flood (C9-01), en vueltas
 var _cpu := []           # segmentos relativos al ojo, para consultas puntuales: [ax, ay, bx, by, id]
 var _facing := 0.0
 
@@ -187,6 +188,7 @@ func step(dt: float) -> void:
 	else: squeeze = move_toward(squeeze, want_sq, sp)
 	view_mat.set_shader_parameter("u_squeeze", App.ease(squeeze))
 	view_mat.set_shader_parameter("u_grow", App.ease(grow))
+	view_mat.set_shader_parameter("u_hue", hue)
 
 func set_lens(l: String, instant := false) -> void:
 	lens = l

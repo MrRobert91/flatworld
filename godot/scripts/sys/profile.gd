@@ -131,6 +131,12 @@ func mark_picked(key: String) -> void:
 func picked(key: String) -> bool:
 	return data.picked.has(key)
 
+# modos que se abren al terminar (C10-09): el modo Colegio
+func unlock_mode(id: String) -> void:
+	if not data.has("modes"): data.modes = {}
+	if data.modes.has(id): return
+	data.modes[id] = 1; touch(0.0)
+
 func unlock_gallery(id: String) -> void:
 	if data.gallery.has(id): return
 	data.gallery[id] = 1; touch(0.0)

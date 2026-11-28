@@ -80,9 +80,25 @@ func _menu_main() -> void:
 	if used.size() > 1 or (used.size() == 1 and used[0].n != g.slot): items.append(["Cargar partida", func(_b): _menu_slots(false)])
 	var mx := maxi(int(Profile.data.max_chapter), int(S.max))
 	if mx > 0: items.append(["Capítulos", "chapters"])
+	if not (Profile.data.get("gallery", {}) as Dictionary).is_empty(): items.append(["Galería", func(_b): _menu_gallery()])
 	var names := []
 	for c in chapters: names.append(c[0])
 	ui.show_menu(items, names, mx, _start)
+
+# la galería (S-16): láminas vistas, notas al margen recogidas y, tras el final, el Prefacio del Editor
+func _menu_gallery() -> void:
+	var G: Dictionary = Profile.data.get("gallery", {})
+	var items := []
+	for i in chapters.size():
+		var id := "lam_%d" % i
+		if G.has(id): items.append([ui.T("Lámina") + " · " + ui.T(chapters[i][0]), func(_b): await ui.lamina(id), "sub"])
+	for m in g.book.get("margins", []):
+		if G.has(m.id): items.append([m.title, func(_b): await ui.show_doc(m.title, [m.text]), "sub"])
+	if G.has("prefacio"):
+		var P: Dictionary = g.book.get("prefacio", {})
+		items.append([P.get("title", "Prefacio"), func(_b): await ui.show_doc(P.title, P.text), "sub"])
+	items.append(["Volver", func(_b): _menu_main(), "sub"])
+	ui.show_menu(items, [], -1, _start)
 
 # los tres huecos (T-12): «Nueva partida» pide hueco y nunca borra sin confirmar dos veces
 func _menu_slots(new_game: bool) -> void:
@@ -116,7 +132,7 @@ func _try(name: String) -> void:
 	g.running = true
 	g.on_menu = func(): ui.toggle_pause(func(): get_tree().quit())
 	if name in ["exam", "woman", "hymn", "mend", "bridge"]: await (get_meta("keep")[1] as ChB).try_mini(name)
-	elif name in ["ascent", "sections", "shadow", "carry", "tess"]: await (get_meta("keep")[3] as ChD).try_mini(name)
+	elif name in ["ascent", "sections", "shadow", "carry", "tess", "lamina", "restraint", "brother", "closing", "treatise"]: await (get_meta("keep")[3] as ChD).try_mini(name)
 	elif name in ["kingview", "section", "ear", "harmony", "square", "cube", "sphere", "table", "cupboard"]: await (get_meta("keep")[2] as ChC).try_mini(name)
 	else: await (get_meta("keep")[0] as ChA).try_mini(name)
 	print("TRY OK ", name)
